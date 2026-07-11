@@ -59,25 +59,25 @@ export function LinkRiotForm({
         <div className="flex-1">
           <label className="text-sm font-medium text-slate-400 mb-1.5 block">Game Name</label>
           <Input 
-            placeholder="Ex: TenZ" 
+            placeholder="Ex: Player One" 
             value={gameName}
             onChange={(e) => setGameName(e.target.value)}
             required
-            minLength={3}
-            maxLength={16}
+            minLength={1}
+            maxLength={30}
           />
         </div>
-        <div className="w-24">
+        <div className="w-28">
           <label className="text-sm font-medium text-slate-400 mb-1.5 block">Tagline</label>
           <div className="relative">
             <span className="absolute left-3 top-2.5 text-slate-500">#</span>
             <Input 
               className="pl-7" 
-              placeholder="000"
+              placeholder="EUW"
               value={tagLine}
-              onChange={(e) => setTagLine(e.target.value.replace(/^#/, ''))}
+              onChange={(e) => setTagLine(e.target.value.replace(/^#/, '').replace(/\s/g, ''))}
               required
-              minLength={3}
+              minLength={1}
               maxLength={5}
             />
           </div>

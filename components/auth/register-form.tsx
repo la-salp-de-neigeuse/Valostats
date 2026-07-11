@@ -8,24 +8,26 @@ import { Button } from "@/components/ui/button";
 
 export function RegisterForm() {
   const router = useRouter();
+  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    event.stopPropagation();
+
+    if (isLoading) return;
+
     setIsLoading(true);
     setError(null);
-
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get("email") as string;
-    const name = formData.get("name") as string;
-    const password = formData.get("password") as string;
 
     try {
       const response = await fetch("/api/user/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name, password }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), password }),
       });
 
       const data = await response.json();
@@ -34,9 +36,8 @@ export function RegisterForm() {
         throw new Error(data.error || "Une erreur est survenue lors de l'inscription.");
       }
 
-      // Connexion automatique
       const result = await signIn("credentials", {
-        email,
+        email: email.trim(),
         password,
         redirect: false,
       });
@@ -59,7 +60,7 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} noValidate className="space-y-4">
       {error && (
         <div className="rounded-md bg-red-950/50 p-3 text-sm text-red-400 border border-red-900/50" role="alert" aria-live="assertive">
           {error}
@@ -67,15 +68,38 @@ export function RegisterForm() {
       )}
       <div className="space-y-2">
         <label htmlFor="name" className="text-sm font-medium">Pseudo Riot</label>
-        <Input id="name" name="name" type="text" placeholder="JettMain" required disabled={isLoading} />
+        <Input
+          id="name"
+          type="text"
+          placeholder="JettMain"
+          required
+          disabled={isLoading}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
       </div>
       <div className="space-y-2">
         <label htmlFor="email" className="text-sm font-medium">Email</label>
-        <Input id="email" name="email" type="email" placeholder="joueur@exemple.com" required disabled={isLoading} />
+        <Input
+          id="email"
+          type="email"
+          placeholder="joueur@exemple.com"
+          required
+          disabled={isLoading}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
       </div>
       <div className="space-y-2">
         <label htmlFor="password" className="text-sm font-medium">Mot de passe</label>
-        <Input id="password" name="password" type="password" required disabled={isLoading} />
+        <Input
+          id="password"
+          type="password"
+          required
+          disabled={isLoading}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
         <p className="text-xs text-zinc-500">Min 12 caractères, Maj, Min, Chiffre, Symbole.</p>
       </div>
       <Button type="submit" className="w-full" isLoading={isLoading}>

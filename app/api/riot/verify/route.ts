@@ -50,10 +50,10 @@ export async function POST(request: Request) {
           { status: 429 }
         );
       }
-      if (error.status === 403) {
+      if (error.status === 401 || error.status === 403) {
         return NextResponse.json(
           { error: "Clé API Riot invalide ou expirée. Contactez l'administrateur." },
-          { status: 403 }
+          { status: 500 }
         );
       }
       return NextResponse.json(

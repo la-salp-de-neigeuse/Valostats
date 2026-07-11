@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { RiotApiError } from "@/services/riot/api-client";
 
 export class HttpError extends Error {
   constructor(
@@ -41,6 +42,10 @@ export async function readJsonBody(request: Request): Promise<unknown> {
 export function jsonError(error: unknown): NextResponse {
   if (error instanceof HttpError) {
     return NextResponse.json({ error: error.message }, { status: error.status });
+  }
+
+  if (error instanceof RiotApiError) {
+    return NextResponse.json({ error: error.message }, { status: 503 });
   }
 
   if (error instanceof Error) {

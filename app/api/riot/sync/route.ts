@@ -6,6 +6,20 @@ import { prisma } from "@/lib/prisma/client";
 import { createJobRunnerId, runJobById } from "@/jobs/orchestrator";
 import { checkRateLimit } from "@/lib/security/rate-limit";
 
+function errorToUserMessage(error: string | undefined | null): string {
+  if (!error) return "Échec de la synchronisation.";
+  if (error.includes("Rate limit") || error.includes("429")) {
+    return "L'API Riot est momentanément saturée. Réessayez dans quelques minutes.";
+  }
+  if (error.includes("Clé API") || error.includes("401") || error.includes("403")) {
+    return "Erreur de configuration de l'API Riot. Contactez l'administrateur.";
+  }
+  if (error.includes("introuvable") || error.includes("404")) {
+    return "Certains matchs n'ont pas pu être récupérés. La synchronisation est partielle.";
+  }
+  return `Échec de la synchronisation : ${error}`;
+}
+
 export async function POST(request: Request) {
   try {
     assertSameOrigin(request);
@@ -118,10 +132,12 @@ export async function POST(request: Request) {
       );
     }
 
+    const userMessage = errorToUserMessage(execution.error);
     return NextResponse.json(
       {
-        error: execution.error ?? "Echec de la synchronisation",
+        error: userMessage,
         jobId: execution.jobId,
+        detail: execution.error,
       },
       { status: 500 }
     );

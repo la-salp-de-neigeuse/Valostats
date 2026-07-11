@@ -30,17 +30,23 @@ export async function getOverlayData(slug: string): Promise<OverlayData | null> 
     select: {
       id: true,
       name: true,
+      visibility: true,
       riotAccount: {
         select: { gameName: true, tagLine: true, currentRank: true, currentRankTier: true, lastSyncAt: true },
+      },
+      settings: {
+        select: { showRankPublicly: true },
       },
     },
   });
 
   if (!user) return null;
+  if (user.visibility !== "PUBLIC") return null;
 
   const serviceUserId = user.id;
+  const canShowRank = user.settings?.showRankPublicly ?? false;
 
-  const [aggregate, analysis, settings, recentMatches, goals, latestInsight] = await Promise.all([
+  const [aggregate, analysis, overlayConfig, recentMatches, goals, latestInsight] = await Promise.all([
     prisma.playerStatAggregate.findFirst({
       where: { userId: serviceUserId, period: "ALL_TIME" },
       orderBy: { computedAt: "desc" },
@@ -94,7 +100,6 @@ export async function getOverlayData(slug: string): Promise<OverlayData | null> 
   }));
 
   const winStreak = computeWinStreak(lastMatches);
-
   const lastMatchEntry = lastMatches[0] ?? null;
 
   const agentAggs = await prisma.playerAgentAggregate.findMany({
@@ -106,12 +111,12 @@ export async function getOverlayData(slug: string): Promise<OverlayData | null> 
 
   return {
     playerName,
-    rank: user.riotAccount?.currentRank ?? aggregate?.rank ?? null,
-    rankTier: user.riotAccount?.currentRankTier ?? aggregate?.rankTier ?? null,
-    rankProgressValue: Number(aggregate?.rankProgressValue ?? 0),
-    winRate: Number(aggregate?.winRate ?? 0),
-    kda: Number(aggregate?.averageKda ?? 0),
-    aiScore: analysis ? analysis.score : null,
+    rank: canShowRank ? (user.riotAccount?.currentRank ?? aggregate?.rank ?? null) : null,
+    rankTier: canShowRank ? (user.riotAccount?.currentRankTier ?? aggregate?.rankTier ?? null) : null,
+    rankProgressValue: canShowRank ? Number(aggregate?.rankProgressValue ?? 0) : 0,
+    winRate: canShowRank ? Number(aggregate?.winRate ?? 0) : 0,
+    kda: canShowRank ? Number(aggregate?.averageKda ?? 0) : 0,
+    aiScore: canShowRank ? (analysis ? analysis.score : null) : null,
     matchCount: aggregate?.matchCount ?? 0,
     wins: aggregate?.wins ?? 0,
     losses: aggregate?.losses ?? 0,
@@ -128,6 +133,6 @@ export async function getOverlayData(slug: string): Promise<OverlayData | null> 
       ? { problem: latestInsight.insights[0].problem, solution: latestInsight.insights[0].solution }
       : null,
     syncTimeAgo: formatSyncTime(user.riotAccount?.lastSyncAt ?? null),
-    settings,
+    settings: overlayConfig,
   };
 }

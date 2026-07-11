@@ -36,45 +36,36 @@ export async function getV2DashboardData(userId: string): Promise<V2DashboardDat
 }
 
 async function getHeatmapData(userId: string): Promise<HeatmapCell[]> {
-  const aggregates = await prisma.playerAgentAggregate.findMany({
-    where: { userId, period: "ALL_TIME" },
-    select: { agentName: true, winRate: true },
-  });
+  const [totalStats, winStats] = await Promise.all([
+    prisma.playerMatchStats.groupBy({
+      by: ["agentName", "mapName"],
+      where: { userId },
+      _count: true,
+    }),
+    prisma.playerMatchStats.groupBy({
+      by: ["agentName", "mapName"],
+      where: { userId, result: "WIN" },
+      _count: true,
+    }),
+  ]);
 
-  if (aggregates.length === 0) return [];
-
-  const agentNames = aggregates.map((a) => a.agentName);
-
-  const maps = await prisma.playerMapAggregate.findMany({
-    where: { userId, period: "ALL_TIME" },
-    select: { mapName: true },
-  });
-
-  const mapNames = [...new Set(maps.map((m) => m.mapName))];
-  const cells: HeatmapCell[] = [];
-
-  for (const agent of agentNames) {
-    for (const mapName of mapNames) {
-      const matchCount = await prisma.playerMatchStats.count({
-        where: { userId, agentName: agent, mapName },
-      });
-
-      if (matchCount === 0) continue;
-
-      const winRecords = await prisma.playerMatchStats.count({
-        where: { userId, agentName: agent, mapName, result: "WIN" },
-      });
-
-      cells.push({
-        agentName: agent,
-        mapName,
-        matchCount,
-        winRate: Math.round((winRecords / matchCount) * 100),
-      });
-    }
+  const winMap = new Map<string, number>();
+  for (const w of winStats) {
+    winMap.set(`${w.agentName}|${w.mapName}`, w._count);
   }
 
-  return cells;
+  return totalStats
+    .filter((t) => t._count > 0)
+    .map((t) => {
+      const matchCount = t._count;
+      const wins = winMap.get(`${t.agentName}|${t.mapName}`) ?? 0;
+      return {
+        agentName: t.agentName,
+        mapName: t.mapName,
+        matchCount,
+        winRate: Math.round((wins / matchCount) * 100),
+      };
+    });
 }
 
 async function getTimelineData(userId: string): Promise<TimelineEntry[]> {

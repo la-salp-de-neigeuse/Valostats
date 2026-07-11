@@ -107,7 +107,7 @@ export async function updateUserRole(
   });
 }
 
-export async function getAllUsersWithRoles() {
+export async function getAllUsersWithRoles(limit = 1_000) {
   return prisma.user.findMany({
     where: { deletedAt: null },
     select: {
@@ -120,5 +120,6 @@ export async function getAllUsersWithRoles() {
       createdAt: true,
     },
     orderBy: [{ role: "desc" }, { createdAt: "desc" }],
+    take: limit,
   });
 }

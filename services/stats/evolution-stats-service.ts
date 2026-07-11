@@ -55,6 +55,7 @@ export async function getEvolutionData(userId: string): Promise<EvolutionBlock[]
       deaths: true,
       matchStartedAt: true,
     },
+    take: 1_000,
   });
 
   if (matches.length < 2) return [];

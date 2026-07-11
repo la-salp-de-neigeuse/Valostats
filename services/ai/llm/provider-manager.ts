@@ -81,8 +81,8 @@ async function getUserConfig(userId: string): Promise<Partial<ProviderConfig> | 
     provider: settings.preferredProvider as LLMProviderType,
     model: settings.preferredModel || undefined,
     temperature: Number(settings.temperature),
-    maxTokens: settings.maxTokens,
-    timeout: settings.llmTimeout,
+    maxTokens: settings.maxTokens ?? undefined,
+    timeout: settings.llmTimeout ?? undefined,
   };
 }
 

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma/client";
 import { createNotification } from "@/services/notifications/notifications-service";
-import { getAllUsersWithRoles } from "@/services/roles/role-service";
+import { dispatchChannel } from "@/services/notifications/channels/dispatcher";
 import { canViewFeedback } from "@/services/roles/types";
 import type { UserRole } from "@prisma/client";
 import type {
@@ -71,15 +71,29 @@ export async function createFeedback(params: {
     include: { user: { select: { name: true, email: true } } },
   });
 
-  const admins = await getAllUsersWithRoles();
-  for (const admin of admins) {
-    if (canViewFeedback(admin.role as UserRole)) {
-      await createNotification({
-        userId: admin.id,
+  const adminRoles: UserRole[] = ["OWNER", "DEVELOPER", "ADMINISTRATOR", "MODERATOR"];
+  const admins = await prisma.user.findMany({
+    where: { role: { in: adminRoles }, deletedAt: null },
+    select: { id: true },
+  });
+
+  if (admins.length > 0) {
+    await prisma.notification.createMany({
+      data: admins.map((a) => ({
+        userId: a.id,
         type: "FEEDBACK_CREATED",
+        channel: "IN_APP",
         title: `Nouveau feedback : ${params.title}`,
         body: `${params.type} — ${params.description.slice(0, 100)}${params.description.length > 100 ? "..." : ""}`,
         link: "/admin/feedback",
+        metadata: { feedbackId: String(created.id) } as never,
+      })),
+    });
+
+    for (const admin of admins) {
+      dispatchChannel(admin.id, "FEEDBACK_CREATED", {
+        title: `Nouveau feedback : ${params.title}`,
+        body: `${params.type} — ${params.description.slice(0, 100)}${params.description.length > 100 ? "..." : ""}`,
         metadata: { feedbackId: String(created.id) },
       });
     }
