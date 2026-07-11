@@ -18,22 +18,23 @@ function round(value: number, decimals = 2): number {
 function computeMetrics(aggregate: AggregateStats | null, userId: string): Promise<PerformanceMetrics> {
   return (async () => {
     const raw = aggregate
-      ? await prisma.playerMatchStats.findMany({
-          where: { userId },
-          select: {
-            openingDuelsTaken: true,
-            openingDuelsWon: true,
-            firstBloods: true,
-            firstDeaths: true,
-            plants: true,
-            defuses: true,
-            roundsPlayed: true,
-            kills: true,
-            deaths: true,
-            result: true,
-          },
-        })
-      : [];
+  ? await prisma.playerMatchStats.findMany({
+      where: { userId },
+      select: {
+        openingDuelsTaken: true,
+        openingDuelsWon: true,
+        firstBloods: true,
+        firstDeaths: true,
+        plants: true,
+        defuses: true,
+        roundsPlayed: true,
+        kills: true,
+        deaths: true,
+        result: true,
+      },
+      take: 1_000,
+    })
+  : [];
 
     const totals = raw.reduce(
       (acc, m) => {

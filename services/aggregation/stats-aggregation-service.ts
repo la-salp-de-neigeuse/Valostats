@@ -189,27 +189,28 @@ async function calculatePlayerStatAggregate(
   const mainAgent = agentGroups[0]?.agentName ?? null;
 
   // Find best and worst maps by win rate
-  const mapsWithStats = await Promise.all(
-    mapGroups.map(async (group) => {
-      const wins = await prisma.playerMatchStats.count({
-        where: {
-          userId,
-          mapName: group.mapName,
-          result: "WIN",
-          matchStartedAt: { gte: windowStart, lte: windowEnd },
-        },
-      });
+  const mapWinCounts = await prisma.playerMatchStats.groupBy({
+    by: ["mapName"],
+    where: {
+      userId,
+      result: "WIN",
+      matchStartedAt: { gte: windowStart, lte: windowEnd },
+    },
+    _count: true,
+  });
 
-      const matchCount = group._count._all;
-      const winRate = matchCount > 0 ? (wins / matchCount) * 100 : 0;
+  const winMap = new Map(mapWinCounts.map((w) => [w.mapName, w._count]));
+  const mapsWithStats = mapGroups.map((group) => {
+    const matchCount = group._count._all;
+    const wins = winMap.get(group.mapName) ?? 0;
+    const winRate = matchCount > 0 ? (wins / matchCount) * 100 : 0;
 
-      return {
-        mapName: group.mapName,
-        matchCount,
-        winRate,
-      };
-    }),
-  );
+    return {
+      mapName: group.mapName,
+      matchCount,
+      winRate,
+    };
+  });
 
   const mapsWithMinMatches = mapsWithStats.filter((map) => map.matchCount >= 3);
   const bestMap = mapsWithMinMatches.length > 0
@@ -267,33 +268,34 @@ async function calculatePlayerAgentAggregate(
     },
   });
 
-  const result = await Promise.all(
-    agentGroups.map(async (group) => {
-      const wins = await prisma.playerMatchStats.count({
-        where: {
-          userId,
-          agentName: group.agentName,
-          result: "WIN",
-          matchStartedAt: { gte: windowStart, lte: windowEnd },
-        },
-      });
+  const agentWinCounts = await prisma.playerMatchStats.groupBy({
+    by: ["agentName"],
+    where: {
+      userId,
+      result: "WIN",
+      matchStartedAt: { gte: windowStart, lte: windowEnd },
+    },
+    _count: true,
+  });
 
-      const matchCount = group._count._all;
-      const totalKills = (group._avg.kills ?? 0) * matchCount;
-      const totalDeaths = (group._avg.deaths ?? 0) * matchCount;
-      const averageKda = totalDeaths > 0 ? totalKills / totalDeaths : totalKills;
-      const winRate = (wins / matchCount) * 100;
-      const damagePerRound = Number(group._avg.damagePerRound ?? 0);
+  const winMap = new Map(agentWinCounts.map((w) => [w.agentName, w._count]));
+  const result = agentGroups.map((group) => {
+    const matchCount = group._count._all;
+    const wins = winMap.get(group.agentName) ?? 0;
+    const totalKills = (group._avg.kills ?? 0) * matchCount;
+    const totalDeaths = (group._avg.deaths ?? 0) * matchCount;
+    const averageKda = totalDeaths > 0 ? totalKills / totalDeaths : totalKills;
+    const winRate = (wins / matchCount) * 100;
+    const damagePerRound = Number(group._avg.damagePerRound ?? 0);
 
-      return {
-        agentName: group.agentName,
-        matchCount,
-        winRate,
-        averageKda,
-        damagePerRound,
-      };
-    }),
-  );
+    return {
+      agentName: group.agentName,
+      matchCount,
+      winRate,
+      averageKda,
+      damagePerRound,
+    };
+  });
 
   return result;
 }
@@ -324,41 +326,42 @@ async function calculatePlayerMapAggregate(
     },
   });
 
-  const result = await Promise.all(
-    mapGroups.map(async (group) => {
-      const wins = await prisma.playerMatchStats.count({
-        where: {
-          userId,
-          mapName: group.mapName,
-          result: "WIN",
-          matchStartedAt: { gte: windowStart, lte: windowEnd },
-        },
-      });
+  const mapWinCounts = await prisma.playerMatchStats.groupBy({
+    by: ["mapName"],
+    where: {
+      userId,
+      result: "WIN",
+      matchStartedAt: { gte: windowStart, lte: windowEnd },
+    },
+    _count: true,
+  });
 
-      const matchCount = group._count._all;
-      const totalKills = (group._avg.kills ?? 0) * matchCount;
-      const totalDeaths = (group._avg.deaths ?? 0) * matchCount;
-      const averageKda = totalDeaths > 0 ? totalKills / totalDeaths : totalKills;
-      const winRate = (wins / matchCount) * 100;
+  const winMap = new Map(mapWinCounts.map((w) => [w.mapName, w._count]));
+  const result = mapGroups.map((group) => {
+    const matchCount = group._count._all;
+    const wins = winMap.get(group.mapName) ?? 0;
+    const totalKills = (group._avg.kills ?? 0) * matchCount;
+    const totalDeaths = (group._avg.deaths ?? 0) * matchCount;
+    const averageKda = totalDeaths > 0 ? totalKills / totalDeaths : totalKills;
+    const winRate = (wins / matchCount) * 100;
 
-      const totalAttackRoundsWon = group._sum.attackRoundsWon ?? 0;
-      const totalAttackRoundsPlayed = group._sum.attackRoundsPlayed ?? 0;
-      const totalDefenseRoundsWon = group._sum.defenseRoundsWon ?? 0;
-      const totalDefenseRoundsPlayed = group._sum.defenseRoundsPlayed ?? 0;
+    const totalAttackRoundsWon = group._sum.attackRoundsWon ?? 0;
+    const totalAttackRoundsPlayed = group._sum.attackRoundsPlayed ?? 0;
+    const totalDefenseRoundsWon = group._sum.defenseRoundsWon ?? 0;
+    const totalDefenseRoundsPlayed = group._sum.defenseRoundsPlayed ?? 0;
 
-      const attackWinRate = totalAttackRoundsPlayed > 0 ? (totalAttackRoundsWon / totalAttackRoundsPlayed) * 100 : 0;
-      const defenseWinRate = totalDefenseRoundsPlayed > 0 ? (totalDefenseRoundsWon / totalDefenseRoundsPlayed) * 100 : 0;
+    const attackWinRate = totalAttackRoundsPlayed > 0 ? (totalAttackRoundsWon / totalAttackRoundsPlayed) * 100 : 0;
+    const defenseWinRate = totalDefenseRoundsPlayed > 0 ? (totalDefenseRoundsWon / totalDefenseRoundsPlayed) * 100 : 0;
 
-      return {
-        mapName: group.mapName,
-        matchCount,
-        winRate,
-        attackWinRate,
-        defenseWinRate,
-        averageKda,
-      };
-    }),
-  );
+    return {
+      mapName: group.mapName,
+      matchCount,
+      winRate,
+      attackWinRate,
+      defenseWinRate,
+      averageKda,
+    };
+  });
 
   return result;
 }

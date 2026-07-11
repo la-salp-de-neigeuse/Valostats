@@ -241,6 +241,7 @@ export async function getGoals(userId: string, status?: string, type?: string): 
   const goals = await prisma.goal.findMany({
     where,
     orderBy: [{ priority: "desc" }, { deadline: "asc" }],
+    take: 100,
   });
 
   return goals.map((g) => toGoalWithProgress({
@@ -270,6 +271,7 @@ export async function recalculateGoals(userId: string): Promise<void> {
 
   const activeGoals = await prisma.goal.findMany({
     where: { userId, status: "IN_PROGRESS" },
+    take: 100,
   });
 
   const activeGoalTitles = new Set(activeGoals.map((g) => g.title));
@@ -414,6 +416,7 @@ export async function getGoalStats(userId: string): Promise<GoalStats> {
     prisma.goal.findMany({
       where: { userId },
       orderBy: { completedAt: "desc" },
+      take: 1_000,
       select: { completedAt: true, difficulty: true, status: true, updatedAt: true },
     }),
   ]);

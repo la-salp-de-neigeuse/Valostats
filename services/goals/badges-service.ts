@@ -32,6 +32,7 @@ export async function checkAndUnlockBadges(userId: string): Promise<Badge[]> {
     prisma.badge.findMany({
       where: { userId },
       select: { badgeId: true },
+      take: 200,
     }),
   ]);
 
@@ -113,6 +114,7 @@ export async function getBadges(userId: string): Promise<Badge[]> {
   const badges = await prisma.badge.findMany({
     where: { userId },
     orderBy: { unlockedAt: "desc" },
+    take: 200,
   });
 
   return badges.map(toBadge);
