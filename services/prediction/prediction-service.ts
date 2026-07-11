@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma/client";
 import { getLatestAnalysis } from "@/services/ai/ai-analysis-service";
+import { getOrSet } from "@/lib/cache/cache-service";
+import { predictionKey, TTL } from "@/lib/cache/keys";
 import {
   getAggregateStatsByPeriod,
   getAgentAggregatesByPeriod,
@@ -98,7 +100,8 @@ export async function getPrediction(
   userId: string,
   weights: PredictionWeights = DEFAULT_WEIGHTS,
 ): Promise<PredictionResult | null> {
-  const [riotAccount, matches, analysis, aggregateStats, agents, maps] = await Promise.all([
+  return getOrSet(predictionKey(userId), async () => {
+    const [riotAccount, matches, analysis, aggregateStats, agents, maps] = await Promise.all([
     prisma.riotAccount.findUnique({
       where: { userId },
       select: { currentRank: true, currentRankTier: true },
@@ -106,6 +109,7 @@ export async function getPrediction(
     prisma.playerMatchStats.findMany({
       where: { userId, rankTierAtMatch: { not: null } },
       orderBy: { matchStartedAt: "asc" },
+      take: 500,
       select: {
         result: true,
         kills: true,
@@ -317,4 +321,5 @@ export async function getPrediction(
     topAgents: agents.slice(0, 3).map(a => ({ name: a.agentDisplayName, matchCount: a.matchCount, winRate: a.winRate })),
     topMaps: maps.slice(0, 3).map(m => ({ name: m.mapName, matchCount: m.matchCount, winRate: m.winRate })),
   };
+  }, TTL.PREDICTION);
 }

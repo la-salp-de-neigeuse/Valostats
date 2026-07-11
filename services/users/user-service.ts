@@ -55,6 +55,16 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 
 export async function registerUser(input: RegisterInput) {
   const normalizedEmail = normalizeEmail(input.email);
+
+  const existing = await prisma.user.findUnique({
+    where: { normalizedEmail },
+    select: { id: true },
+  });
+
+  if (existing) {
+    throw new Error("Un compte existe déjà avec cet email.");
+  }
+
   const passwordHash = await hashPassword(input.password);
   const publicSlug = createPublicSlug(input.name || "player");
 

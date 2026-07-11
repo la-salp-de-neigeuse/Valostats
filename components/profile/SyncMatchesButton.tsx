@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/toast";
 
 type SyncState = "idle" | "loading" | "success" | "error";
 
@@ -18,6 +19,7 @@ export function SyncMatchesButton({ lastSyncAt }: { lastSyncAt: Date | null }) {
   const [errorMsg, setErrorMsg] = useState("");
   const [syncResult, setSyncResult] = useState<SyncResult | null>(null);
   const router = useRouter();
+  const { addToast } = useToast();
 
   async function handleSync() {
     setState("loading");
@@ -31,15 +33,22 @@ export function SyncMatchesButton({ lastSyncAt }: { lastSyncAt: Date | null }) {
       if (!res.ok) {
         setErrorMsg(data.error || "Une erreur est survenue");
         setState("error");
+        addToast({ variant: "error", title: "Sync échouée", description: data.error || "Une erreur est survenue" });
         return;
       }
 
       setSyncResult(data.result);
       setState("success");
+      addToast({
+        variant: "success",
+        title: "Synchronisation terminée",
+        description: `${data.result.matchesInserted} match(s) importé(s), ${data.result.playerStatsInserted} stat(s) enregistrée(s)`,
+      });
       router.refresh();
     } catch {
       setErrorMsg("Impossible de contacter le serveur.");
       setState("error");
+      addToast({ variant: "error", title: "Sync échouée", description: "Impossible de contacter le serveur." });
     }
   }
 
@@ -86,14 +95,14 @@ export function SyncMatchesButton({ lastSyncAt }: { lastSyncAt: Date | null }) {
       </button>
 
       {state === "success" && syncResult && (
-        <p className="text-xs text-emerald-400 leading-relaxed">
+        <p className="text-xs text-emerald-400/70 leading-relaxed animate-fade-in">
           {syncResult.matchesInserted} match(s) importé(s), {syncResult.playerStatsInserted} stat(s) enregistrée(s)
           {syncResult.skippedDuplicates > 0 && ` (${syncResult.skippedDuplicates} déjà présents)`}.
         </p>
       )}
 
       {state === "error" && (
-        <p className="text-xs text-rose-400 leading-relaxed">{errorMsg}</p>
+        <p className="text-xs text-rose-400/70 leading-relaxed animate-fade-in">{errorMsg}</p>
       )}
     </div>
   );

@@ -16,6 +16,7 @@ export type OverlayWidgetType =
   | "recentMatches"
   | "lastMatch"
   | "mainAgent"
+  | "bestAgent"
   | "winStreak"
   | "lastResult"
   | "progression"
@@ -51,6 +52,8 @@ export interface OverlaySettings {
   showBorder: boolean;
   borderRadius: number;
   fontScale: number;
+  shadow: boolean;
+  shadowBlur: number;
 }
 
 const DEFAULT_WIDGETS: OverlayWidgetConfig[] = [
@@ -63,7 +66,8 @@ const DEFAULT_WIDGETS: OverlayWidgetConfig[] = [
   { type: "winStreak", visible: true, x: 2, y: 1, w: 2, h: 1 },
   { type: "lastResult", visible: true, x: 4, y: 1, w: 2, h: 1 },
   { type: "mainAgent", visible: true, x: 6, y: 1, w: 2, h: 1 },
-  { type: "lastMatch", visible: true, x: 8, y: 1, w: 4, h: 1 },
+  { type: "bestAgent", visible: true, x: 8, y: 1, w: 2, h: 1 },
+  { type: "lastMatch", visible: true, x: 10, y: 1, w: 2, h: 1 },
   { type: "progression", visible: true, x: 0, y: 2, w: 4, h: 1 },
   { type: "goalOfDay", visible: true, x: 4, y: 2, w: 3, h: 1 },
   { type: "lastAiInsight", visible: true, x: 7, y: 2, w: 3, h: 1 },
@@ -90,6 +94,8 @@ export const DEFAULT_OVERLAY_SETTINGS: OverlaySettings = {
   showBorder: true,
   borderRadius: 12,
   fontScale: 100,
+  shadow: true,
+  shadowBlur: 12,
 };
 
 export const WIDGET_LABELS: Record<OverlayWidgetType, string> = {
@@ -102,6 +108,7 @@ export const WIDGET_LABELS: Record<OverlayWidgetType, string> = {
   recentMatches: "Derniers matchs",
   lastMatch: "Dernier match",
   mainAgent: "Agent principal",
+  bestAgent: "Meilleur agent",
   winStreak: "Série de victoires",
   lastResult: "Dernier résultat",
   progression: "Barre de progression",
@@ -120,6 +127,7 @@ export const WIDGET_SIZES: Record<OverlayWidgetType, { w: number; h: number }> =
   recentMatches: { w: 12, h: 1 },
   lastMatch: { w: 4, h: 1 },
   mainAgent: { w: 2, h: 1 },
+  bestAgent: { w: 2, h: 1 },
   winStreak: { w: 2, h: 1 },
   lastResult: { w: 2, h: 1 },
   progression: { w: 4, h: 1 },
@@ -153,6 +161,7 @@ export interface OverlayData {
   lastMatch: OverlayMatchEntry | null;
   lastAgent: string | null;
   mainAgent: string | null;
+  bestAgent: { name: string; winRate: number } | null;
   winStreak: number;
   lastResult: string | null;
   goalOfDay: { title: string; progress: number; target: number } | null;

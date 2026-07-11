@@ -1,9 +1,5 @@
 import { MatchResult, RiotPlatform, RiotRegionGroup, ValorantQueue } from "@prisma/client";
-import type { RiotMatchDto, RiotMatchPlayerDto, RiotMatchTeamDto } from "./match-api";
-
-// -----------------------------------------------------------------
-// Queue mapping
-// -----------------------------------------------------------------
+import type { RiotMatchDto, RiotMatchPlayerDto, RiotMatchTeamDto } from "@/services/riot-api/match-api";
 
 const QUEUE_ID_TO_ENUM: Record<string, ValorantQueue> = {
   competitive: "COMPETITIVE",
@@ -16,13 +12,8 @@ const QUEUE_ID_TO_ENUM: Record<string, ValorantQueue> = {
 
 function mapQueueId(queueId: string): ValorantQueue {
   const mapped = QUEUE_ID_TO_ENUM[queueId.toLowerCase()];
-  // Fallback sur UNRATED si queue inconnue
   return mapped ?? "UNRATED";
 }
-
-// -----------------------------------------------------------------
-// Map name mapping (mapId → nom lisible)
-// -----------------------------------------------------------------
 
 const MAP_ID_TO_NAME: Record<string, string> = {
   "/Game/Maps/Ascent/Ascent": "Ascent",
@@ -45,10 +36,6 @@ function mapIdToName(mapId: string): string {
   return MAP_ID_TO_NAME[mapId] ?? mapId;
 }
 
-// -----------------------------------------------------------------
-// Result resolution
-// -----------------------------------------------------------------
-
 function resolveResult(playerTeamId: string, teams: RiotMatchTeamDto[]): MatchResult {
   const team = teams.find((t) => t.teamId === playerTeamId);
   if (!team) return "DRAW";
@@ -59,10 +46,6 @@ function resolveResult(playerTeamId: string, teams: RiotMatchTeamDto[]): MatchRe
   return "DRAW";
 }
 
-// -----------------------------------------------------------------
-// Damage calculations
-// -----------------------------------------------------------------
-
 function calcDamagePerRound(player: RiotMatchPlayerDto): number {
   const totalDamage = player.roundDamage.reduce((sum, rd) => sum + rd.damage, 0);
   const rounds = player.stats.roundsPlayed || 1;
@@ -70,8 +53,6 @@ function calcDamagePerRound(player: RiotMatchPlayerDto): number {
 }
 
 function calcHeadshotRate(): number {
-  // L'API Valorant match v1 ne fournit pas le détail hs/body/leg dans le DTO de base.
-  // On retourne 0 par défaut en attendant une source plus précise.
   return 0;
 }
 
@@ -79,10 +60,6 @@ function calcCombatScore(player: RiotMatchPlayerDto): number {
   const rounds = player.stats.roundsPlayed || 1;
   return Math.round((player.stats.score / rounds) * 100) / 100;
 }
-
-// -----------------------------------------------------------------
-// Round stats per player
-// -----------------------------------------------------------------
 
 function calcRoundStats(
   playerPuuid: string,
@@ -95,7 +72,6 @@ function calcRoundStats(
   for (const round of roundResults) {
     if (round.bombPlanter === playerPuuid) plants++;
     if (round.bombDefuser === playerPuuid) defuses++;
-    // firstBlood non disponible directement — on utilise le champ sur le player DTO si présent
   }
 
   return { plants, defuses, firstBloods };
@@ -106,8 +82,6 @@ function calcAttackDefenseStats(
   playerTeamId: string,
   teams: RiotMatchTeamDto[]
 ) {
-  // L'API Valorant match v1 ne sépare pas attack/defense par joueur dans le DTO de base.
-  // On retourne les valeurs de l'équipe comme proxy.
   const team = teams.find((t) => t.teamId === playerTeamId);
   return {
     attackRoundsWon: team ? Math.floor(team.roundsWon / 2) : 0,
@@ -116,10 +90,6 @@ function calcAttackDefenseStats(
     defenseRoundsPlayed: team ? Math.ceil(team.roundsPlayed / 2) : 0,
   };
 }
-
-// -----------------------------------------------------------------
-// Main transform
-// -----------------------------------------------------------------
 
 export interface TransformedMatch {
   match: {
@@ -132,7 +102,6 @@ export interface TransformedMatch {
     gameStartedAt: Date;
     durationSeconds: number;
   };
-  /** Map : puuid → stats à insérer dans PlayerMatchStats (sans userId) */
   playerStatsByPuuid: Map<
     string,
     {

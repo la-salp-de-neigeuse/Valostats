@@ -13,6 +13,7 @@ import {
   WinStreakWidget,
   LastResultWidget,
   MainAgentWidget,
+  BestAgentWidget,
   LastMatchWidget,
   MatchBarWidget,
   GoalWidget,
@@ -33,6 +34,7 @@ const WIDGET_MAP: Record<
   recentMatches: (d) => <MatchBarWidget matches={d.lastMatches} />,
   lastMatch: (d) => <LastMatchWidget match={d.lastMatch} />,
   mainAgent: (d) => <MainAgentWidget mainAgent={d.mainAgent} />,
+  bestAgent: (d) => <BestAgentWidget agent={d.bestAgent} />,
   winStreak: (d) => <WinStreakWidget streak={d.winStreak} />,
   lastResult: (d) => <LastResultWidget lastResult={d.lastResult} />,
   progression: (d) => <ProgressWidget progress={d.rankProgressValue} />,
@@ -96,8 +98,35 @@ export function OverlayRenderer({
   }, [slug]);
 
   useEffect(() => {
-    const id = setInterval(fetchData, intervalMs);
-    return () => clearInterval(id);
+    let id: ReturnType<typeof setInterval> | undefined;
+
+    function startPolling() {
+      if (id) clearInterval(id);
+      id = setInterval(fetchData, intervalMs);
+    }
+
+    function stopPolling() {
+      if (id) {
+        clearInterval(id);
+        id = undefined;
+      }
+    }
+
+    function onVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        fetchData();
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    }
+
+    startPolling();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      stopPolling();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, [fetchData, intervalMs]);
 
   const columns = 12;

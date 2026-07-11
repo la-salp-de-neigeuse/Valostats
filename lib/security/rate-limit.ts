@@ -9,12 +9,23 @@ interface RateLimitEntry {
 const RATE_LIMITS = RATE_LIMIT_CONFIG;
 type RateLimitScope = keyof typeof RATE_LIMITS;
 
+const FALLBACK_STORE_MAX = 10_000;
+
 function buildKey(scope: string, identifier: string): string {
   return `ratelimit:${scope}:${identifier}`;
 }
 
 const fallbackStore = new Map<string, RateLimitEntry>();
 let cleanupTimer: ReturnType<typeof setInterval> | null = null;
+
+function evictOldest(): void {
+  if (fallbackStore.size <= FALLBACK_STORE_MAX) return;
+  const entries = [...fallbackStore.entries()].sort((a, b) => a[1].resetAt - b[1].resetAt);
+  const toDelete = entries.slice(0, fallbackStore.size - FALLBACK_STORE_MAX);
+  for (const [key] of toDelete) {
+    fallbackStore.delete(key);
+  }
+}
 
 function startFallbackCleanup(): void {
   if (cleanupTimer) return;
@@ -25,6 +36,7 @@ function startFallbackCleanup(): void {
         fallbackStore.delete(key);
       }
     }
+    evictOldest();
   }, CLEANUP_INTERVAL_MS);
   if (typeof cleanupTimer === "object" && "unref" in cleanupTimer) {
     cleanupTimer.unref();

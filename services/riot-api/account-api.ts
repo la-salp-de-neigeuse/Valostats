@@ -1,11 +1,11 @@
 import { RiotRegionGroup } from "@prisma/client";
-import { riotFetch, RiotApiError } from "./api-client";
+import { riotFetch, RiotApiError } from "@/services/riot-api/api-client";
 
 const REGION_GROUP_TO_API_ROUTING: Record<RiotRegionGroup, string> = {
   AMERICAS: "americas",
   ASIA: "asia",
   EUROPE: "europe",
-  SEA: "asia", // Fallback sur asia pour l'Account API
+  SEA: "asia",
 };
 
 export interface RiotAccountDto {

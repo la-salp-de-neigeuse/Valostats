@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { RiotApiError } from "@/services/riot/api-client";
+import { RiotApiError } from "@/services/riot-api/api-client";
+import { MAX_BODY_SIZE } from "@/constants/limits";
 
 export class HttpError extends Error {
   constructor(
@@ -32,9 +33,19 @@ export function assertSameOrigin(request: Request): void {
 }
 
 export async function readJsonBody(request: Request): Promise<unknown> {
+  const contentLength = request.headers.get("content-length");
+  if (contentLength && parseInt(contentLength, 10) > MAX_BODY_SIZE) {
+    throw new HttpError(413, "Corps de requête trop volumineux.");
+  }
+
   try {
-    return await request.json();
-  } catch {
+    const text = await request.text();
+    if (text.length > MAX_BODY_SIZE) {
+      throw new HttpError(413, "Corps de requête trop volumineux.");
+    }
+    return JSON.parse(text);
+  } catch (error) {
+    if (error instanceof HttpError) throw error;
     throw new HttpError(400, "Corps JSON invalide.");
   }
 }

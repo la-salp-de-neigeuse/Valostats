@@ -1,11 +1,13 @@
 import { prisma } from "@/lib/prisma/client";
 import { getAggregateStatsByPeriod, getAgentAggregatesByPeriod, getMapAggregatesByPeriod, type StatsPeriod } from "@/services/stats/aggregate-stats-service";
 import { getRecentMatchesForChart } from "@/services/stats/evolution-stats-service";
+import { getOrSet } from "@/lib/cache/cache-service";
+import { publicProfileKey, TTL } from "@/lib/cache/keys";
 import type { PublicProfile, PublicProfileError } from "./types";
 
 export async function getPublicProfile(slug: string, period: StatsPeriod = "all"): Promise<PublicProfile | PublicProfileError> {
-  // Get user by slug with deletedAt
-  const user = await prisma.user.findUnique({
+  return getOrSet(publicProfileKey(slug, period), async () => {
+    const user = await prisma.user.findUnique({
     where: { publicSlug: slug },
     select: {
       id: true,
@@ -61,29 +63,30 @@ export async function getPublicProfile(slug: string, period: StatsPeriod = "all"
     user.settings?.showAiScore ? getLatestAiAnalysis(user.id) : Promise.resolve(null),
   ]);
 
-  return {
-    user: {
-      id: user.id,
-      name: user.name,
-      publicSlug: user.publicSlug,
-      visibility: user.visibility,
-      role: user.role,
-      riotAccount: riotAccount ? {
-        gameName: riotAccount.gameName,
-        tagLine: riotAccount.tagLine,
-        currentRank: riotAccount.currentRank,
-        currentRankTier: riotAccount.currentRankTier,
-        platform: riotAccount.platform,
-        regionGroup: riotAccount.regionGroup,
-      } : null,
-    },
-    stats,
-    agents,
-    maps,
-    recentMatches,
-    aiAnalysis,
-    period,
-  };
+    return {
+      user: {
+        id: user.id,
+        name: user.name,
+        publicSlug: user.publicSlug,
+        visibility: user.visibility,
+        role: user.role,
+        riotAccount: riotAccount ? {
+          gameName: riotAccount.gameName,
+          tagLine: riotAccount.tagLine,
+          currentRank: riotAccount.currentRank,
+          currentRankTier: riotAccount.currentRankTier,
+          platform: riotAccount.platform,
+          regionGroup: riotAccount.regionGroup,
+        } : null,
+      },
+      stats,
+      agents,
+      maps,
+      recentMatches,
+      aiAnalysis,
+      period,
+    };
+  }, TTL.PUBLIC_PROFILE);
 }
 
 async function getLatestAiAnalysis(userId: string) {

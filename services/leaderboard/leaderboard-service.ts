@@ -1,6 +1,8 @@
 import type { AggregatePeriod, LeaderboardSortKey, RiotRegionGroup } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma/client";
+import { getOrSet } from "@/lib/cache/cache-service";
+import { leaderboardKey, TTL } from "@/lib/cache/keys";
 
 export type LeaderboardPeriod = "7d" | "30d" | "all";
 
@@ -68,7 +70,8 @@ function getSortPrisma(sortBy: LeaderboardSortKey) {
 export async function getLeaderboard(
   filters: LeaderboardFilters
 ): Promise<LeaderboardResult> {
-  const aggregatePeriod = mapPeriod(filters.period);
+  return getOrSet(leaderboardKey(filters as unknown as Record<string, unknown>), async () => {
+    const aggregatePeriod = mapPeriod(filters.period);
   const page = Math.max(1, filters.page ?? 1);
   const limit = Math.min(100, Math.max(1, filters.limit ?? 50));
   const skip = (page - 1) * limit;
@@ -164,4 +167,5 @@ export async function getLeaderboard(
     limit,
     totalPages: Math.ceil(total / limit),
   };
+  }, TTL.LEADERBOARD);
 }

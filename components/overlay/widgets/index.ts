@@ -8,6 +8,7 @@ export { AiScoreWidget } from "./AiScoreWidget";
 export { WinStreakWidget } from "./WinStreakWidget";
 export { LastResultWidget } from "./LastResultWidget";
 export { MainAgentWidget } from "./MainAgentWidget";
+export { BestAgentWidget } from "./BestAgentWidget";
 export { LastMatchWidget } from "./LastMatchWidget";
 export { MatchBarWidget } from "./MatchBarWidget";
 export { GoalWidget } from "./GoalWidget";

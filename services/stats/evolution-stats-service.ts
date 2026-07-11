@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma/client";
 import { isPremiumUser } from "@/services/subscription/subscription-service";
 import { mapPeriodToAggregate } from "@/services/stats/aggregate-stats-service";
 import type { StatsPeriod } from "@/services/stats/aggregate-stats-service";
+import { getOrSet } from "@/lib/cache/cache-service";
+import { evolutionKey, periodComparisonKey, recentMatchesKey, TTL } from "@/lib/cache/keys";
 
 export interface EvolutionBlock {
   label: string;
@@ -42,11 +44,12 @@ function round(value: number, decimals: number): number {
   return Math.round(value * factor) / factor;
 }
 
-export async function getEvolutionData(userId: string): Promise<EvolutionBlock[]> {
-  const premium = await isPremiumUser(userId);
-  if (!premium) return [];
+export async function getEvolutionData(userId: string, premium?: boolean): Promise<EvolutionBlock[]> {
+  const hasPremium = premium ?? await isPremiumUser(userId);
+  if (!hasPremium) return [];
 
-  const matches = await prisma.playerMatchStats.findMany({
+  return getOrSet(evolutionKey(userId), async () => {
+    const matches = await prisma.playerMatchStats.findMany({
     where: { userId },
     orderBy: { matchStartedAt: "asc" },
     select: {
@@ -83,14 +86,17 @@ export async function getEvolutionData(userId: string): Promise<EvolutionBlock[]
     });
   }
 
-  return blocks;
+    return blocks;
+  }, TTL.EVOLUTION);
 }
 
-export async function getPerformanceByPeriod(userId: string): Promise<PeriodComparison[]> {
-  const premium = await isPremiumUser(userId);
-  if (!premium) return [];
-  const periods: StatsPeriod[] = ["7d", "30d", "all"];
-  const labels: Record<StatsPeriod, string> = {
+export async function getPerformanceByPeriod(userId: string, premium?: boolean): Promise<PeriodComparison[]> {
+  const hasPremium = premium ?? await isPremiumUser(userId);
+  if (!hasPremium) return [];
+
+  return getOrSet(periodComparisonKey(userId), async () => {
+    const periods: StatsPeriod[] = ["7d", "30d", "all"];
+    const labels: Record<StatsPeriod, string> = {
     "7d": "7 jours",
     "30d": "30 jours",
     all: "Global",
@@ -132,16 +138,20 @@ export async function getPerformanceByPeriod(userId: string): Promise<PeriodComp
     })
   );
 
-  return results.filter((r): r is PeriodComparison => r !== null);
+    return results.filter((r): r is PeriodComparison => r !== null);
+  }, TTL.EVOLUTION);
 }
 
 export async function getRecentMatchesForChart(
   userId: string,
-  limit: number = 15
+  limit: number = 15,
+  premium?: boolean
 ): Promise<RecentMatchPoint[]> {
-  const premium = await isPremiumUser(userId);
-  if (!premium) return [];
-  const matches = await prisma.playerMatchStats.findMany({
+  const hasPremium = premium ?? await isPremiumUser(userId);
+  if (!hasPremium) return [];
+
+  return getOrSet(recentMatchesKey(userId, limit), async () => {
+    const matches = await prisma.playerMatchStats.findMany({
     where: { userId },
     orderBy: { matchStartedAt: "desc" },
     take: limit,
@@ -157,15 +167,16 @@ export async function getRecentMatchesForChart(
     },
   });
 
-  return matches.reverse().map((m) => ({
-    id: String(m.id),
-    result: m.result,
-    kills: m.kills,
-    deaths: m.deaths,
-    assists: m.assists,
-    kdRatio: kdRatio(m.kills, m.deaths),
-    agentName: m.agentName,
-    mapName: m.mapName,
-    playedAt: m.matchStartedAt,
-  }));
+    return matches.reverse().map((m) => ({
+      id: String(m.id),
+      result: m.result,
+      kills: m.kills,
+      deaths: m.deaths,
+      assists: m.assists,
+      kdRatio: kdRatio(m.kills, m.deaths),
+      agentName: m.agentName,
+      mapName: m.mapName,
+      playedAt: m.matchStartedAt,
+    }));
+  }, TTL.MATCH_CHART);
 }

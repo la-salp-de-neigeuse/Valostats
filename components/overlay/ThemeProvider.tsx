@@ -85,6 +85,7 @@ export function OverlayThemeProvider({ settings }: { settings: OverlaySettings }
 
   const borderR = settings.borderRadius;
   const showB = settings.showBorder;
+  const shadowB = settings.shadow;
 
   return (
     <style>{`
@@ -105,6 +106,7 @@ export function OverlayThemeProvider({ settings }: { settings: OverlaySettings }
         background: ${settings.displayMode === "minimal" ? "transparent" : "var(--ol-card)"};
         border: ${showB ? "1px solid var(--ol-border)" : "none"};
         border-radius: ${borderR}px;
+        box-shadow: ${shadowB ? `0 4px ${settings.shadowBlur}px rgba(0,0,0,0.3)` : "none"};
         padding: ${settings.size === "small" ? "8px 12px" : settings.size === "large" ? "16px 24px" : "12px 16px"};
         opacity: var(--ol-opacity);
         backdrop-filter: ${settings.theme === "transparent" || settings.theme === "streamer" ? "blur(8px)" : "none"};

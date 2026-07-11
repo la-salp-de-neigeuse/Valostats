@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { assertSameOrigin, HttpError, jsonError } from "@/lib/security/request";
 import { verifyRiotAccount } from "@/services/riot-account/riot-account-service";
-import { RiotApiError } from "@/services/riot/api-client";
+import { RiotApiError } from "@/services/riot-api/api-client";
 import { checkRateLimit } from "@/lib/security/rate-limit";
 
 export async function POST(request: Request) {

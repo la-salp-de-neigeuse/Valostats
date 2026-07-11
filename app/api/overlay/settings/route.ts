@@ -1,17 +1,23 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/options";
+
+import { getCurrentUser } from "@/lib/auth/session";
+import { assertSameOrigin, HttpError, jsonError } from "@/lib/security/request";
 import { saveOverlaySettings } from "@/services/overlay/overlay-settings-service";
 
+export const runtime = "nodejs";
+
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
+  try {
+    assertSameOrigin(req);
 
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+    const user = await getCurrentUser();
+    if (!user) throw new HttpError(401, "Non authentifié");
+
+    const body = await req.json();
+    await saveOverlaySettings(user.id, body);
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return jsonError(error);
   }
-
-  const body = await req.json();
-  await saveOverlaySettings(session.user.id, body);
-
-  return NextResponse.json({ success: true });
 }

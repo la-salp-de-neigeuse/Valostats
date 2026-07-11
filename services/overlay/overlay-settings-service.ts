@@ -2,6 +2,9 @@ import { prisma } from "@/lib/prisma/client";
 import type { Prisma } from "@prisma/client";
 import type { OverlaySettings, OverlayWidgetConfig } from "./types";
 import { DEFAULT_OVERLAY_SETTINGS } from "./types";
+import type { OverlaySettingsInput } from "@/lib/validation/settings";
+import { cacheDelete } from "@/lib/cache/cache-service";
+import { settingsKey } from "@/lib/cache/keys";
 
 export async function getOverlaySettings(userId: string): Promise<OverlaySettings> {
   const config = await prisma.overlayConfig.findUnique({
@@ -30,6 +33,8 @@ export async function getOverlaySettings(userId: string): Promise<OverlaySetting
     showBorder: (stored.showBorder as boolean) ?? DEFAULT_OVERLAY_SETTINGS.showBorder,
     borderRadius: (stored.borderRadius as number) ?? DEFAULT_OVERLAY_SETTINGS.borderRadius,
     fontScale: (stored.fontScale as number) ?? DEFAULT_OVERLAY_SETTINGS.fontScale,
+    shadow: (stored.shadow as boolean) ?? DEFAULT_OVERLAY_SETTINGS.shadow,
+    shadowBlur: (stored.shadowBlur as number) ?? DEFAULT_OVERLAY_SETTINGS.shadowBlur,
   };
 }
 
@@ -42,6 +47,47 @@ export async function saveOverlaySettings(
     create: { userId, settings: settings as unknown as Prisma.InputJsonValue },
     update: { settings: settings as unknown as Prisma.InputJsonValue },
   });
+}
+
+export async function updateOverlaySettings(
+  userId: string,
+  input: OverlaySettingsInput,
+): Promise<void> {
+  const existing = await prisma.overlayConfig.findUnique({
+    where: { userId },
+    select: { settings: true },
+  });
+
+  const stored = (existing?.settings as Record<string, unknown>) ?? {};
+
+  const mergedWidgets = (stored.widgets as OverlayWidgetConfig[] | undefined)?.map((w) => ({
+    ...w,
+    visible: input.widgets[w.type] ?? w.visible,
+  })) ?? DEFAULT_OVERLAY_SETTINGS.widgets.map((def) => ({
+    ...def,
+    visible: input.widgets[def.type] ?? def.visible,
+  }));
+
+  await prisma.overlayConfig.upsert({
+    where: { userId },
+    create: {
+      userId,
+      settings: {
+        ...stored,
+        theme: input.theme,
+        widgets: mergedWidgets,
+      } as Prisma.InputJsonValue,
+    },
+    update: {
+      settings: {
+        ...stored,
+        theme: input.theme,
+        widgets: mergedWidgets,
+      } as Prisma.InputJsonValue,
+    },
+  });
+
+  await cacheDelete(settingsKey(userId));
 }
 
 function mergeWidgets(

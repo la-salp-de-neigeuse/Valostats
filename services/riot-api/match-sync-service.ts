@@ -1,8 +1,8 @@
 import { RiotRegionGroup, SyncJobType } from "@prisma/client";
 import { prisma } from "@/lib/prisma/client";
-import { RiotApiError, sleep } from "@/services/riot/api-client";
-import { getMatchDetails, getMatchIdsByPuuid } from "@/services/riot/match-api";
-import { transformMatch } from "@/services/riot/match-transformer";
+import { RiotApiError, sleep } from "@/services/riot-api/api-client";
+import { getMatchDetails, getMatchIdsByPuuid } from "@/services/riot-api/match-api";
+import { transformMatch } from "@/services/riot-api/match-transformer";
 import { recalculateGoals } from "@/services/goals/goals-service";
 import { createNotification } from "@/services/notifications/notifications-service";
 
@@ -25,11 +25,6 @@ function parseSyncCursor(cursor: string | null): number | null {
   return Number.isNaN(parsed) || parsed < 0 ? null : parsed;
 }
 
-/**
- * Collecte les IDs de matchs à traiter :
- * - Toujours les 20 plus récents (sync incrémentale)
- * - + un lot historique si syncCursor est défini (backfill paginé)
- */
 async function collectMatchIds(
   puuid: string,
   regionGroup: RiotRegionGroup,
@@ -62,18 +57,6 @@ async function collectMatchIds(
   return { ids: [...allIds], nextCursor };
 }
 
-/**
- * Synchronise les matchs récents d'un utilisateur.
- *
- * Respecte :
- * - syncLockUntil : évite les syncs concurrentes
- * - syncCursor : reprend le backfill historique paginé
- * - lastSyncAt / nextSyncAt : horodatage et cooldown entre syncs
- *
- * Utilise les contraintes uniques Prisma pour éviter les doublons :
- * - ValorantMatch.riotMatchId (@unique)
- * - PlayerMatchStats @@unique([userId, matchId])
- */
 export async function syncMatchesForUser(userId: string): Promise<MatchSyncResult> {
   const result: MatchSyncResult = {
     matchIdsFound: 0,
@@ -165,7 +148,6 @@ export async function syncMatchesForUser(userId: string): Promise<MatchSyncResul
             });
             result.playerStatsInserted++;
           } catch {
-            // Doublon ignoré silencieusement (contrainte unique)
           }
         }
       } catch (err) {
@@ -195,7 +177,6 @@ export async function syncMatchesForUser(userId: string): Promise<MatchSyncResul
       },
     });
 
-    // Trigger stat aggregation job if new matches were inserted
     if (result.playerStatsInserted > 0) {
       await prisma.syncJob.create({
         data: {
@@ -208,14 +189,11 @@ export async function syncMatchesForUser(userId: string): Promise<MatchSyncResul
         },
       });
 
-      // Recalculer les objectifs après chaque synchronisation
       try {
         await recalculateGoals(userId);
       } catch {
-        // Échec silencieux : le recalcule des objectifs n'est pas bloquant
       }
 
-      // Notification de synchronisation terminée
       try {
         await createNotification({
           userId,
@@ -231,7 +209,6 @@ export async function syncMatchesForUser(userId: string): Promise<MatchSyncResul
           },
         });
       } catch {
-        // Échec silencieux
       }
     }
 

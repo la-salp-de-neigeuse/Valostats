@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma/client";
 import { getLatestAnalysis } from "@/services/ai/ai-analysis-service";
 import { formatAgentName } from "@/lib/valorant/agents";
 import { getOverlaySettings } from "./overlay-settings-service";
+import { getOrSet } from "@/lib/cache/cache-service";
+import { overlayKey, TTL } from "@/lib/cache/keys";
 import type { OverlayData, OverlayMatchEntry } from "./types";
 
 function computeWinStreak(matches: OverlayMatchEntry[]): number {
@@ -25,7 +27,8 @@ function formatSyncTime(date: Date | null | undefined): string | null {
 }
 
 export async function getOverlayData(slug: string): Promise<OverlayData | null> {
-  const user = await prisma.user.findUnique({
+  return getOrSet(overlayKey(slug), async () => {
+    const user = await prisma.user.findUnique({
     where: { publicSlug: slug },
     select: {
       id: true,
@@ -102,12 +105,19 @@ export async function getOverlayData(slug: string): Promise<OverlayData | null> 
   const winStreak = computeWinStreak(lastMatches);
   const lastMatchEntry = lastMatches[0] ?? null;
 
-  const agentAggs = await prisma.playerAgentAggregate.findMany({
-    where: { userId: serviceUserId, period: "ALL_TIME" },
-    orderBy: { matchCount: "desc" },
-    take: 1,
-    select: { agentName: true },
-  });
+  const [agentAggs, bestAgentAgg] = await Promise.all([
+    prisma.playerAgentAggregate.findMany({
+      where: { userId: serviceUserId, period: "ALL_TIME" },
+      orderBy: { matchCount: "desc" },
+      take: 1,
+      select: { agentName: true },
+    }),
+    prisma.playerAgentAggregate.findFirst({
+      where: { userId: serviceUserId, period: "ALL_TIME", matchCount: { gte: 5 } },
+      orderBy: { winRate: "desc" },
+      select: { agentName: true, winRate: true },
+    }),
+  ]);
 
   return {
     playerName,
@@ -124,6 +134,7 @@ export async function getOverlayData(slug: string): Promise<OverlayData | null> 
     lastMatch: lastMatchEntry,
     lastAgent: lastMatchEntry?.agentName ?? null,
     mainAgent: agentAggs[0] ? formatAgentName(agentAggs[0].agentName) : null,
+    bestAgent: bestAgentAgg ? { name: formatAgentName(bestAgentAgg.agentName), winRate: Number(bestAgentAgg.winRate) } : null,
     winStreak,
     lastResult: lastMatchEntry?.result ?? null,
     goalOfDay: goals
@@ -135,4 +146,5 @@ export async function getOverlayData(slug: string): Promise<OverlayData | null> 
     syncTimeAgo: formatSyncTime(user.riotAccount?.lastSyncAt ?? null),
     settings: overlayConfig,
   };
+  }, TTL.OVERLAY);
 }

@@ -28,7 +28,7 @@ const MODE_LABELS: Record<OverlayDisplayMode, string> = {
 
 const ALL_WIDGET_TYPES: OverlayWidgetType[] = [
   "playerName", "rank", "rr", "winRate", "kda", "aiScore",
-  "recentMatches", "lastMatch", "mainAgent", "winStreak",
+  "recentMatches", "lastMatch", "mainAgent", "bestAgent", "winStreak",
   "lastResult", "progression", "goalOfDay", "lastAiInsight", "syncTime",
 ];
 
@@ -69,6 +69,22 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
           const clampedX = Math.max(0, Math.min(x, COLUMNS - w.w));
           const clampedY = Math.max(0, Math.min(y, ROWS - w.h));
           return { ...w, x: clampedX, y: clampedY };
+        }),
+      }));
+      setSaved(false);
+    },
+    [],
+  );
+
+  const resizeWidget = useCallback(
+    (type: OverlayWidgetType, dw: number, dh: number) => {
+      setSettings((prev) => ({
+        ...prev,
+        widgets: prev.widgets.map((w) => {
+          if (w.type !== type) return w;
+          const newW = Math.max(1, Math.min(w.w + dw, COLUMNS - w.x));
+          const newH = Math.max(1, Math.min(w.h + dh, ROWS - w.y));
+          return { ...w, w: newW, h: newH };
         }),
       }));
       setSaved(false);
@@ -210,7 +226,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
                   draggable
                   onDragStart={(e) => handleDragStart(e, widget.type)}
                   onDragEnd={() => setDragType(null)}
-                  className={`flex items-center justify-center text-xs font-medium rounded-lg cursor-grab active:cursor-grabbing transition-all ${
+                  className={`relative flex items-center justify-center text-xs font-medium rounded-lg cursor-grab active:cursor-grabbing transition-all group ${
                     dragType === widget.type
                       ? "opacity-50 ring-2 ring-rose-500"
                       : "hover:ring-1 hover:ring-slate-500"
@@ -224,7 +240,19 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
                   }}
                   title={`${WIDGET_LABELS[widget.type]} (${widget.w}x${widget.h})`}
                 >
-                  {WIDGET_LABELS[widget.type]}
+                  <span className="truncate px-1">{WIDGET_LABELS[widget.type]}</span>
+                  <div className="absolute bottom-0.5 right-0.5 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); resizeWidget(widget.type, -1, 0); }}
+                      className="w-3.5 h-3.5 flex items-center justify-center rounded bg-slate-700/80 text-[8px] text-white hover:bg-slate-600"
+                      title="Rétrécir"
+                    >−</button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); resizeWidget(widget.type, 1, 0); }}
+                      className="w-3.5 h-3.5 flex items-center justify-center rounded bg-slate-700/80 text-[8px] text-white hover:bg-slate-600"
+                      title="Élargir"
+                    >+</button>
+                  </div>
                 </div>
               ))}
           </div>
@@ -332,6 +360,35 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
             />
             <span className="text-xs text-slate-400">{settings.borderRadius}px</span>
           </div>
+        </div>
+      </Section>
+
+      <Section label="Ombres">
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2 cursor-pointer text-sm text-slate-300">
+            <input
+              type="checkbox"
+              checked={settings.shadow}
+              onChange={(e) => update("shadow", e.target.checked)}
+              className="accent-rose-500"
+            />
+            Afficher les ombres
+          </label>
+          {settings.shadow && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-500">Flou:</span>
+              <input
+                type="range"
+                min={4}
+                max={32}
+                step={2}
+                value={settings.shadowBlur}
+                onChange={(e) => update("shadowBlur", Number(e.target.value))}
+                className="w-24 accent-rose-500"
+              />
+              <span className="text-xs text-slate-400">{settings.shadowBlur}px</span>
+            </div>
+          )}
         </div>
       </Section>
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { createJobRunnerId, runQueuedJobsBatch } from "@/jobs/orchestrator";
+import { MAX_BODY_SIZE } from "@/constants/limits";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -34,7 +35,13 @@ async function executeBatch(limit?: number) {
 
 async function readOptionalJson(request: Request): Promise<unknown> {
   try {
-    return await request.json();
+    const contentLength = request.headers.get("content-length");
+    if (contentLength && parseInt(contentLength, 10) > MAX_BODY_SIZE) {
+      return undefined;
+    }
+    const text = await request.text();
+    if (text.length > MAX_BODY_SIZE) return undefined;
+    return JSON.parse(text);
   } catch {
     return undefined;
   }

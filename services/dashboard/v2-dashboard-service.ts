@@ -1,5 +1,15 @@
 import { prisma } from "@/lib/prisma/client";
 import { getLatestAnalysis } from "@/services/ai/ai-analysis-service";
+import { getOrSet } from "@/lib/cache/cache-service";
+import {
+  dashboardHeatmapKey,
+  dashboardTimelineKey,
+  dashboardActivityKey,
+  dashboardGoalsKey,
+  dashboardRankEvolutionKey,
+  dashboardVsAverageKey,
+  TTL,
+} from "@/lib/cache/keys";
 import type {
   V2DashboardData,
   HeatmapCell,
@@ -36,7 +46,8 @@ export async function getV2DashboardData(userId: string): Promise<V2DashboardDat
 }
 
 async function getHeatmapData(userId: string): Promise<HeatmapCell[]> {
-  const [totalStats, winStats] = await Promise.all([
+  return getOrSet(dashboardHeatmapKey(userId), async () => {
+    const [totalStats, winStats] = await Promise.all([
     prisma.playerMatchStats.groupBy({
       by: ["agentName", "mapName"],
       where: { userId },
@@ -66,10 +77,12 @@ async function getHeatmapData(userId: string): Promise<HeatmapCell[]> {
         winRate: Math.round((wins / matchCount) * 100),
       };
     });
+  }, TTL.DASHBOARD);
 }
 
 async function getTimelineData(userId: string): Promise<TimelineEntry[]> {
-  const matches = await prisma.playerMatchStats.findMany({
+  return getOrSet(dashboardTimelineKey(userId), async () => {
+    const matches = await prisma.playerMatchStats.findMany({
     where: { userId },
     orderBy: { matchStartedAt: "desc" },
     take: 30,
@@ -86,21 +99,23 @@ async function getTimelineData(userId: string): Promise<TimelineEntry[]> {
     },
   });
 
-  return matches.map((m) => ({
-    id: String(m.id),
-    result: m.result,
-    agentName: m.agentName,
-    mapName: m.mapName,
-    kills: m.kills,
-    deaths: m.deaths,
-    assists: m.assists,
-    score: m.score,
-    playedAt: m.matchStartedAt,
-  }));
+    return matches.map((m) => ({
+      id: String(m.id),
+      result: m.result,
+      agentName: m.agentName,
+      mapName: m.mapName,
+      kills: m.kills,
+      deaths: m.deaths,
+      assists: m.assists,
+      score: m.score,
+      playedAt: m.matchStartedAt,
+    }));
+  }, TTL.DASHBOARD);
 }
 
 async function getActivityData(userId: string): Promise<ActivityEntry[]> {
-  const [recentNotifications, recentSyncs] = await Promise.all([
+  return getOrSet(dashboardActivityKey(userId), async () => {
+    const [recentNotifications, recentSyncs] = await Promise.all([
     prisma.notification.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
@@ -138,27 +153,31 @@ async function getActivityData(userId: string): Promise<ActivityEntry[]> {
     });
   }
 
-  entries.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-  return entries.slice(0, 15);
+    entries.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    return entries.slice(0, 15);
+  }, TTL.DASHBOARD);
 }
 
 async function getGoalsSummary(userId: string): Promise<GoalsSummary> {
-  const [activeCount, completedCount, totalCount] = await Promise.all([
+  return getOrSet(dashboardGoalsKey(userId), async () => {
+    const [activeCount, completedCount, totalCount] = await Promise.all([
     prisma.goal.count({ where: { userId, status: "IN_PROGRESS" } }),
     prisma.goal.count({ where: { userId, status: "COMPLETED" } }),
     prisma.goal.count({ where: { userId } }),
   ]);
 
-  return {
-    activeCount,
-    completedCount,
-    completionRate: totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0,
-    nextMilestone: completedCount < 5 ? "Complétez 5 objectifs" : completedCount < 25 ? "Atteignez 25 objectifs" : "Objectif ultime",
-  };
+    return {
+      activeCount,
+      completedCount,
+      completionRate: totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0,
+      nextMilestone: completedCount < 5 ? "Complétez 5 objectifs" : completedCount < 25 ? "Atteignez 25 objectifs" : "Objectif ultime",
+    };
+  }, TTL.DASHBOARD);
 }
 
 async function getRankEvolution(userId: string): Promise<RankPoint[]> {
-  const matches = await prisma.playerMatchStats.findMany({
+  return getOrSet(dashboardRankEvolutionKey(userId), async () => {
+    const matches = await prisma.playerMatchStats.findMany({
     where: {
       userId,
       rankAtMatch: { not: null },
@@ -183,11 +202,13 @@ async function getRankEvolution(userId: string): Promise<RankPoint[]> {
     }
   }
 
-  return evolution;
+    return evolution;
+  }, TTL.DASHBOARD);
 }
 
 async function getVsAverage(userId: string): Promise<VsAverage[]> {
-  const aggregate = await prisma.playerStatAggregate.findFirst({
+  return getOrSet(dashboardVsAverageKey(userId), async () => {
+    const aggregate = await prisma.playerStatAggregate.findFirst({
     where: { userId, period: "ALL_TIME" },
     orderBy: { computedAt: "desc" },
     select: {
@@ -256,7 +277,8 @@ async function getVsAverage(userId: string): Promise<VsAverage[]> {
       unit: "",
       higherIsBetter: true,
     },
-  ];
+    ];
+  }, TTL.DASHBOARD);
 }
 
 function mapNotificationType(type: string): ActivityEntry["type"] {

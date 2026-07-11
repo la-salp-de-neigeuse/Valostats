@@ -1,10 +1,10 @@
 import { prisma } from "@/lib/prisma/client";
-import type { ProfileVisibility } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
+import { getOrSet, cacheDelete } from "@/lib/cache/cache-service";
+import { settingsKey, TTL } from "@/lib/cache/keys";
 import type {
   NotificationSettings,
   AiSettings,
-  PrivacySettings,
   UserProfileSettings,
   SettingsData,
 } from "./types";
@@ -17,8 +17,6 @@ import type {
   ProfileSettingsInput,
   NotificationSettingsInput,
   AiSettingsInput,
-  PrivacySettingsInput,
-  OverlaySettingsInput,
 } from "@/lib/validation/settings";
 
 function parseNotificationSettings(raw: unknown): NotificationSettings {
@@ -46,7 +44,8 @@ function parseAiSettings(settings: {
 }
 
 export async function getSettings(userId: string): Promise<SettingsData> {
-  const [user, riotAccount, overlayConfig] = await Promise.all([
+  return getOrSet(settingsKey(userId), async () => {
+    const [user, riotAccount, overlayConfig] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -112,6 +111,7 @@ export async function getSettings(userId: string): Promise<SettingsData> {
       ...((overlayStored?.visibleWidgets as Record<string, boolean>) ?? {}),
     },
   };
+  }, TTL.SETTINGS);
 }
 
 export async function updateProfileSettings(
@@ -131,6 +131,8 @@ export async function updateProfileSettings(
       timezone: true,
     },
   });
+
+  await cacheDelete(settingsKey(userId));
 
   return {
     name: user.name,
@@ -156,6 +158,8 @@ export async function updateNotificationSettings(
     },
   });
 
+  await cacheDelete(settingsKey(userId));
+
   return { ...input };
 }
 
@@ -180,67 +184,9 @@ export async function updateAiSettings(
     },
   });
 
-  return { ...input };
-}
-
-export async function updatePrivacySettings(
-  userId: string,
-  input: PrivacySettingsInput,
-): Promise<PrivacySettings> {
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      visibility: input.visibility as ProfileVisibility,
-      privacyVersion: { increment: 1 },
-      settings: {
-        upsert: {
-          create: {
-            showRankPublicly: input.showRankPublicly,
-            showMatchHistory: input.showMatchHistory,
-            showAiScore: input.showAiScore,
-            allowLeaderboard: input.allowLeaderboard,
-          },
-          update: {
-            showRankPublicly: input.showRankPublicly,
-            showMatchHistory: input.showMatchHistory,
-            showAiScore: input.showAiScore,
-            allowLeaderboard: input.allowLeaderboard,
-          },
-        },
-      },
-    },
-  });
+  await cacheDelete(settingsKey(userId));
 
   return { ...input };
 }
 
-export async function updateOverlaySettings(
-  userId: string,
-  input: OverlaySettingsInput,
-): Promise<void> {
-  const existing = await prisma.overlayConfig.findUnique({
-    where: { userId },
-    select: { settings: true },
-  });
 
-  const stored = (existing?.settings as Record<string, unknown>) ?? {};
-
-  await prisma.overlayConfig.upsert({
-    where: { userId },
-    create: {
-      userId,
-      settings: {
-        ...stored,
-        theme: input.theme,
-        visibleWidgets: input.widgets,
-      } as Prisma.InputJsonValue,
-    },
-    update: {
-      settings: {
-        ...stored,
-        theme: input.theme,
-        visibleWidgets: input.widgets,
-      } as Prisma.InputJsonValue,
-    },
-  });
-}

@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma/client";
 import { formatAgentName } from "@/lib/valorant/agents";
+import { getOrSet } from "@/lib/cache/cache-service";
+import { performanceKey, TTL } from "@/lib/cache/keys";
 import {
   getAggregateStatsByPeriod,
   getAgentAggregatesByPeriod,
@@ -17,63 +19,43 @@ function round(value: number, decimals = 2): number {
 
 function computeMetrics(aggregate: AggregateStats | null, userId: string): Promise<PerformanceMetrics> {
   return (async () => {
-    const raw = aggregate
-  ? await prisma.playerMatchStats.findMany({
-      where: { userId },
-      select: {
-        openingDuelsTaken: true,
-        openingDuelsWon: true,
-        firstBloods: true,
-        firstDeaths: true,
-        plants: true,
-        defuses: true,
-        roundsPlayed: true,
-        kills: true,
-        deaths: true,
-        result: true,
-      },
-      take: 1_000,
-    })
-  : [];
+    const duelStats = aggregate
+      ? await prisma.playerMatchStats.aggregate({
+          where: { userId },
+          _sum: {
+            openingDuelsTaken: true,
+            openingDuelsWon: true,
+            firstBloods: true,
+            firstDeaths: true,
+            plants: true,
+            defuses: true,
+            roundsPlayed: true,
+            deaths: true,
+          },
+        })
+      : null;
 
-    const totals = raw.reduce(
-      (acc, m) => {
-        acc.openingDuelsTaken += m.openingDuelsTaken;
-        acc.openingDuelsWon += m.openingDuelsWon;
-        acc.firstBloods += m.firstBloods;
-        acc.firstDeaths += m.firstDeaths;
-        acc.plants += m.plants;
-        acc.defuses += m.defuses;
-        acc.roundsPlayed += m.roundsPlayed;
-        acc.kills += m.kills;
-        acc.deaths += m.deaths;
-        if (m.result === "WIN") acc.wins++;
-        else if (m.result === "LOSS") acc.losses++;
-        return acc;
-      },
-      {
-        openingDuelsTaken: 0,
-        openingDuelsWon: 0,
-        firstBloods: 0,
-        firstDeaths: 0,
-        plants: 0,
-        defuses: 0,
-        roundsPlayed: 0,
-        kills: 0,
-        deaths: 0,
-        wins: 0,
-        losses: 0,
-      },
-    );
+    const totals = {
+      openingDuelsTaken: duelStats?._sum.openingDuelsTaken ?? 0,
+      openingDuelsWon: duelStats?._sum.openingDuelsWon ?? 0,
+      firstBloods: duelStats?._sum.firstBloods ?? 0,
+      firstDeaths: duelStats?._sum.firstDeaths ?? 0,
+      plants: duelStats?._sum.plants ?? 0,
+      defuses: duelStats?._sum.defuses ?? 0,
+      roundsPlayed: duelStats?._sum.roundsPlayed ?? 0,
+      deaths: duelStats?._sum.deaths ?? 0,
+    };
 
-    const matchCount = raw.length;
-    const attackWinRate = aggregate ? Number(aggregate.attackWinRate) : (totals.wins > 0 && totals.losses > 0 ? totals.wins / (totals.wins + totals.losses) * 100 : 0);
+    const matchCount = aggregate?.matchCount ?? 0;
+    const wins = aggregate?.wins ?? 0;
+    const losses = aggregate?.losses ?? 0;
+    const attackWinRate = aggregate ? Number(aggregate.attackWinRate) : 0;
     const defenseWinRate = aggregate ? Number(aggregate.defenseWinRate) : 0;
     const survivalRate = totals.roundsPlayed > 0 ? round(1 - totals.deaths / totals.roundsPlayed) : 0;
 
     return {
-      winRate: aggregate ? Number(aggregate.winRate) : (matchCount > 0 ? round(totals.wins / matchCount * 100, 1) : 0),
-      kda: aggregate ? Number(aggregate.kdRatio) : (totals.deaths > 0 ? round(totals.kills / totals.deaths, 2) : totals.kills),
+      winRate: aggregate ? Number(aggregate.winRate) : 0,
+      kda: aggregate ? Number(aggregate.kdRatio) : 0,
       headshotRate: aggregate ? Number(aggregate.headshotRate) : 0,
       damagePerRound: aggregate ? Number(aggregate.damagePerRound) : 0,
       combatScore: aggregate ? Number(aggregate.combatScore) : 0,
@@ -88,8 +70,8 @@ function computeMetrics(aggregate: AggregateStats | null, userId: string): Promi
       survivalRate,
       roundsPlayed: totals.roundsPlayed,
       matchCount,
-      wins: totals.wins,
-      losses: totals.losses,
+      wins,
+      losses,
     };
   })();
 }
@@ -121,7 +103,8 @@ export async function getPerformanceData(
   userId: string,
   period: StatsPeriod = "all",
 ): Promise<PerformanceData> {
-  const [aggregate, agents, maps, analysis, coachingReport] = await Promise.all([
+  return getOrSet(performanceKey(userId, period), async () => {
+    const [aggregate, agents, maps, analysis, coachingReport] = await Promise.all([
     getAggregateStatsByPeriod(userId, period),
     getAgentAggregatesByPeriod(userId, period),
     getMapAggregatesByPeriod(userId, period),
@@ -157,18 +140,19 @@ export async function getPerformanceData(
   const strengths = (coachingReport?.strengths ?? []).map((s) => s.problem);
   const weaknesses = (coachingReport?.weaknesses ?? []).map((w) => w.problem);
 
-  return {
-    current: metrics,
-    agents: agentItems,
-    maps: mapItems,
-    radar,
-    aiInsights: {
-      score: aiScore,
-      summary: analysis?.summary ?? null,
-      strengths,
-      weaknesses,
-    },
-    vsAverage,
-    hasData,
-  };
+    return {
+      current: metrics,
+      agents: agentItems,
+      maps: mapItems,
+      radar,
+      aiInsights: {
+        score: aiScore,
+        summary: analysis?.summary ?? null,
+        strengths,
+        weaknesses,
+      },
+      vsAverage,
+      hasData,
+    };
+  }, TTL.PERFORMANCE);
 }

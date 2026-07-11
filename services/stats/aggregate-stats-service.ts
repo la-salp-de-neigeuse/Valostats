@@ -2,6 +2,8 @@ import type { AggregatePeriod } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma/client";
 import { formatAgentName } from "@/lib/valorant/agents";
+import { getOrSet } from "@/lib/cache/cache-service";
+import { statsKey, agentStatsKey, mapStatsKey, TTL } from "@/lib/cache/keys";
 
 export type StatsPeriod = "7d" | "30d" | "all";
 
@@ -97,9 +99,12 @@ export async function getAggregateStatsByPeriod(
   userId: string,
   period: StatsPeriod = "all"
 ): Promise<AggregateStats> {
-  const aggregatePeriod = mapPeriodToAggregate(period);
+  return getOrSet(
+    statsKey(userId, period),
+    async () => {
+      const aggregatePeriod = mapPeriodToAggregate(period);
 
-  const aggregate = await prisma.playerStatAggregate.findFirst({
+      const aggregate = await prisma.playerStatAggregate.findFirst({
     where: {
       userId,
       period: aggregatePeriod,
@@ -169,52 +174,67 @@ export async function getAggregateStatsByPeriod(
     worstMap: aggregate.worstMap,
     rankProgressValue: Number(aggregate.rankProgressValue),
   };
+    },
+    TTL.STATS_AGGREGATE,
+  );
 }
 
 export async function getAgentAggregatesByPeriod(
   userId: string,
   period: StatsPeriod = "all"
 ): Promise<AgentAggregate[]> {
-  const aggregatePeriod = mapPeriodToAggregate(period);
+  return getOrSet(
+    agentStatsKey(userId, period),
+    async () => {
+      const aggregatePeriod = mapPeriodToAggregate(period);
 
-  const aggregates = await prisma.playerAgentAggregate.findMany({
-    where: {
-      userId,
-      period: aggregatePeriod,
+      const aggregates = await prisma.playerAgentAggregate.findMany({
+        where: {
+          userId,
+          period: aggregatePeriod,
+        },
+        orderBy: { matchCount: "desc" },
+      });
+
+      return aggregates.map((agg) => ({
+        agentName: agg.agentName,
+        agentDisplayName: formatAgentName(agg.agentName),
+        matchCount: agg.matchCount,
+        winRate: Number(agg.winRate),
+        averageKda: Number(agg.averageKda),
+        damagePerRound: Number(agg.damagePerRound),
+      }));
     },
-    orderBy: { matchCount: "desc" },
-  });
-
-  return aggregates.map((agg) => ({
-    agentName: agg.agentName,
-    agentDisplayName: formatAgentName(agg.agentName),
-    matchCount: agg.matchCount,
-    winRate: Number(agg.winRate),
-    averageKda: Number(agg.averageKda),
-    damagePerRound: Number(agg.damagePerRound),
-  }));
+    TTL.STATS_AGGREGATE,
+  );
 }
 
 export async function getMapAggregatesByPeriod(
   userId: string,
   period: StatsPeriod = "all"
 ): Promise<MapAggregate[]> {
-  const aggregatePeriod = mapPeriodToAggregate(period);
+  return getOrSet(
+    mapStatsKey(userId, period),
+    async () => {
+      const aggregatePeriod = mapPeriodToAggregate(period);
 
-  const aggregates = await prisma.playerMapAggregate.findMany({
-    where: {
-      userId,
-      period: aggregatePeriod,
+      const aggregates = await prisma.playerMapAggregate.findMany({
+        where: {
+          userId,
+          period: aggregatePeriod,
+        },
+        orderBy: { matchCount: "desc" },
+      });
+
+      return aggregates.map((agg) => ({
+        mapName: agg.mapName,
+        matchCount: agg.matchCount,
+        winRate: Number(agg.winRate),
+        attackWinRate: Number(agg.attackWinRate),
+        defenseWinRate: Number(agg.defenseWinRate),
+        averageKda: Number(agg.averageKda),
+      }));
     },
-    orderBy: { matchCount: "desc" },
-  });
-
-  return aggregates.map((agg) => ({
-    mapName: agg.mapName,
-    matchCount: agg.matchCount,
-    winRate: Number(agg.winRate),
-    attackWinRate: Number(agg.attackWinRate),
-    defenseWinRate: Number(agg.defenseWinRate),
-    averageKda: Number(agg.averageKda),
-  }));
+    TTL.STATS_AGGREGATE,
+  );
 }

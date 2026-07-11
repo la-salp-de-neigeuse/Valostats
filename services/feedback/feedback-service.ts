@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma/client";
 import { createNotification } from "@/services/notifications/notifications-service";
 import { dispatchChannel } from "@/services/notifications/channels/dispatcher";
-import { canViewFeedback } from "@/services/roles/types";
 import type { UserRole } from "@prisma/client";
 import type {
   FeedbackType,

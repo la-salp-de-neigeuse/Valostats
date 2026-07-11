@@ -95,7 +95,7 @@ export async function linkRiotAccount(
   return toSafeRiotAccount(account);
 }
 
-import { getAccountByRiotId } from "@/services/riot/account-api";
+import { getAccountByRiotId } from "@/services/riot-api/account-api";
 
 export async function unlinkRiotAccount(userId: string): Promise<void> {
   const account = await prisma.riotAccount.findUnique({ where: { userId } });

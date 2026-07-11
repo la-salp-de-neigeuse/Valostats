@@ -1,6 +1,6 @@
-import { syncMatchesForUser } from "@/services/riot/match-sync-service";
-import type { MatchSyncResult } from "@/services/riot/match-sync-service";
+import { syncMatchesForUser } from "@/services/riot-api/match-sync-service";
 
+import type { MatchSyncResult } from "@/services/riot-api/match-sync-service";
 export interface RiotSyncJobPayload {
   userId: string;
 }

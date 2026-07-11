@@ -26,3 +26,5 @@ export const ACCOUNT_LOCKOUT_THRESHOLD = 5;
 export const ACCOUNT_LOCKOUT_DURATION_MIN = 15;
 
 export const CLEANUP_INTERVAL_MS = 60_000;
+
+export const MAX_BODY_SIZE = 100_000;

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { UserProfileSettings } from "@/services/settings/types";
+import { useToast } from "@/components/ui/toast";
 
 const LOCALES = [
   { value: "fr", label: "Français" },
@@ -35,6 +36,7 @@ export function ProfileSection({ initial }: ProfileSectionProps) {
   const [timezone, setTimezone] = useState(initial.timezone);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const { addToast } = useToast();
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -56,8 +58,11 @@ export function ProfileSection({ initial }: ProfileSectionProps) {
       }
 
       setMessage({ type: "success", text: "Profil mis à jour." });
+      addToast({ variant: "success", title: "Profil mis à jour" });
     } catch (err) {
-      setMessage({ type: "error", text: err instanceof Error ? err.message : "Erreur inattendue." });
+      const msg = err instanceof Error ? err.message : "Erreur inattendue.";
+      setMessage({ type: "error", text: msg });
+      addToast({ variant: "error", title: "Erreur", description: msg });
     } finally {
       setSaving(false);
     }

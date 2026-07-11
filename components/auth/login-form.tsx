@@ -2,14 +2,14 @@
 
 import * as React from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/toast";
 
 export function LoginForm() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const { addToast } = useToast();
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -27,18 +27,22 @@ export function LoginForm() {
     });
 
     if (result?.error) {
-      setError("Identifiants incorrects ou compte verrouillé.");
+      const errorMessages: Record<string, string> = {
+        CredentialsSignin: "Email ou mot de passe incorrect.",
+      };
+      setError(errorMessages[result.error] ?? result.error);
       setIsLoading(false);
     } else {
-      router.push("/dashboard");
-      router.refresh();
+      addToast({ variant: "success", title: "Connecté", description: "Bienvenue sur ValoStats." });
+      setIsLoading(false);
+      window.location.href = "/dashboard";
     }
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {error && (
-        <div className="rounded-md bg-red-950/50 p-3 text-sm text-red-400 border border-red-900/50" role="alert" aria-live="assertive">
+        <div className="rounded-md bg-red-950/50 p-3 text-sm text-red-400 border border-red-900/50 animate-fade-in" role="alert" aria-live="assertive">
           {error}
         </div>
       )}

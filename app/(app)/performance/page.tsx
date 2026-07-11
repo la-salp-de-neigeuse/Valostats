@@ -18,12 +18,13 @@ export default async function PerformancePage() {
     redirect("/login");
   }
 
-  const [data, evolutionBlocks, periodComparison, recentMatches, premium] = await Promise.all([
+  const premium = await isPremiumUser(user.id);
+
+  const [data, evolutionBlocks, periodComparison, recentMatches] = await Promise.all([
     getPerformanceData(user.id),
-    getEvolutionData(user.id),
-    getPerformanceByPeriod(user.id),
-    getRecentMatchesForChart(user.id),
-    isPremiumUser(user.id),
+    getEvolutionData(user.id, premium),
+    getPerformanceByPeriod(user.id, premium),
+    getRecentMatchesForChart(user.id, 15, premium),
   ]);
 
   return (

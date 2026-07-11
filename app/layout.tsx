@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthSessionProvider } from "@/components/auth/session-provider";
+import { ToastProvider } from "@/components/ui/toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -63,7 +64,7 @@ export default function RootLayout({
         >
           Aller au contenu principal
         </a>
-        <AuthSessionProvider>{children}</AuthSessionProvider>
+        <AuthSessionProvider><ToastProvider>{children}</ToastProvider></AuthSessionProvider>
       </body>
     </html>
   );

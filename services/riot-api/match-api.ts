@@ -1,9 +1,5 @@
 import { RiotRegionGroup } from "@prisma/client";
-import { riotFetch } from "./api-client";
-
-// -----------------------------------------------------------------
-// Routing helpers
-// -----------------------------------------------------------------
+import { riotFetch } from "@/services/riot-api/api-client";
 
 const REGION_GROUP_TO_API_ROUTING: Record<RiotRegionGroup, string> = {
   AMERICAS: "americas",
@@ -11,10 +7,6 @@ const REGION_GROUP_TO_API_ROUTING: Record<RiotRegionGroup, string> = {
   EUROPE: "europe",
   SEA: "asia",
 };
-
-// -----------------------------------------------------------------
-// DTOs
-// -----------------------------------------------------------------
 
 export interface RiotMatchListDto {
   puuid: string;
@@ -27,7 +19,7 @@ export interface RiotMatchListDto {
 }
 
 export interface RiotMatchPlayerDto {
-  subject: string; // PUUID du joueur
+  subject: string;
   teamId: string;
   characterId: string;
   competitiveTier: number;
@@ -98,14 +90,6 @@ export interface RiotMatchDto {
   roundResults: RiotMatchRoundResultDto[];
 }
 
-// -----------------------------------------------------------------
-// API functions
-// -----------------------------------------------------------------
-
-/**
- * Récupère les IDs de matchs récents pour un PUUID donné.
- * Par défaut : 20 matchs, tous types de queue.
- */
 export async function getMatchIdsByPuuid(
   puuid: string,
   regionGroup: RiotRegionGroup,
@@ -127,9 +111,6 @@ export async function getMatchIdsByPuuid(
   return data.history.map((h) => h.matchId);
 }
 
-/**
- * Récupère les détails complets d'un match par son ID.
- */
 export async function getMatchDetails(
   matchId: string,
   regionGroup: RiotRegionGroup

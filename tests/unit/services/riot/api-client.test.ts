@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { RiotApiError, riotFetch, sleep } from "@/services/riot/api-client";
+import { RiotApiError, riotFetch, sleep } from "@/services/riot-api/api-client";
 
 const VALID_API_KEY = "RGAPI-test-key";
 

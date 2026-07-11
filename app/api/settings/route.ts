@@ -1,25 +1,25 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/options";
+
+import { getCurrentUser } from "@/lib/auth/session";
 import { updateSettingsSchema } from "@/lib/validation/settings";
 import {
   getSettings,
   updateProfileSettings,
   updateNotificationSettings,
   updateAiSettings,
-  updatePrivacySettings,
-  updateOverlaySettings,
 } from "@/services/settings/settings-service";
-import { assertSameOrigin, readJsonBody, jsonError } from "@/lib/security/request";
+import { updateOverlaySettings } from "@/services/overlay/overlay-settings-service";
+import { updatePrivacySettings } from "@/services/privacy/privacy-service";
+import { assertSameOrigin, HttpError, jsonError, readJsonBody } from "@/lib/security/request";
+
+export const runtime = "nodejs";
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
-  }
-
   try {
-    const settings = await getSettings(session.user.id);
+    const user = await getCurrentUser();
+    if (!user) throw new HttpError(401, "Non authentifié.");
+
+    const settings = await getSettings(user.id);
     return NextResponse.json(settings);
   } catch (error) {
     return jsonError(error);
@@ -29,49 +29,36 @@ export async function GET() {
 export async function PUT(req: Request) {
   try {
     assertSameOrigin(req);
-  } catch (error) {
-    return jsonError(error);
-  }
 
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
-  }
+    const user = await getCurrentUser();
+    if (!user) throw new HttpError(401, "Non authentifié.");
 
-  let body: unknown;
-  try {
-    body = await readJsonBody(req);
-  } catch (error) {
-    return jsonError(error);
-  }
+    const body = await readJsonBody(req);
+    const parsed = updateSettingsSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Données invalides.", details: parsed.error.flatten() },
+        { status: 400 },
+      );
+    }
 
-  const parsed = updateSettingsSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Données invalides.", details: parsed.error.flatten() },
-      { status: 400 },
-    );
-  }
-
-  const { profile, notifications, ai, privacy, overlay } = parsed.data;
-
-  try {
+    const { profile, notifications, ai, privacy, overlay } = parsed.data;
     const results: Record<string, unknown> = {};
 
     if (profile) {
-      results.profile = await updateProfileSettings(session.user.id, profile);
+      results.profile = await updateProfileSettings(user.id, profile);
     }
     if (notifications) {
-      results.notifications = await updateNotificationSettings(session.user.id, notifications);
+      results.notifications = await updateNotificationSettings(user.id, notifications);
     }
     if (ai) {
-      results.ai = await updateAiSettings(session.user.id, ai);
+      results.ai = await updateAiSettings(user.id, ai);
     }
     if (privacy) {
-      results.privacy = await updatePrivacySettings(session.user.id, privacy);
+      results.privacy = await updatePrivacySettings(user.id, privacy);
     }
     if (overlay) {
-      await updateOverlaySettings(session.user.id, overlay);
+      await updateOverlaySettings(user.id, overlay);
       results.overlay = { success: true };
     }
 

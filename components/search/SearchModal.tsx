@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useRouter } from "next/navigation";
 import type { SearchResult } from "@/services/search/types";
 
@@ -29,38 +30,32 @@ function SearchModalInner({ onClose }: { onClose: () => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 200);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  const handleSearch = useCallback(async (q: string) => {
-    if (q.length < 2) {
-      setResults([]);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=10`);
-      if (!res.ok) return;
-      const data = await res.json();
-      setResults(data.results ?? []);
-      setSelectedIndex(-1);
-    } catch {
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => handleSearch(query), 200);
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [query, handleSearch]);
+    const timer = setTimeout(() => {
+      if (debouncedQuery.length < 2) {
+        setResults([]);
+        return;
+      }
+      setLoading(true);
+      fetch(`/api/search?q=${encodeURIComponent(debouncedQuery)}&limit=10`)
+        .then((res) => {
+          if (!res.ok) return;
+          return res.json();
+        })
+        .then((data) => {
+          setResults(data?.results ?? []);
+          setSelectedIndex(-1);
+        })
+        .catch(() => setResults([]))
+        .finally(() => setLoading(false));
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [debouncedQuery]);
 
   useEffect(() => {
     inputRef.current?.focus();

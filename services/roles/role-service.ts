@@ -93,10 +93,6 @@ export async function updateUserRole(
     throw new Error("Seuls les propriétaires et développeurs peuvent modifier les rôles.");
   }
 
-  if (!canManageRoles(actorRole)) {
-    throw new Error("Vous n'avez pas la permission de modifier les rôles.");
-  }
-
   if (actorRole !== "OWNER" && (newRole === "OWNER" || newRole === "DEVELOPER")) {
     throw new Error("Vous ne pouvez pas attribuer ce rôle.");
   }
