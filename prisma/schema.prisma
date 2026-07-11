@@ -1,0 +1,823 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  OWNER
+  DEVELOPER
+  ADMINISTRATOR
+  MODERATOR
+  PREMIUM
+  FRIEND
+  USER
+}
+
+enum UserPlan {
+  FREE
+  PRO
+  TEAM
+}
+
+enum ProfileVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum RiotPlatform {
+  BR1
+  EUN1
+  EUW1
+  JP1
+  KR
+  LA1
+  LA2
+  NA1
+  OC1
+  TR1
+}
+
+enum RiotRegionGroup {
+  AMERICAS
+  ASIA
+  EUROPE
+  SEA
+}
+
+enum ValorantQueue {
+  COMPETITIVE
+  UNRATED
+  PREMIER
+  SWIFTPLAY
+  SPIKERUSH
+  DEATHMATCH
+}
+
+enum MatchResult {
+  WIN
+  LOSS
+  DRAW
+}
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum SyncJobType {
+  RIOT_MATCH_SYNC
+  STAT_AGGREGATION
+  AI_ANALYSIS
+  LEADERBOARD_REBUILD
+  PUBLIC_PROFILE_REBUILD
+}
+
+enum AggregatePeriod {
+  LAST_7_DAYS
+  LAST_30_DAYS
+  ACT
+  SEASON
+  ALL_TIME
+}
+
+enum LeaderboardSortKey {
+  KDA
+  WIN_RATE
+  AI_SCORE
+  PROGRESSION
+  MATCH_COUNT
+}
+
+enum AiAnalysisStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum DashboardWidgetType {
+  CURRENT_RANK
+  RANK_PROGRESS
+  AVERAGE_KDA
+  WIN_RATE
+  MATCH_COUNT
+  MAIN_AGENT
+  BEST_MAPS
+  WORST_MAPS
+  PERFORMANCE_EVOLUTION
+  AI_SCORE
+  RECENT_MATCHES
+  AGENT_MAP_HEATMAP
+  MATCH_TIMELINE
+  RECENT_ACTIVITY
+  GOALS_SUMMARY
+  RANK_PROGRESSION
+  LATEST_INSIGHTS
+  RANK_EVOLUTION
+  VS_AVERAGE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  TRIALING
+  UNPAID
+}
+
+model User {
+  id                 String                    @id @default(uuid()) @db.Uuid
+  name               String?
+  email              String                    @unique
+  normalizedEmail    String                    @unique
+  emailVerified      DateTime?
+  image              String?
+  role               UserRole                  @default(USER)
+  plan               UserPlan                  @default(FREE)
+  visibility         ProfileVisibility         @default(PRIVATE)
+  publicSlug         String                    @unique
+  privacyVersion     Int                       @default(1)
+  sessionVersion     Int                       @default(1)
+  locale             String                    @default("fr")
+  timezone           String                    @default("Europe/Paris")
+  lastSeenAt         DateTime?
+  deletedAt          DateTime?
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+  accounts           Account[]
+  sessions           Session[]
+  password           PasswordCredential?
+  passwordResets     PasswordResetToken[]
+  settings           UserSettings?
+  riotAccount        RiotAccount?
+  dashboardWidgets   DashboardWidget[]
+  matchStats         PlayerMatchStats[]
+  statAggregates     PlayerStatAggregate[]
+  agentAggregates    PlayerAgentAggregate[]
+  mapAggregates      PlayerMapAggregate[]
+  aiAnalyses         AiAnalysis[]
+  leaderboardRows    LeaderboardEntry[]
+  publicProfileCache PublicPlayerProfileCache?
+  overlayConfig      OverlayConfig?
+  usageCounters      UsageCounter[]
+  syncJobs           SyncJob[]
+  stripeCustomer     StripeCustomer?
+  subscription       Subscription?
+  goals              Goal[]
+  badges             Badge[]
+  notifications      Notification[]
+  aiPromptLogs       AiPromptLog[]
+  feedbacks          Feedback[]
+
+  @@index([visibility])
+  @@index([plan])
+  @@index([email])
+  @@index([deletedAt])
+  @@index([updatedAt])
+}
+
+model PasswordCredential {
+  id                String    @id @default(uuid()) @db.Uuid
+  userId            String    @unique @db.Uuid
+  passwordHash      String
+  passwordUpdatedAt DateTime  @default(now())
+  failedAttempts    Int       @default(0)
+  lockedUntil       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Account {
+  id                    String  @id @default(uuid()) @db.Uuid
+  userId                String  @db.Uuid
+  type                  String
+  provider              String
+  providerAccountId     String
+  encryptedRefreshToken Bytes?
+  encryptedAccessToken  Bytes?
+  expires_at            Int?
+  token_type            String?
+  scope                 String?
+  idTokenHash           String?
+  session_state         String?
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(uuid()) @db.Uuid
+  sessionToken String   @unique
+  userId       String   @db.Uuid
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expires])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@index([expires])
+}
+
+model UserSettings {
+  id                  String   @id @default(uuid()) @db.Uuid
+  userId              String   @unique @db.Uuid
+  showRankPublicly    Boolean  @default(false)
+  showMatchHistory    Boolean  @default(false)
+  showAiScore         Boolean  @default(false)
+  allowLeaderboard    Boolean  @default(false)
+  marketingEmails     Boolean  @default(false)
+  productEmails       Boolean  @default(true)
+  preferredProvider   String   @default("OPENAI")
+  preferredModel      String   @default("")
+  temperature         Decimal  @default("0.3") @db.Decimal(4, 2)
+  maxTokens           Int      @default(2048)
+  llmTimeout          Int      @default(120)
+  notificationSettings Json    @default("{}")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model StripeCustomer {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @unique @db.Uuid
+  stripeCustomerId String   @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id                    String              @id @default(uuid()) @db.Uuid
+  userId                String              @unique @db.Uuid
+  stripeSubscriptionId  String              @unique
+  stripeCustomerId      String
+  status                SubscriptionStatus
+  plan                  UserPlan
+  currentPeriodStart    DateTime
+  currentPeriodEnd      DateTime
+  cancelAtPeriodEnd     Boolean             @default(false)
+  canceledAt            DateTime?
+  trialStart            DateTime?
+  trialEnd              DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  user                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([stripeCustomerId])
+}
+
+model RiotAccount {
+  id                    String           @id @default(uuid()) @db.Uuid
+  userId                String           @unique @db.Uuid
+  riotPuuid             String           @unique
+  gameName              String
+  tagLine               String
+  platform              RiotPlatform
+  regionGroup           RiotRegionGroup
+  currentRank           String?
+  currentRankTier       Int?
+  encryptedAccessToken  Bytes?
+  encryptedRefreshToken Bytes?
+  tokenExpiresAt        DateTime?
+  scopes                String?
+  consentExpiresAt      DateTime?
+  isVerified            Boolean          @default(false)
+  verifiedAt            DateTime?
+  connectedAt           DateTime         @default(now())
+  lastSyncAt            DateTime?
+  nextSyncAt            DateTime?
+  syncCursor            String?
+  syncLockUntil         DateTime?
+  lastSyncError         String?
+  user                  User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([gameName, tagLine])
+  @@index([platform])
+  @@index([regionGroup])
+  @@index([currentRankTier])
+  @@index([nextSyncAt])
+}
+
+model ValorantMatch {
+  id              BigInt             @id @default(autoincrement())
+  riotMatchId     String             @unique
+  platform        RiotPlatform
+  regionGroup     RiotRegionGroup
+  queue           ValorantQueue
+  mapId           String
+  mapName         String
+  gameStartedAt   DateTime
+  durationSeconds Int
+  createdAt       DateTime           @default(now())
+  players         PlayerMatchStats[]
+
+  @@index([regionGroup, gameStartedAt])
+  @@index([platform, gameStartedAt])
+  @@index([queue, gameStartedAt])
+  @@index([mapName])
+}
+
+model PlayerMatchStats {
+  id                  BigInt        @id @default(autoincrement())
+  userId              String        @db.Uuid
+  matchId             BigInt
+  matchStartedAt      DateTime
+  agentName           String
+  mapName             String
+  teamId              String
+  result              MatchResult
+  rankAtMatch         String?
+  rankTierAtMatch     Int?
+  kills               Int
+  deaths              Int
+  assists             Int
+  score               Int
+  headshotRate        Decimal       @db.Decimal(5, 2)
+  damagePerRound      Decimal       @db.Decimal(7, 2)
+  combatScore         Decimal       @db.Decimal(7, 2)
+  firstBloods         Int
+  firstDeaths         Int
+  openingDuelsTaken   Int
+  openingDuelsWon     Int
+  utilityCasts        Int
+  plants              Int
+  defuses             Int
+  attackRoundsWon     Int
+  attackRoundsPlayed  Int
+  defenseRoundsWon    Int
+  defenseRoundsPlayed Int
+  roundsPlayed        Int
+  createdAt           DateTime      @default(now())
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match               ValorantMatch @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, matchId])
+  @@index([userId, matchStartedAt])
+  @@index([userId, agentName, matchStartedAt])
+  @@index([userId, mapName, matchStartedAt])
+  @@index([matchStartedAt])
+  @@index([result])
+}
+
+model PlayerStatAggregate {
+  id                BigInt          @id @default(autoincrement())
+  userId            String          @db.Uuid
+  period            AggregatePeriod
+  windowStart       DateTime
+  windowEnd         DateTime
+  rank              String?
+  rankTier          Int?
+  matchCount        Int
+  wins              Int
+  losses            Int
+  kills             Int
+  deaths            Int
+  assists           Int
+  averageKda        Decimal         @db.Decimal(7, 3)
+  winRate           Decimal         @db.Decimal(5, 2)
+  headshotRate      Decimal         @db.Decimal(5, 2)
+  damagePerRound    Decimal         @db.Decimal(7, 2)
+  combatScore       Decimal         @db.Decimal(7, 2)
+  firstDeathRate    Decimal         @db.Decimal(5, 2)
+  attackWinRate     Decimal         @db.Decimal(5, 2)
+  defenseWinRate    Decimal         @db.Decimal(5, 2)
+  utilityPerRound   Decimal         @db.Decimal(7, 3)
+  mainAgent         String?
+  bestMap           String?
+  worstMap          String?
+  aiScore           Decimal?        @db.Decimal(6, 2)
+  rankProgressValue Decimal         @db.Decimal(8, 3)
+  computedAt        DateTime        @default(now())
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, period, windowStart, windowEnd])
+  @@index([period, windowEnd])
+  @@index([period, averageKda])
+  @@index([period, winRate])
+  @@index([period, aiScore])
+  @@index([period, rankProgressValue])
+  @@index([period, matchCount])
+}
+
+model PlayerAgentAggregate {
+  id             BigInt          @id @default(autoincrement())
+  userId         String          @db.Uuid
+  period         AggregatePeriod
+  windowStart    DateTime
+  windowEnd      DateTime
+  agentName      String
+  matchCount     Int
+  winRate        Decimal         @db.Decimal(5, 2)
+  averageKda     Decimal         @db.Decimal(7, 3)
+  damagePerRound Decimal         @db.Decimal(7, 2)
+  computedAt     DateTime        @default(now())
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, period, windowStart, windowEnd, agentName])
+  @@index([userId, period, windowEnd])
+  @@index([agentName, period])
+}
+
+model PlayerMapAggregate {
+  id             BigInt          @id @default(autoincrement())
+  userId         String          @db.Uuid
+  period         AggregatePeriod
+  windowStart    DateTime
+  windowEnd      DateTime
+  mapName        String
+  matchCount     Int
+  winRate        Decimal         @db.Decimal(5, 2)
+  attackWinRate  Decimal         @db.Decimal(5, 2)
+  defenseWinRate Decimal         @db.Decimal(5, 2)
+  averageKda     Decimal         @db.Decimal(7, 3)
+  computedAt     DateTime        @default(now())
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, period, windowStart, windowEnd, mapName])
+  @@index([userId, period, windowEnd])
+  @@index([mapName, period])
+}
+
+model AiAnalysis {
+  id               BigInt           @id @default(autoincrement())
+  userId           String           @db.Uuid
+  aggregateId      BigInt?
+  status           AiAnalysisStatus @default(PENDING)
+  modelName        String
+  modelVersion     String
+  promptVersion    String
+  provider         String           @default("RULE_BASED")
+  inputHash        String
+  score            Decimal?         @db.Decimal(6, 2)
+  summary          String?
+  inputTokens      Int?
+  outputTokens     Int?
+  estimatedCost    Decimal?         @db.Decimal(10, 4)
+  generationTimeMs Int?
+  generatedAt      DateTime?
+  rawResult        Json?
+  createdAt        DateTime         @default(now())
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  insights         AiInsight[]
+
+  @@unique([userId, modelName, modelVersion, promptVersion, inputHash])
+  @@index([userId, createdAt])
+  @@index([score])
+}
+
+model AiInsight {
+  id          BigInt     @id @default(autoincrement())
+  analysisId  BigInt
+  category    String
+  severity    Int
+  problem     String
+  explanation String
+  solution    String
+  evidence    Json
+  analysis    AiAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([analysisId])
+  @@index([category])
+  @@index([severity])
+}
+
+model DashboardWidget {
+  id        String              @id @default(uuid()) @db.Uuid
+  userId    String              @db.Uuid
+  type      DashboardWidgetType
+  title     String
+  visible   Boolean             @default(true)
+  positionX Int
+  positionY Int
+  width     Int
+  height    Int
+  config    Json                @default("{}")
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type])
+  @@index([userId, visible])
+}
+
+model LeaderboardSnapshot {
+  id          BigInt             @id @default(autoincrement())
+  period      AggregatePeriod
+  sortKey     LeaderboardSortKey
+  windowStart DateTime
+  windowEnd   DateTime
+  computedAt  DateTime           @default(now())
+  rowCount    Int
+  entries     LeaderboardEntry[]
+
+  @@unique([period, sortKey, windowStart, windowEnd])
+  @@index([period, sortKey, computedAt])
+}
+
+model LeaderboardEntry {
+  id           BigInt              @id @default(autoincrement())
+  snapshotId   BigInt
+  userId       String              @db.Uuid
+  rankPosition Int
+  publicSlug   String
+  displayName  String
+  rankName     String?
+  rankTier     Int?
+  kda          Decimal             @db.Decimal(7, 3)
+  winRate      Decimal             @db.Decimal(5, 2)
+  aiScore      Decimal?            @db.Decimal(6, 2)
+  progression  Decimal             @db.Decimal(8, 3)
+  matchCount   Int
+  createdAt    DateTime            @default(now())
+  snapshot     LeaderboardSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([snapshotId, userId])
+  @@unique([snapshotId, rankPosition])
+  @@index([userId])
+  @@index([publicSlug])
+}
+
+model PublicPlayerProfileCache {
+  id             BigInt   @id @default(autoincrement())
+  userId         String   @unique @db.Uuid
+  publicSlug     String   @unique
+  privacyVersion Int
+  payload         Json
+  rebuiltAt       DateTime @default(now())
+  expiresAt       DateTime
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([publicSlug])
+  @@index([expiresAt])
+}
+
+model SyncJob {
+  id             BigInt      @id @default(autoincrement())
+  userId         String?     @db.Uuid
+  type           SyncJobType
+  status         JobStatus   @default(QUEUED)
+  idempotencyKey String      @unique
+  payload        Json
+  attempts       Int         @default(0)
+  maxAttempts    Int         @default(5)
+  runAt          DateTime    @default(now())
+  lockedAt       DateTime?
+  lockOwner      String?
+  lastError      String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  completedAt    DateTime?
+  user           User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status, runAt])
+  @@index([userId, type, createdAt])
+}
+
+model OverlayConfig {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @db.Uuid
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UsageCounter {
+  id          BigInt   @id @default(autoincrement())
+  userId      String   @db.Uuid
+  metric      String
+  periodStart DateTime
+  periodEnd   DateTime
+  value       Int      @default(0)
+  cost        Decimal  @default(0) @db.Decimal(12, 4)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, metric, periodStart, periodEnd])
+  @@index([metric, periodStart, periodEnd])
+}
+
+enum GoalType {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum GoalStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
+}
+
+enum GoalDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum GoalPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Goal {
+  id           BigInt        @id @default(autoincrement())
+  userId       String        @db.Uuid
+  title        String
+  description  String
+  type         GoalType      @default(WEEKLY)
+  difficulty   GoalDifficulty @default(MEDIUM)
+  priority     GoalPriority  @default(MEDIUM)
+  reward       String?
+  currentValue Decimal       @default(0) @db.Decimal(10, 3)
+  targetValue  Decimal       @db.Decimal(10, 3)
+  unit         String        @default("")
+  status       GoalStatus    @default(IN_PROGRESS)
+  deadline     DateTime?
+  completedAt  DateTime?
+  metadata     Json          @default("{}")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([userId, type, status])
+  @@index([userId, deadline])
+}
+
+model Badge {
+  id          BigInt   @id @default(autoincrement())
+  userId      String   @db.Uuid
+  badgeId     String
+  name        String
+  description String
+  icon        String
+  unlockedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+}
+
+enum FeedbackType {
+  BUG
+  IDEA
+  SUGGESTION
+  POSITIVE
+}
+
+enum FeedbackStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+  DUPLICATE
+}
+
+enum FeedbackPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum NotificationType {
+  RANK_CHANGE
+  NEW_RECORD
+  WIN_STREAK
+  AI_INSIGHT
+  GOAL_COMPLETED
+  BADGE_UNLOCKED
+  SCORE_IMPROVEMENT
+  SYNC_COMPLETED
+  NEW_MAIN_AGENT
+  FEEDBACK_CREATED
+  FEEDBACK_RESOLVED
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  DISCORD
+  PUSH
+}
+
+model Notification {
+  id        BigInt             @id @default(autoincrement())
+  userId    String             @db.Uuid
+  type      NotificationType
+  channel   NotificationChannel @default(IN_APP)
+  title     String
+  body      String?
+  link      String?
+  metadata  Json               @default("{}")
+  readAt    DateTime?
+  archivedAt DateTime?
+  createdAt DateTime           @default(now())
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, archivedAt])
+  @@index([userId, createdAt])
+  @@index([userId, type])
+  @@index([userId, archivedAt, createdAt])
+}
+
+model AiPromptLog {
+  id              BigInt   @id @default(autoincrement())
+  userId          String   @db.Uuid
+  provider        String
+  model           String
+  promptVersion   String?
+  systemPrompt    String?
+  userPrompt      String?
+  responseContent String?
+  inputTokens     Int?
+  outputTokens    Int?
+  estimatedCost   Decimal? @db.Decimal(12, 6)
+  durationMs      Int?
+  success         Boolean  @default(true)
+  errorMessage    String?
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([provider, createdAt])
+}
+
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  userId     String?  @db.Uuid
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model Feedback {
+  id              BigInt           @id @default(autoincrement())
+  userId          String           @db.Uuid
+  type            FeedbackType
+  title           String
+  description     String
+  status          FeedbackStatus   @default(NEW)
+  priority        FeedbackPriority @default(MEDIUM)
+  pageUrl         String?
+  browser         String?
+  operatingSystem String?
+  userAgent       String?
+  screenshotUrl   String?
+  adminNote       String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([priority])
+  @@index([type])
+  @@index([createdAt])
+}

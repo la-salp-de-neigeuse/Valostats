@@ -1,0 +1,15 @@
+export { WidgetCard, WidgetCardDouble } from "./WidgetCard";
+export { PlayerNameWidget } from "./PlayerNameWidget";
+export { RankWidget } from "./RankWidget";
+export { ProgressWidget } from "./ProgressWidget";
+export { WinRateWidget } from "./WinRateWidget";
+export { KdaWidget } from "./KdaWidget";
+export { AiScoreWidget } from "./AiScoreWidget";
+export { WinStreakWidget } from "./WinStreakWidget";
+export { LastResultWidget } from "./LastResultWidget";
+export { MainAgentWidget } from "./MainAgentWidget";
+export { LastMatchWidget } from "./LastMatchWidget";
+export { MatchBarWidget } from "./MatchBarWidget";
+export { GoalWidget } from "./GoalWidget";
+export { LastInsightWidget } from "./LastInsightWidget";
+export { SyncTimeWidget } from "./SyncTimeWidget";
