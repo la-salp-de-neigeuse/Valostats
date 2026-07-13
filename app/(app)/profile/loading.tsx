@@ -11,7 +11,7 @@ export default function ProfileLoading() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-        <div className="bg-[#111115] border border-slate-800 rounded-2xl p-6">
+        <div className="bg-surface border border-slate-800 rounded-2xl p-6">
           <SkeletonBlock className="h-6 w-32 mb-6" />
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -24,7 +24,7 @@ export default function ProfileLoading() {
           <SkeletonBlock className="h-10 w-full rounded-xl mt-6" />
         </div>
 
-        <div className="bg-[#111115] border border-slate-800 rounded-2xl p-6">
+        <div className="bg-surface border border-slate-800 rounded-2xl p-6">
           <SkeletonBlock className="h-6 w-44 mb-6" />
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (

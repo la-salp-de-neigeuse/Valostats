@@ -7,7 +7,7 @@ import type { RegisterInput, LoginInput } from "@/lib/validation/auth";
 import type { UpdatePrivacyInput, UpdateProfileInput, DeleteAccountInput } from "@/lib/validation/user";
 
 export type SafeUser = Pick<User,
-  | "id" | "name" | "email" | "role" | "plan"
+  | "id" | "name" | "email" | "image" | "role" | "plan"
   | "visibility" | "publicSlug" | "privacyVersion"
   | "sessionVersion" | "createdAt" | "deletedAt"
 >;
@@ -24,8 +24,8 @@ export type UserProfile = SafeUser & {
 };
 
 export function toSafeUser(user: User): SafeUser {
-  const { name, email, role, plan, visibility, publicSlug, privacyVersion, sessionVersion, createdAt, deletedAt } = user;
-  return { id: user.id, name, email, role, plan, visibility, publicSlug, privacyVersion, sessionVersion, createdAt, deletedAt };
+  const { name, email, image, role, plan, visibility, publicSlug, privacyVersion, sessionVersion, createdAt, deletedAt } = user;
+  return { id: user.id, name, email, image, role, plan, visibility, publicSlug, privacyVersion, sessionVersion, createdAt, deletedAt };
 }
 
 export function toUserProfile(user: User & { settings: UserSettings | null }): UserProfile {

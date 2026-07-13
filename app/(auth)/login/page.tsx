@@ -6,22 +6,34 @@ export const metadata = {
   description: "Connectez-vous à votre compte ValoStats pour accéder à vos statistiques et analyses Valorant.",
 };
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const registered = (await searchParams).registered === "true";
+
   return (
     <main id="main-content" className="flex min-h-screen items-center justify-center p-4 bg-background">
-      <div className="w-full max-w-md space-y-8 rounded-xl border border-white/10 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-sm">
+      <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Bon retour</h1>
-          <p className="mt-2 text-sm text-zinc-400">Connectez-vous à votre compte ValoStats</p>
+          <div className="w-12 h-12 rounded-xl bg-gradient-brand-br flex items-center justify-center text-white font-bold text-lg mx-auto mb-4 shadow-lg shadow-accent-glow">
+            V
+          </div>
+          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Bon retour</h1>
+          <p className="mt-2 text-sm text-text-muted">Connectez-vous à votre compte ValoStats</p>
         </div>
-        <LoginForm />
-        <p className="text-center text-sm text-zinc-400">
+        <div className="bg-surface border border-border rounded-xl p-8">
+          <LoginForm registered={registered} />
+        </div>
+        <p className="text-center text-sm text-text-muted">
           Pas encore de compte ?{" "}
-          <Link href="/register" className="font-medium text-red-500 hover:text-red-400 underline-offset-4 hover:underline">
-            S&apos;inscrire
+          <Link href="/register" className="font-medium text-accent hover:text-accent-hover underline-offset-4 hover:underline transition-colors">
+            {"S'inscrire"}
           </Link>
         </p>
       </div>
     </main>
   );
 }
+

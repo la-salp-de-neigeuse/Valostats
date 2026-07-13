@@ -7,7 +7,7 @@ interface PerformanceSectionProps {
 export function PerformanceSection({ recentMatches }: PerformanceSectionProps) {
   if (recentMatches.length === 0) {
     return (
-      <div className="bg-[#111115] border border-slate-800 rounded-2xl p-6">
+      <div className="bg-surface border border-slate-800 rounded-2xl p-6">
         <h2 className="text-xl font-semibold text-white mb-4">Derniers matchs</h2>
         <p className="text-slate-400">Aucun match récent.</p>
       </div>
@@ -38,7 +38,7 @@ export function PerformanceSection({ recentMatches }: PerformanceSectionProps) {
   }
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl p-6">
+    <div className="bg-surface border border-slate-800 rounded-2xl p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-white">Derniers matchs</h2>
         <div className="flex gap-4 text-sm">
@@ -46,7 +46,7 @@ export function PerformanceSection({ recentMatches }: PerformanceSectionProps) {
             Série actuelle: <span className="text-emerald-400 font-semibold">{currentStreak}W</span>
           </div>
           <div className="text-slate-400">
-            Meilleure série: <span className="text-rose-400 font-semibold">{maxStreak}W</span>
+            Meilleure série: <span className="text-accent font-semibold">{maxStreak}W</span>
           </div>
         </div>
       </div>
@@ -62,7 +62,7 @@ export function PerformanceSection({ recentMatches }: PerformanceSectionProps) {
                 match.result === "WIN"
                   ? "bg-emerald-500/20 text-emerald-400"
                   : match.result === "LOSS"
-                  ? "bg-rose-500/20 text-rose-400"
+                  ? "bg-accent/20 text-accent"
                   : "bg-slate-500/20 text-slate-400"
               }`}
             >

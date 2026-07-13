@@ -67,7 +67,7 @@ export function RecentMatchesChart({ data }: RecentMatchesChartProps) {
           />
           <Tooltip content={<CustomTooltip />} />
           <Bar dataKey="Kills" fill="#22c55e" radius={[4, 4, 0, 0]} maxBarSize={12} />
-          <Bar dataKey="Deaths" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={12} />
+          <Bar dataKey="Deaths" fill="#FF4655" radius={[4, 4, 0, 0]} maxBarSize={12} />
         </BarChart>
       </ResponsiveContainer>
     </div>

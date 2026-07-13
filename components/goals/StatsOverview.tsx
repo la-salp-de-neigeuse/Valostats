@@ -12,19 +12,19 @@ function StatCard({
   accent?: boolean;
 }) {
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl p-4">
+    <div className="bg-surface border border-slate-800 rounded-2xl p-4">
       <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">{label}</div>
-      <div className={`text-2xl font-bold ${accent ? "text-rose-400" : "text-white"}`}>{value}</div>
+      <div className={`text-2xl font-bold ${accent ? "text-accent" : "text-white"}`}>{value}</div>
     </div>
   );
 }
 
 function ProgressRing({ value, label }: { value: number; label: string }) {
   const clamped = Math.min(Math.max(value, 0), 100);
-  const color = clamped >= 70 ? "stroke-emerald-500" : clamped >= 40 ? "stroke-amber-500" : "stroke-rose-500";
+  const color = clamped >= 70 ? "stroke-emerald-500" : clamped >= 40 ? "stroke-amber-500" : "stroke-accent";
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl p-5 text-center">
+    <div className="bg-surface border border-slate-800 rounded-2xl p-5 text-center">
       <div className="relative w-20 h-20 mx-auto mb-3">
         <svg className="w-20 h-20 -rotate-90" viewBox="0 0 72 72">
           <circle cx="36" cy="36" r="30" fill="none" stroke="#27272a" strokeWidth="6" />
@@ -76,7 +76,7 @@ export function StatsOverview({
           <ProgressRing value={progression.weeklyCompletion} label="Hebdomadaire" />
           <ProgressRing value={progression.monthlyCompletion} label="Mensuel" />
           <ProgressRing value={progression.overallScore} label="Global" />
-          <div className="bg-[#111115] border border-slate-800 rounded-2xl p-5 flex flex-col justify-center">
+          <div className="bg-surface border border-slate-800 rounded-2xl p-5 flex flex-col justify-center">
             <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Prochain palier</div>
             <div className="text-lg font-bold text-white">{progression.nextMilestone}</div>
           </div>

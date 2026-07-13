@@ -10,7 +10,7 @@ interface MapPerformanceChartProps {
 export function MapPerformanceChart({ maps }: MapPerformanceChartProps) {
   if (maps.length === 0) {
     return (
-      <div className="bg-[#111115] border border-slate-800 rounded-2xl p-5">
+      <div className="bg-surface border border-slate-800 rounded-2xl p-5">
         <h3 className="text-sm font-semibold text-white mb-4">Performance par Map</h3>
         <p className="text-sm text-slate-500">Aucune donnée map disponible</p>
       </div>
@@ -27,7 +27,7 @@ export function MapPerformanceChart({ maps }: MapPerformanceChartProps) {
     }));
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl p-5">
+    <div className="bg-surface border border-slate-800 rounded-2xl p-5">
       <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Performance par Map</h3>
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>

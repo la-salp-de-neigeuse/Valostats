@@ -34,14 +34,14 @@ export function GoalsView({
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-1 bg-[#111115] border border-slate-800 rounded-xl p-1 overflow-x-auto">
+      <div className="flex gap-1 bg-surface border border-slate-800 rounded-xl p-1 overflow-x-auto">
         {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
               tab === t.id
-                ? "bg-rose-500 text-white"
+                ? "bg-accent text-white"
                 : "text-slate-400 hover:text-white hover:bg-slate-800/50"
             }`}
           >
@@ -60,7 +60,7 @@ export function GoalsView({
       {tab === "active" && (
         <div className="space-y-4">
           {activeGoals.length === 0 ? (
-            <div className="bg-[#111115] border border-slate-800 rounded-2xl p-8 text-center">
+            <div className="bg-surface border border-slate-800 rounded-2xl p-8 text-center">
               <div className="text-4xl mb-3">🎯</div>
               <h3 className="text-lg font-semibold text-white mb-2">Aucun objectif actif</h3>
               <p className="text-sm text-slate-400">
@@ -81,7 +81,7 @@ export function GoalsView({
       {tab === "history" && (
         <div className="space-y-4">
           {completedGoals.length === 0 && expiredGoals.length === 0 ? (
-            <div className="bg-[#111115] border border-slate-800 rounded-2xl p-8 text-center">
+            <div className="bg-surface border border-slate-800 rounded-2xl p-8 text-center">
               <div className="text-4xl mb-3">📜</div>
               <p className="text-sm text-slate-400">Aucun objectif complété ou expiré pour le moment.</p>
             </div>

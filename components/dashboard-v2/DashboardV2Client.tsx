@@ -8,6 +8,7 @@ import type { AnalysisResult } from "@/services/ai/types";
 import { PerformanceStats } from "@/components/dashboard/PerformanceStats";
 import { AgentStats } from "@/components/dashboard/AgentStats";
 import { MapStats } from "@/components/dashboard/MapStats";
+import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { AiScoreCard } from "@/components/ai-coach/AiScoreCard";
 import { WinRateChart } from "@/components/charts/WinRateChart";
 import { KdChart } from "@/components/charts/KdChart";
@@ -21,6 +22,7 @@ import { RankEvolutionWidget } from "./RankEvolutionWidget";
 import { InsightsWidget } from "./InsightsWidget";
 import { VsAverageWidget } from "./VsAverageWidget";
 import { PredictionWidget } from "./PredictionWidget";
+import { Button } from "@/components/ui/button";
 
 interface DashboardV2ClientProps {
   initialLayout: WidgetLayout[];
@@ -47,16 +49,8 @@ interface DashboardV2ClientProps {
   } | null;
 }
 
-type WidgetComponent = (props: { widget: WidgetLayout }) => React.ReactNode;
-
 function WidgetWrapper({
-  widget,
-  children,
-  onDragStart,
-  onDragOver,
-  onDragEnd,
-  onDrop,
-  isDragOver,
+  widget, children, onDragStart, onDragOver, onDragEnd, onDrop, isDragOver,
 }: {
   widget: WidgetLayout;
   children: React.ReactNode;
@@ -73,10 +67,14 @@ function WidgetWrapper({
       onDragOver={onDragOver}
       onDragEnd={onDragEnd}
       onDrop={(e) => onDrop?.(e, widget)}
-      className={`bg-[#111115] border rounded-2xl overflow-hidden transition-all
-        ${isDragOver ? "border-rose-500/50 shadow-lg shadow-rose-500/10" : "border-slate-800"}
-        hover:border-slate-700 cursor-grab active:cursor-grabbing`}
-      style={{ gridColumn: `span ${widget.width}`, gridRow: `span ${widget.height}` }}
+      className={`bg-surface border rounded-xl overflow-hidden transition-all duration-200
+        ${isDragOver ? "border-accent/50 shadow-glow ring-1 ring-accent/20" : "border-border/80"}
+        hover:border-border-hover cursor-grab active:cursor-grabbing
+        lg:col-[var(--col)] lg:row-[var(--row)]`}
+      style={{
+        "--col": `span ${widget.width}`,
+        "--row": `span ${widget.height}`,
+      } as React.CSSProperties}
     >
       {children}
     </div>
@@ -84,20 +82,9 @@ function WidgetWrapper({
 }
 
 export function DashboardV2Client({
-  initialLayout,
-  v2Data,
-  stats,
-  agents,
-  maps,
-  evolutionBlocks,
-  periodComparison,
-  recentMatches,
-  analysis,
-  bestMap,
-  worstMap,
-  premium,
-  hasMatches,
-  predictionSummary,
+  initialLayout, v2Data, stats, agents, maps, evolutionBlocks,
+  periodComparison, recentMatches, analysis, bestMap, worstMap,
+  premium, hasMatches, predictionSummary,
 }: DashboardV2ClientProps) {
   const [layout, setLayout] = useState<WidgetLayout[]>(initialLayout);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
@@ -152,10 +139,40 @@ export function DashboardV2Client({
     }
   }
 
-  const widgets: WidgetComponent = ({ widget }: { widget: WidgetLayout }) => {
+  function WidgetContent({ widget }: { widget: WidgetLayout }) {
     switch (widget.type) {
       case "PERFORMANCE_EVOLUTION":
-        return <PerformanceEvolutionWidget evolutionBlocks={evolutionBlocks} periodComparison={periodComparison} recentMatches={recentMatches} premium={premium} />;
+        return (
+          <div className="p-5">
+            <WidgetHeader title="Évolution des performances" />
+            <div className="space-y-4 mt-4">
+              {premium ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-surface-hover/30 rounded-xl p-4 border border-border/50">
+                    <p className="text-xs text-text-muted font-medium mb-3">Winrate</p>
+                    <WinRateChart data={evolutionBlocks} />
+                  </div>
+                  <div className="bg-surface-hover/30 rounded-xl p-4 border border-border/50">
+                    <p className="text-xs text-text-muted font-medium mb-3">K/D</p>
+                    <KdChart data={evolutionBlocks} />
+                  </div>
+                  <div className="bg-surface-hover/30 rounded-xl p-4 border border-border/50">
+                    <p className="text-xs text-text-muted font-medium mb-3">Par période</p>
+                    <PeriodComparison data={periodComparison} />
+                  </div>
+                  <div className="bg-surface-hover/30 rounded-xl p-4 border border-border/50">
+                    <p className="text-xs text-text-muted font-medium mb-3">Derniers matchs</p>
+                    <RecentMatchesChart data={recentMatches} />
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-surface-hover/30 rounded-xl p-6 text-center border border-border/50">
+                  <p className="text-sm text-text-muted italic">{"Passez Premium pour les graphiques d'évolution"}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
       case "AGENT_MAP_HEATMAP":
         return <HeatmapWidget data={v2Data.heatmap} />;
       case "MATCH_TIMELINE":
@@ -176,54 +193,47 @@ export function DashboardV2Client({
             <AiScoreCard score={analysis.score} summary={analysis.summary} />
           </div>
         ) : (
-          <div className="p-5">
-            <WidgetHeader title="Score IA" />
-            <p className="text-sm text-slate-500">Aucune analyse disponible</p>
+          <div className="p-6 text-center">
+            <p className="text-sm text-text-muted/60">Aucune analyse disponible</p>
           </div>
         );
       default:
-        return <div className="p-5 text-sm text-slate-500">Widget inconnu</div>;
+        return <div className="p-6 text-center"><p className="text-sm text-text-muted/60">Widget inconnu</p></div>;
     }
-  };
+  }
 
   if (!hasMatches) {
-    return (
-      <LegacyDashboardShell
-        stats={stats}
-        analysis={analysis}
-        agents={agents}
-        maps={maps}
-        bestMap={bestMap}
-        worstMap={worstMap}
-      />
-    );
+    return <LegacyDashboardShell stats={stats} analysis={analysis} agents={agents} maps={maps} bestMap={bestMap} worstMap={worstMap} />;
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard</h1>
-          <p className="text-slate-400 mt-1">Aperçu complet de vos performances</p>
-        </div>
-        <button
+    <div className="max-w-7xl mx-auto space-y-7">
+      <DashboardHero title="Dashboard" description="Aperçu complet de vos performances Valorant.">
+        <Button
           onClick={handleSave}
-          disabled={saving}
-          className="inline-flex items-center gap-2 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white font-semibold py-2 px-4 rounded-xl transition-colors text-sm"
-        >
-          {saving && (
-            <svg aria-hidden="true" className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          isLoading={saving}
+          variant="secondary"
+          size="sm"
+          leftIcon={
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
             </svg>
-          )}
-          Sauvegarder la disposition
-        </button>
-      </div>
+          }
+        >
+          Sauvegarder
+        </Button>
+      </DashboardHero>
 
       <PerformanceStats stats={stats} />
 
-      <div className="grid grid-cols-4 gap-4 auto-rows-min">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <AgentStats agents={agents} />
+        <MapStats maps={maps} bestMap={bestMap} worstMap={worstMap} />
+      </div>
+
+      <div className="flex flex-col lg:grid lg:grid-cols-4 gap-5 auto-rows-min">
         {layout
           .filter((w) => w.visible)
           .map((w) => (
@@ -236,14 +246,13 @@ export function DashboardV2Client({
               onDrop={handleDrop}
               isDragOver={dragOverId === w.id}
             >
-              {widgets({ widget: w })}
+              <WidgetContent widget={w} />
             </WidgetWrapper>
           ))}
       </div>
 
-      {/* PREDICTION SUMMARY BLOCK */}
       {predictionSummary && (
-        <div className="bg-[#111115] border border-slate-800 rounded-2xl overflow-hidden shadow-xl max-w-sm">
+        <div className="bg-surface border border-border/80 rounded-xl overflow-hidden max-w-md">
           <PredictionWidget data={predictionSummary} />
         </div>
       )}
@@ -253,63 +262,14 @@ export function DashboardV2Client({
 
 function WidgetHeader({ title }: { title: string }) {
   return (
-    <div className="px-5 py-3 border-b border-slate-800">
-      <h3 className="text-sm font-semibold text-white">{title}</h3>
-    </div>
-  );
-}
-
-function PerformanceEvolutionWidget({
-  evolutionBlocks,
-  periodComparison,
-  recentMatches,
-  premium,
-}: {
-  evolutionBlocks: EvolutionBlock[];
-  periodComparison: EvolutionPeriodComparison[];
-  recentMatches: RecentMatchPoint[];
-  premium: boolean;
-}) {
-  return (
-    <div className="p-5">
-      <WidgetHeader title="Évolution" />
-      <div className="space-y-4 mt-4">
-        <AgentStats agents={[]} />
-        <MapStats maps={[]} bestMap={null} worstMap={null} />
-        {premium ? (
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-slate-800/30 rounded-xl p-3">
-              <p className="text-xs text-slate-400 mb-2">Winrate</p>
-              <WinRateChart data={evolutionBlocks} />
-            </div>
-            <div className="bg-slate-800/30 rounded-xl p-3">
-              <p className="text-xs text-slate-400 mb-2">K/D</p>
-              <KdChart data={evolutionBlocks} />
-            </div>
-            <div className="bg-slate-800/30 rounded-xl p-3">
-              <p className="text-xs text-slate-400 mb-2">Par période</p>
-              <PeriodComparison data={periodComparison} />
-            </div>
-            <div className="bg-slate-800/30 rounded-xl p-3">
-              <p className="text-xs text-slate-400 mb-2">Derniers matchs</p>
-              <RecentMatchesChart data={recentMatches} />
-            </div>
-          </div>
-        ) : (
-          <p className="text-sm text-slate-500 italic">Passer Premium pour les graphiques d&apos;évolution</p>
-        )}
-      </div>
+    <div className="flex items-center justify-between pb-3 border-b border-border/50">
+      <h3 className="text-sm font-semibold text-text-primary">{title}</h3>
     </div>
   );
 }
 
 function LegacyDashboardShell({
-  stats,
-  analysis,
-  agents,
-  maps,
-  bestMap,
-  worstMap,
+  stats, analysis, agents, maps, bestMap, worstMap,
 }: {
   stats: AggregateStats;
   analysis: AnalysisResult | null;
@@ -320,16 +280,18 @@ function LegacyDashboardShell({
 }) {
   return (
     <div className="max-w-6xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard</h1>
-        <p className="text-slate-400 mt-2">Aperçu de vos performances Valorant.</p>
-      </div>
+      <DashboardHero title="Dashboard" description="Aperçu de vos performances Valorant." />
       <PerformanceStats stats={stats} />
-      {analysis && <AiScoreCard score={analysis.score} summary={analysis.summary} />}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {analysis && (
+        <div className="bg-surface border border-border/80 rounded-xl overflow-hidden">
+          <AiScoreCard score={analysis.score} summary={analysis.summary} />
+        </div>
+      )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <AgentStats agents={agents} />
         <MapStats maps={maps} bestMap={bestMap} worstMap={worstMap} />
       </div>
     </div>
   );
 }
+

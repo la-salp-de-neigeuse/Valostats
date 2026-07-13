@@ -49,11 +49,11 @@ export function NotificationItem({
 
   const content = (
     <div
-      className={`flex items-start gap-3 p-3 rounded-xl transition-colors cursor-pointer ${
+      className={`flex items-start gap-3 p-3 rounded-xl transition-all cursor-pointer ${
         notification.isRead
           ? "hover:bg-slate-800/30"
-          : "bg-rose-500/5 hover:bg-rose-500/10"
-      }`}
+          : "bg-accent/5 hover:bg-accent-light"
+      } ${!notification.isRead ? "hover:scale-[1.01]" : ""}`}
       onClick={handleRead}
       role="button"
       tabIndex={0}
@@ -72,7 +72,7 @@ export function NotificationItem({
         </p>
       </div>
       {!notification.isRead && (
-        <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0 mt-2" />
+        <span className="w-2 h-2 rounded-full bg-accent shrink-0 mt-2" />
       )}
       {notification.isRead && (
         <button

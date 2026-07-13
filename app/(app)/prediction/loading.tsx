@@ -13,7 +13,7 @@ export default function PredictionLoading() {
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-[#111115] to-[#0a0a0c] border border-slate-800 rounded-3xl p-8">
+      <div className="bg-gradient-to-br bg-surface border border-border rounded-3xl p-8">
         <div className="flex items-center justify-between mb-8">
           <div>
             <SkeletonBlock className="h-5 w-32" />
@@ -41,7 +41,7 @@ export default function PredictionLoading() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {[1, 2].map((i) => (
-          <div key={i} className="bg-[#111115] border border-slate-800 rounded-2xl p-6">
+          <div key={i} className="bg-surface border border-slate-800 rounded-2xl p-6">
             <SkeletonBlock className="h-5 w-32 mb-4" />
             {[1, 2, 3].map((j) => (
               <div key={j} className="flex items-center gap-3 mb-3">

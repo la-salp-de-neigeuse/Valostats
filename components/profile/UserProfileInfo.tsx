@@ -5,7 +5,7 @@ import { hasAnyAdminPermission } from "@/services/roles/types";
 
 export function UserProfileInfo({ user }: { user: UserProfile }) {
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-3xl p-8 flex flex-col h-full">
+    <div className="bg-surface border border-slate-800 rounded-3xl p-8 flex flex-col h-full">
       <h2 className="text-xl font-bold text-white mb-6">Informations du compte</h2>
       
       <div className="space-y-6 flex-1">
@@ -29,7 +29,7 @@ export function UserProfileInfo({ user }: { user: UserProfile }) {
         <div>
           <label className="text-sm font-medium text-slate-500">Plan actuel</label>
           <div className="mt-2 flex items-center gap-3">
-            <span className="px-3 py-1 bg-rose-500/10 text-rose-500 text-sm font-semibold rounded-lg border border-rose-500/20">
+            <span className="px-3 py-1 bg-accent-light text-accent text-sm font-semibold rounded-lg border border-accent/20">
               {user.plan}
             </span>
             {user.plan === "FREE" && !hasAnyAdminPermission(user.role) && (

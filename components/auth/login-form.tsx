@@ -1,15 +1,15 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/toast";
 
-export function LoginForm() {
+export function LoginForm({ registered }: { registered?: boolean }) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const { addToast } = useToast();
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -33,14 +33,18 @@ export function LoginForm() {
       setError(errorMessages[result.error] ?? result.error);
       setIsLoading(false);
     } else {
-      addToast({ variant: "success", title: "Connecté", description: "Bienvenue sur ValoStats." });
       setIsLoading(false);
-      window.location.href = "/dashboard";
+      router.push("/dashboard");
     }
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      {registered && (
+        <div className="rounded-md bg-emerald-950/50 p-3 text-sm text-emerald-400 border border-emerald-900/50" role="alert">
+          Compte créé avec succès ! Connectez-vous avec vos identifiants.
+        </div>
+      )}
       {error && (
         <div className="rounded-md bg-red-950/50 p-3 text-sm text-red-400 border border-red-900/50 animate-fade-in" role="alert" aria-live="assertive">
           {error}

@@ -70,7 +70,7 @@ export function VerifyRiotButton() {
         )}
       </button>
       {state === "error" && (
-        <p className="text-xs text-rose-400 leading-relaxed">{errorMsg}</p>
+        <p className="text-xs text-accent leading-relaxed">{errorMsg}</p>
       )}
     </div>
   );

@@ -15,7 +15,7 @@ export default function GoalsLoading() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-[#111115] border border-slate-800 rounded-2xl p-6">
+          <div key={i} className="bg-surface border border-slate-800 rounded-2xl p-6">
             <SkeletonBlock className="h-4 w-20" />
             <SkeletonBlock className="h-8 w-12 mt-3" />
             <SkeletonBlock className="h-3 w-28 mt-2" />
@@ -23,7 +23,7 @@ export default function GoalsLoading() {
         ))}
       </div>
 
-      <div className="bg-gradient-to-br from-[#111115] to-[#0a0a0c] border border-slate-800 rounded-2xl p-6">
+      <div className="bg-gradient-to-br bg-surface border border-border rounded-2xl p-6">
         <div className="flex items-center justify-between mb-6">
           <SkeletonBlock className="h-5 w-32" />
           <SkeletonBlock className="h-9 w-28 rounded-xl" />
@@ -44,7 +44,7 @@ export default function GoalsLoading() {
         ))}
       </div>
 
-      <div className="bg-[#111115] border border-slate-800 rounded-2xl p-6">
+      <div className="bg-surface border border-slate-800 rounded-2xl p-6">
         <SkeletonBlock className="h-5 w-40 mb-4" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
@@ -56,7 +56,7 @@ export default function GoalsLoading() {
         </div>
       </div>
 
-      <div className="bg-[#111115] border border-slate-800 rounded-2xl p-6">
+      <div className="bg-surface border border-slate-800 rounded-2xl p-6">
         <SkeletonBlock className="h-5 w-36 mb-4" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[1, 2].map((i) => (

@@ -3,6 +3,8 @@ import type { MatchResult, ValorantQueue } from "@prisma/client";
 import { prisma } from "@/lib/prisma/client";
 import { formatAgentName } from "@/lib/valorant/agents";
 import { isPremiumUser } from "@/services/subscription/subscription-service";
+import { getOrSet } from "@/lib/cache/cache-service";
+import { matchHistoryKey, TTL } from "@/lib/cache/keys";
 
 export type MatchHistoryItem = {
   id: string;
@@ -66,36 +68,42 @@ export async function getMatchHistoryForUser(
   const limit = options.limit ?? DEFAULT_LIMIT;
   const offset = options.offset ?? 0;
 
-  const premium = await isPremiumUser(userId);
+  return getOrSet(
+    matchHistoryKey(userId, limit, offset),
+    async () => {
+      const premium = await isPremiumUser(userId);
 
-  const where: Record<string, unknown> = { userId };
+      const where: Record<string, unknown> = { userId };
 
-  if (!premium) {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    where.matchStartedAt = { gte: thirtyDaysAgo };
-  }
+      if (!premium) {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        where.matchStartedAt = { gte: thirtyDaysAgo };
+      }
 
-  const [stats, total] = await Promise.all([
-    prisma.playerMatchStats.findMany({
-      where,
-      include: {
-        match: {
-          select: {
-            durationSeconds: true,
-            queue: true,
+      const [stats, total] = await Promise.all([
+        prisma.playerMatchStats.findMany({
+          where,
+          include: {
+            match: {
+              select: {
+                durationSeconds: true,
+                queue: true,
+              },
+            },
           },
-        },
-      },
-      orderBy: { matchStartedAt: "desc" },
-      take: limit,
-      skip: offset,
-    }),
-    prisma.playerMatchStats.count({ where }),
-  ]);
+          orderBy: { matchStartedAt: "desc" },
+          take: limit,
+          skip: offset,
+        }),
+        prisma.playerMatchStats.count({ where }),
+      ]);
 
-  return {
-    matches: stats.map(toMatchHistoryItem),
-    total,
-  };
+      return {
+        matches: stats.map(toMatchHistoryItem),
+        total,
+      };
+    },
+    TTL.MATCH_HISTORY,
+  );
 }

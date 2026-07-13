@@ -1,21 +1,6 @@
 import Link from "next/link";
-
-function CheckIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-
-function CrossIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  );
-}
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const PLANS = [
   {
@@ -32,7 +17,6 @@ const PLANS = [
       { label: "Graphiques d'évolution", included: false },
       { label: "Support prioritaire", included: false },
     ],
-    cta: "Commencer gratuitement",
     href: "/register",
     highlight: false,
   },
@@ -50,7 +34,6 @@ const PLANS = [
       { label: "Export de données", included: true },
       { label: "Support prioritaire", included: true },
     ],
-    cta: "Passer à Premium",
     href: "/register",
     highlight: true,
   },
@@ -61,14 +44,14 @@ export function PricingSection() {
     <section id="pricing" className="py-20 lg:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-sm font-medium tracking-wider text-rose-400 uppercase mb-4">Tarifs</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+          <Badge variant="premium" size="sm" className="mb-4">Tarifs</Badge>
+          <h2 className="text-3xl sm:text-4xl font-bold text-text-primary tracking-tight">
             Un prix adapté à votre{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-rose-600">
+            <span className="text-transparent bg-clip-text bg-gradient-brand">
               ambition
             </span>
           </h2>
-          <p className="text-slate-400 mt-4 leading-relaxed">
+          <p className="text-text-muted mt-4 leading-relaxed">
             Commencez gratuitement et passez à Premium quand vous êtes prêt à aller plus loin.
           </p>
         </div>
@@ -79,43 +62,47 @@ export function PricingSection() {
               key={plan.name}
               className={`rounded-2xl p-6 border relative ${
                 plan.highlight
-                  ? "bg-gradient-to-br from-rose-500/10 to-transparent border-rose-500/30"
-                  : "bg-gradient-to-br from-[#111115] to-[#0a0a0c] border-slate-800"
+                  ? "bg-gradient-to-br from-accent/10 to-transparent border-accent/30 shadow-glow"
+                  : "bg-surface border-border"
               }`}
             >
               {plan.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-rose-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-semibold px-3 py-1 rounded-full">
                   Populaire
                 </div>
               )}
 
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-white mb-1">{plan.name}</h3>
-                <p className="text-sm text-slate-400 mb-4">{plan.description}</p>
+                <h3 className="text-lg font-semibold text-text-primary mb-1">{plan.name}</h3>
+                <p className="text-sm text-text-muted mb-4">{plan.description}</p>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-bold text-white">{plan.price}</span>
-                  <span className="text-sm text-slate-500">{plan.period}</span>
+                  <span className="text-3xl font-bold text-text-primary">{plan.price}</span>
+                  <span className="text-sm text-text-muted">{plan.period}</span>
                 </div>
               </div>
 
               <ul className="space-y-3 mb-6">
                 {plan.features.map((feature) => (
                   <li key={feature.label} className="flex items-center gap-2 text-sm">
-                    <span className="flex-shrink-0">{feature.included ? <CheckIcon /> : <CrossIcon />}</span>
-                    <span className={feature.included ? "text-slate-300" : "text-slate-600"}>{feature.label}</span>
+                    {feature.included ? (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-success">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-text-muted">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    )}
+                    <span className={feature.included ? "text-text-secondary" : "text-text-muted"}>{feature.label}</span>
                   </li>
                 ))}
               </ul>
 
-              <Link
-                href={plan.href}
-                className={`block text-center font-semibold py-2.5 rounded-xl transition-colors text-sm ${
-                  plan.highlight
-                    ? "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/20"
-                    : "bg-slate-800 hover:bg-slate-700 text-slate-300"
-                }`}
-              >
-                {plan.cta}
+              <Link href={plan.href} className="block">
+                <Button variant={plan.highlight ? "premium" : "secondary"} className="w-full">
+                  {plan.highlight ? "Passer à Premium" : "Commencer gratuitement"}
+                </Button>
               </Link>
             </div>
           ))}

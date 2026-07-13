@@ -39,7 +39,7 @@ describe("getSeverityConfig", () => {
   });
 
   it("returns CSS classes for each severity level", () => {
-    expect(SEVERITY_CONFIG[3].borderBg).toContain("rose-500");
+    expect(SEVERITY_CONFIG[3].borderBg).toContain("accent");
     expect(SEVERITY_CONFIG[0].borderBg).toContain("emerald-500");
   });
 });

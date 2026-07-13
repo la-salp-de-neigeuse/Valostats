@@ -14,8 +14,8 @@ const RESULT_STYLES: Record<
   },
   LOSS: {
     label: "Défaite",
-    badgeClass: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-    borderClass: "border-l-rose-500",
+    badgeClass: "bg-accent-light text-accent border-accent/20",
+    borderClass: "border-l-accent",
   },
   DRAW: {
     label: "Égalité",
@@ -38,7 +38,7 @@ export function MatchHistoryRow({ match }: { match: MatchHistoryItem }) {
 
   return (
     <article
-      className={`bg-[#111115] border border-slate-800 border-l-4 ${resultStyle.borderClass} rounded-2xl p-5 hover:border-slate-700 transition-colors`}
+      className={`bg-surface border border-slate-800 border-l-4 ${resultStyle.borderClass} rounded-2xl p-5 hover-lift hover:border-slate-700 transition-all`}
       aria-label={`Match ${resultStyle.label} sur ${match.mapName}`}
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

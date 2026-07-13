@@ -47,7 +47,7 @@ export function RoleBadge({ role, size = "sm", showLabel = true, className }: Ro
 export function StaffBadge({ size = "sm" }: { size?: Size }) {
   const classes = [
     "inline-flex items-center gap-1 rounded-full border font-medium",
-    "text-rose-400 border-rose-500/40 bg-rose-500/10",
+    "text-accent border-accent/40 bg-accent-light",
     sizeClasses[size],
   ].join(" ");
 

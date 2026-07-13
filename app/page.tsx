@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
-import { BenefitsSection } from "@/components/marketing/BenefitsSection";
-import { CTASection } from "@/components/marketing/CTASection";
-import { DashboardPreview } from "@/components/marketing/DashboardPreview";
-import { FeaturesSection } from "@/components/marketing/FeaturesSection";
-import { Footer } from "@/components/marketing/Footer";
-import { HeroSection } from "@/components/marketing/HeroSection";
 import { Navbar } from "@/components/marketing/Navbar";
+import { HeroSection } from "@/components/marketing/HeroSection";
+import { HowItWorksSection } from "@/components/marketing/HowItWorksSection";
+import { FeaturesSection } from "@/components/marketing/FeaturesSection";
+import { AiPreview } from "@/components/marketing/AiPreview";
+import { StatsSection } from "@/components/marketing/StatsSection";
+import { DashboardPreview } from "@/components/marketing/DashboardPreview";
+import { OverlayPreview } from "@/components/marketing/OverlayPreview";
 import { PricingSection } from "@/components/marketing/PricingSection";
+import { FaqSection } from "@/components/marketing/FaqSection";
+import { CTASection } from "@/components/marketing/CTASection";
+import { Footer } from "@/components/marketing/Footer";
 
 export const metadata: Metadata = {
-  title: "ValoStats - Analyse et amélioration pour joueurs Valorant",
+  title: "ValoStats - Analyse de performances Valorant",
   description:
-    "Suivez vos performances Valorant avec des statistiques détaillées, un coach IA, un overlay pour streamer, et comparez-vous aux meilleurs joueurs.",
+    "ValoStats analyse vos performances Valorant avec des données réelles issues de l'API Riot. Coach IA, overlay stream, statistiques avancées. Gratuit pour commencer.",
   openGraph: {
-    title: "ValoStats - Analyse et amélioration pour joueurs Valorant",
+    title: "ValoStats - Analyse de performances Valorant",
     description:
-      "Suivez vos performances Valorant avec des statistiques détaillées, un coach IA, un overlay pour streamer, et comparez-vous aux meilleurs joueurs.",
+      "Analysez vos performances Valorant avec des données réelles. Coach IA, overlay stream, statistiques avancées.",
   },
 };
 
@@ -25,10 +29,14 @@ export default function Home() {
       <Navbar />
       <main id="main-content">
         <HeroSection />
+        <HowItWorksSection />
         <FeaturesSection />
+        <AiPreview />
+        <StatsSection />
         <DashboardPreview />
-        <BenefitsSection />
+        <OverlayPreview />
         <PricingSection />
+        <FaqSection />
         <CTASection />
       </main>
       <Footer />

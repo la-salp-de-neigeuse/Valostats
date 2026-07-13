@@ -5,8 +5,8 @@ export const MIN_MATCHES_FOR_ANALYSIS = 5;
 export const AI_SCORE_THRESHOLDS = [
   { min: 70, label: "Excellent", color: "text-emerald-400", bg: "bg-emerald-500" },
   { min: 50, label: "Bon", color: "text-yellow-400", bg: "bg-yellow-500" },
-  { min: 30, label: "Intermédiaire", color: "text-orange-400", bg: "bg-orange-500" },
-  { min: 0, label: "Débutant", color: "text-rose-400", bg: "bg-rose-500" },
+  { min: 30, label: "Intermédiaire", color: "text-ai-purple", bg: "bg-ai-purple" },
+  { min: 0, label: "Débutant", color: "text-accent", bg: "bg-accent" },
 ] as const;
 
 export function getScoreThreshold(score: number) {
@@ -44,16 +44,16 @@ export const SCORE_BREAKDOWN_BAR_COLORS: Record<string, string> = {
   kda: "from-blue-500 to-blue-400",
   winRate: "from-emerald-500 to-emerald-400",
   headshotRate: "from-violet-500 to-violet-400",
-  damagePerRound: "from-orange-500 to-orange-400",
-  firstDeathRate: "from-rose-500 to-rose-400",
+  damagePerRound: "from-ai-purple to-purple-400",
+  firstDeathRate: "from-accent to-accent",
   consistency: "from-cyan-500 to-cyan-400",
   agentMastery: "from-amber-500 to-amber-400",
   mapKnowledge: "from-indigo-500 to-indigo-400",
 };
 
 export const SEVERITY_CONFIG: Record<number, { label: string; borderBg: string }> = {
-  3: { label: "Critique", borderBg: "bg-rose-500/10 border-rose-500/30 text-rose-400" },
-  2: { label: "Élevé", borderBg: "bg-orange-500/10 border-orange-500/30 text-orange-400" },
+  3: { label: "Critique", borderBg: "bg-accent-light border-accent/25 text-accent" },
+  2: { label: "Élevé", borderBg: "bg-ai-purple/10 border-ai-purple/30 text-ai-purple" },
   1: { label: "Moyen", borderBg: "bg-yellow-500/10 border-yellow-500/30 text-yellow-400" },
   0: { label: "Faible", borderBg: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" },
 };
@@ -73,7 +73,7 @@ export const DIFFICULTY_CONFIG: Record<string, { label: string; color: string }>
   },
   hard: {
     label: "Difficile",
-    color: "bg-rose-500/10 text-rose-400 border-rose-500/20",
+    color: "bg-accent-light text-accent border-accent/20",
   },
 };
 

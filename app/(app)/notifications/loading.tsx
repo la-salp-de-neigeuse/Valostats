@@ -19,7 +19,7 @@ export default function NotificationsLoading() {
         ))}
       </div>
 
-      <div className="bg-[#111115] border border-slate-800 rounded-2xl p-4 space-y-1">
+      <div className="bg-surface border border-slate-800 rounded-2xl p-4 space-y-1">
         {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="flex items-start gap-3 p-3">
             <SkeletonBlock className="h-10 w-10 rounded-xl shrink-0" />

@@ -11,7 +11,7 @@ export function GoalCard({ goal }: GoalCardProps) {
   const diffLabel = diffConfig.label;
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition-colors">
+    <div className="bg-surface border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition-colors">
       <div className="flex items-start justify-between mb-2">
         <h4 className="font-semibold text-white text-sm">{goal.title}</h4>
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${diffColor}`}>

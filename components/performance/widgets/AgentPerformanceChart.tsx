@@ -10,7 +10,7 @@ interface AgentPerformanceChartProps {
 export function AgentPerformanceChart({ agents }: AgentPerformanceChartProps) {
   if (agents.length === 0) {
     return (
-      <div className="bg-[#111115] border border-slate-800 rounded-2xl p-5">
+      <div className="bg-surface border border-slate-800 rounded-2xl p-5">
         <h3 className="text-sm font-semibold text-white mb-4">Performance par Agent</h3>
         <p className="text-sm text-slate-500">Aucune donnée agent disponible</p>
       </div>
@@ -27,7 +27,7 @@ export function AgentPerformanceChart({ agents }: AgentPerformanceChartProps) {
     }));
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl p-5">
+    <div className="bg-surface border border-slate-800 rounded-2xl p-5">
       <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Performance par Agent</h3>
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
@@ -39,7 +39,7 @@ export function AgentPerformanceChart({ agents }: AgentPerformanceChartProps) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             formatter={(value: any) => [`${Number(value).toFixed(1)}%`, "Winrate"]}
           />
-          <Bar dataKey="Winrate" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={32} />
+          <Bar dataKey="Winrate" fill="#FF4655" radius={[4, 4, 0, 0]} maxBarSize={32} />
         </BarChart>
       </ResponsiveContainer>
     </div>

@@ -118,7 +118,7 @@ export function FeedbackAdminClient({ currentUserRole }: FeedbackAdminClientProp
             { label: "Résolus", value: stats.resolved, color: "text-emerald-400" },
             { label: "Critiques", value: stats.critical, color: "text-red-400" },
           ].map((s) => (
-            <div key={s.label} className="bg-[#111115] border border-slate-800 rounded-xl p-4">
+            <div key={s.label} className="bg-surface border border-slate-800 rounded-xl p-4">
               <p className="text-2xl font-bold text-white">{s.value}</p>
               <p className="text-xs text-slate-400 mt-1">{s.label}</p>
             </div>
@@ -129,26 +129,26 @@ export function FeedbackAdminClient({ currentUserRole }: FeedbackAdminClientProp
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          className="bg-slate-800 text-sm text-slate-200 border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-rose-500/50">
+          className="bg-slate-800 text-sm text-slate-200 border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-accent/50">
           <option value="">Tous les statuts</option>
           {statuses.map((s) => <option key={s} value={s}>{FEEDBACK_STATUS_LABELS[s]}</option>)}
         </select>
 
         <select value={typeFilter} onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }}
-          className="bg-slate-800 text-sm text-slate-200 border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-rose-500/50">
+          className="bg-slate-800 text-sm text-slate-200 border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-accent/50">
           <option value="">Tous les types</option>
           {types.map((t) => <option key={t} value={t}>{FEEDBACK_TYPE_LABELS[t]}</option>)}
         </select>
 
         <select value={priorityFilter} onChange={(e) => { setPriorityFilter(e.target.value); setPage(1); }}
-          className="bg-slate-800 text-sm text-slate-200 border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-rose-500/50">
+          className="bg-slate-800 text-sm text-slate-200 border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-accent/50">
           <option value="">Toutes les priorités</option>
           {priorities.map((p) => <option key={p} value={p}>{FEEDBACK_PRIORITY_LABELS[p]}</option>)}
         </select>
       </div>
 
       {/* Table */}
-      <div className="bg-[#111115] border border-slate-800 rounded-2xl overflow-hidden">
+      <div className="bg-surface border border-slate-800 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -182,8 +182,10 @@ export function FeedbackAdminClient({ currentUserRole }: FeedbackAdminClientProp
                   <tr key={fb.id} className="hover:bg-slate-800/30 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-rose-500 to-orange-400 flex items-center justify-center text-white font-bold text-xs">
-                          {(fb.userName || "U").charAt(0).toUpperCase()}
+                        <div className="w-7 h-7 rounded-full bg-accent/10 flex items-center justify-center text-accent">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="12 2 22 22 2 22 12 2" />
+                          </svg>
                         </div>
                         <span className="text-sm text-slate-300">{fb.userName || fb.userEmail}</span>
                       </div>
@@ -239,14 +241,14 @@ export function FeedbackAdminClient({ currentUserRole }: FeedbackAdminClientProp
                                   value={noteText}
                                   onChange={(e) => setNoteText(e.target.value)}
                                   placeholder="Note interne..."
-                                  className="w-28 px-2 py-1 text-xs bg-slate-800 border border-slate-700 rounded text-slate-200 focus:outline-none focus:ring-1 focus:ring-rose-500/50"
+                                  className="w-28 px-2 py-1 text-xs bg-slate-800 border border-slate-700 rounded text-slate-200 focus:outline-none focus:ring-1 focus:ring-accent/50"
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") updateField(fb.id, "note", noteText);
                                     if (e.key === "Escape") setEditingNote(null);
                                   }}
                                   autoFocus
                                 />
-                                <button onClick={() => updateField(fb.id, "note", noteText)} className="text-xs text-rose-400 hover:text-rose-300">OK</button>
+                                <button onClick={() => updateField(fb.id, "note", noteText)} className="text-xs text-accent hover:text-accent-hover">OK</button>
                               </div>
                             ) : (
                               <button

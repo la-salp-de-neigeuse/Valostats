@@ -59,7 +59,7 @@ function Pagination({ data, baseQueryString }: { data: LeaderboardResult; baseQu
             href={href}
             className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
               p === data.page
-                ? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+                ? "bg-accent/20 text-accent border border-accent/25"
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
             }`}
           >
@@ -74,7 +74,7 @@ function Pagination({ data, baseQueryString }: { data: LeaderboardResult; baseQu
 export function LeaderboardTable({ data, currentSort, currentQueryString }: LeaderboardTableProps) {
   if (data.entries.length === 0) {
     return (
-      <div className="bg-[#111115] border border-slate-800 rounded-2xl p-8 text-center" role="status">
+      <div className="bg-surface border border-slate-800 rounded-2xl p-8 text-center" role="status">
         <p className="text-slate-400">Aucun joueur trouvé pour ces filtres.</p>
         <p className="text-slate-500 text-sm mt-2">Essayez de modifier les filtres ou de synchroniser des matchs.</p>
       </div>
@@ -83,7 +83,7 @@ export function LeaderboardTable({ data, currentSort, currentQueryString }: Lead
 
   return (
     <div>
-      <div className="bg-[#111115] border border-slate-800 rounded-2xl overflow-hidden" role="group" aria-label="Classement des joueurs">
+      <div className="bg-surface border border-slate-800 rounded-2xl overflow-hidden" role="group" aria-label="Classement des joueurs">
         <table className="w-full">
           <thead>
             <tr className="border-b border-slate-800">
@@ -130,7 +130,7 @@ function LeaderboardRow({ entry, currentSort }: { entry: LeaderboardPlayerEntry;
         <RankBadge rank={entry.rank} />
       </td>
       <td className="px-4 py-3">
-        <Link href={`/player/${entry.publicSlug}`} className="hover:text-rose-400 transition-colors">
+        <Link href={`/player/${entry.publicSlug}`} className="hover:text-accent transition-colors">
           <span className="text-sm font-medium text-white">{displayName}</span>
         </Link>
       </td>
@@ -141,12 +141,12 @@ function LeaderboardRow({ entry, currentSort }: { entry: LeaderboardPlayerEntry;
         <span className="text-sm text-slate-300 font-mono">{entry.matchCount}</span>
       </td>
       <td className="px-4 py-3 text-right">
-        <span className={`text-sm font-mono ${entry.winRate >= 55 ? "text-emerald-400" : entry.winRate >= 50 ? "text-slate-300" : "text-rose-400"}`}>
+        <span className={`text-sm font-mono ${entry.winRate >= 55 ? "text-emerald-400" : entry.winRate >= 50 ? "text-slate-300" : "text-accent"}`}>
           {entry.winRate.toFixed(1)}%
         </span>
       </td>
       <td className="px-4 py-3 text-right">
-        <span className={`text-sm font-mono ${entry.kda >= 1.2 ? "text-emerald-400" : entry.kda >= 1 ? "text-slate-300" : "text-rose-400"}`}>
+        <span className={`text-sm font-mono ${entry.kda >= 1.2 ? "text-emerald-400" : entry.kda >= 1 ? "text-slate-300" : "text-accent"}`}>
           {entry.kda.toFixed(2)}
         </span>
       </td>

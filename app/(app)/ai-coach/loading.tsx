@@ -14,7 +14,7 @@ export default function AiCoachLoading() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 bg-gradient-to-br from-[#111115] to-[#0a0a0c] border border-slate-800 rounded-2xl p-6">
+        <div className="lg:col-span-2 bg-gradient-to-br bg-surface border border-border rounded-2xl p-6">
           <div className="flex items-start gap-4 mb-4">
             <SkeletonBlock className="h-12 w-12 rounded-xl" />
             <div className="flex-1">
@@ -33,7 +33,7 @@ export default function AiCoachLoading() {
         </div>
 
         <div>
-          <div className="bg-[#111115] border border-slate-800 rounded-2xl p-5">
+          <div className="bg-surface border border-slate-800 rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <SkeletonBlock className="h-8 w-8 rounded-lg" />
               <SkeletonBlock className="h-5 w-28" />
@@ -54,7 +54,7 @@ export default function AiCoachLoading() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="bg-[#111115] border border-slate-800 rounded-2xl p-5">
+        <div className="bg-surface border border-slate-800 rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-4">
             <SkeletonBlock className="h-8 w-8 rounded-lg" />
             <SkeletonBlock className="h-5 w-28" />
@@ -78,14 +78,14 @@ export default function AiCoachLoading() {
         </div>
 
         <div className="lg:col-span-2">
-          <div className="bg-[#111115] border border-slate-800 rounded-2xl p-5">
+          <div className="bg-surface border border-slate-800 rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <SkeletonBlock className="h-8 w-8 rounded-lg" />
               <SkeletonBlock className="h-5 w-40" />
             </div>
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-[#111115] border border-slate-800 rounded-xl p-4">
+                <div key={i} className="bg-surface border border-slate-800 rounded-xl p-4">
                   <div className="flex items-start justify-between mb-2">
                     <SkeletonBlock className="h-4 w-40" />
                     <SkeletonBlock className="h-5 w-14 rounded-full" />
@@ -112,7 +112,7 @@ export default function AiCoachLoading() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[1, 2].map((i) => (
-                <div key={i} className="bg-[#111115] border border-emerald-500/10 rounded-lg p-3">
+                <div key={i} className="bg-surface border border-emerald-500/10 rounded-lg p-3">
                   <div className="flex items-start gap-2">
                     <SkeletonBlock className="h-8 w-8 rounded-lg shrink-0" />
                     <div className="flex-1">

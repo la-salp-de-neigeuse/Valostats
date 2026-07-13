@@ -9,15 +9,20 @@ export const metadata = {
 export default function RegisterPage() {
   return (
     <main id="main-content" className="flex min-h-screen items-center justify-center p-4 bg-background">
-      <div className="w-full max-w-md space-y-8 rounded-xl border border-white/10 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-sm">
+      <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Créer un compte</h1>
-          <p className="mt-2 text-sm text-zinc-400">Commencez à analyser vos parties Valorant</p>
+          <div className="w-12 h-12 rounded-xl bg-gradient-brand-br flex items-center justify-center text-white font-bold text-lg mx-auto mb-4 shadow-lg shadow-accent-glow">
+            V
+          </div>
+          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Créer un compte</h1>
+          <p className="mt-2 text-sm text-text-muted">Commencez à analyser vos parties Valorant</p>
         </div>
-        <RegisterForm />
-        <p className="text-center text-sm text-zinc-400">
+        <div className="bg-surface border border-border rounded-xl p-8">
+          <RegisterForm />
+        </div>
+        <p className="text-center text-sm text-text-muted">
           Déjà un compte ?{" "}
-          <Link href="/login" className="font-medium text-red-500 hover:text-red-400 underline-offset-4 hover:underline">
+          <Link href="/login" className="font-medium text-accent hover:text-accent-hover underline-offset-4 hover:underline transition-colors">
             Se connecter
           </Link>
         </p>

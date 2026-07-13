@@ -21,7 +21,7 @@ export default function MatchesLoading() {
         {[1, 2, 3, 4, 5].map((i) => (
           <div
             key={i}
-            className="bg-[#111115] border border-slate-800 rounded-xl p-4"
+            className="bg-surface border border-slate-800 rounded-xl p-4"
           >
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">

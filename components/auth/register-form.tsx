@@ -1,10 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { signIn } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/toast";
 
 interface PasswordCheck {
   label: string;
@@ -12,7 +10,7 @@ interface PasswordCheck {
 }
 
 const CHECKS: PasswordCheck[] = [
-  { label: "12 caractères minimum", test: (p) => p.length >= 12 },
+  { label: "8 caractères minimum", test: (p) => p.length >= 8 },
   { label: "Une lettre majuscule", test: (p) => /[A-Z]/.test(p) },
   { label: "Une lettre minuscule", test: (p) => /[a-z]/.test(p) },
   { label: "Un chiffre", test: (p) => /\d/.test(p) },
@@ -43,7 +41,7 @@ function PasswordStrength({ password }: { password: string }) {
             <li
               key={check.label}
               className={`flex items-center gap-1.5 text-xs transition-colors duration-200 ${
-                neutral ? "text-slate-500" : ok ? "text-emerald-400" : "text-rose-400"
+                neutral ? "text-slate-500" : ok ? "text-emerald-400" : "text-accent"
               }`}
             >
               <svg
@@ -79,7 +77,6 @@ export function RegisterForm() {
   const [password, setPassword] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const { addToast } = useToast();
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -103,20 +100,8 @@ export function RegisterForm() {
         throw new Error(data.error || "Une erreur est survenue lors de l'inscription.");
       }
 
-      const result = await signIn("credentials", {
-        email: email.trim(),
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        addToast({ variant: "warning", title: "Connexion", description: "Inscription réussie, connexion automatique en cours…" });
-        setIsLoading(false);
-      } else {
-        addToast({ variant: "success", title: "Bienvenue sur ValoStats", description: "Votre compte a été créé avec succès." });
-        setIsLoading(false);
-        window.location.href = "/dashboard";
-      }
+      setIsLoading(false);
+      window.location.href = "/dashboard";
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

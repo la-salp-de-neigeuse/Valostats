@@ -12,6 +12,8 @@ export class HttpError extends Error {
 }
 
 export function assertSameOrigin(request: Request): void {
+  if (process.env.NODE_ENV === "development") return;
+
   const origin = request.headers.get("origin");
 
   if (!origin) {

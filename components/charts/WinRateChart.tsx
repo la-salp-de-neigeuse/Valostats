@@ -21,7 +21,7 @@ export function WinRateChart({ data }: WinRateChartProps) {
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-48 text-slate-500 text-sm">
-        Pas assez de matchs pour afficher l&apos;évolution
+        {"Pas assez de matchs pour afficher l'évolution"}
       </div>
     );
   }
@@ -64,3 +64,4 @@ export function WinRateChart({ data }: WinRateChartProps) {
     </div>
   );
 }
+

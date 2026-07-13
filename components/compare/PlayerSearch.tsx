@@ -77,13 +77,13 @@ function SearchInput({
         value={query}
         onChange={handleChange}
         placeholder="Rechercher par nom ou Riot ID..."
-        className="w-full bg-[#0a0a0c] border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-rose-500 transition-colors"
+        className="w-full bg-background border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-accent transition-colors"
       />
       {loading && (
         <span className="absolute right-3 top-9 text-xs text-slate-500">Recherche...</span>
       )}
       {open && results.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full bg-[#111115] border border-slate-700 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+        <div className="absolute z-50 mt-1 w-full bg-surface border border-slate-700 rounded-xl shadow-xl max-h-60 overflow-y-auto">
           {results.map((r) => (
             <button
               key={r.publicSlug}
@@ -100,7 +100,7 @@ function SearchInput({
         </div>
       )}
       {open && results.length === 0 && query.length >= 2 && !loading && (
-        <div className="absolute z-50 mt-1 w-full bg-[#111115] border border-slate-700 rounded-xl shadow-xl p-4 text-center text-sm text-slate-500">
+        <div className="absolute z-50 mt-1 w-full bg-surface border border-slate-700 rounded-xl shadow-xl p-4 text-center text-sm text-slate-500">
           Aucun joueur trouvé
         </div>
       )}
@@ -121,7 +121,7 @@ export function PlayerSearch() {
   }, [canCompare, p1, p2, router]);
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl p-6">
+    <div className="bg-surface border border-slate-800 rounded-2xl p-6">
       <div className="flex flex-col md:flex-row gap-4 items-end">
         <SearchInput
           label="Joueur 1"
@@ -137,7 +137,7 @@ export function PlayerSearch() {
         <button
           onClick={handleCompare}
           disabled={!canCompare}
-          className="w-full md:w-auto bg-rose-500 hover:bg-rose-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-xl transition-colors"
+          className="w-full md:w-auto bg-accent hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-xl transition-colors"
         >
           Comparer
         </button>

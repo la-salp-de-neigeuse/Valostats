@@ -40,7 +40,7 @@ export function InsightCard({ category, severity, problem, explanation, solution
 
   if (compact) {
     return (
-      <div className={`bg-[#111115] border rounded-lg p-3 hover:border-slate-700 transition-colors ${severityColor}`}>
+      <div className={`bg-surface border rounded-lg p-3 hover:border-slate-700 transition-colors ${severityColor}`}>
         <div className="flex items-start gap-2">
           <div className="p-1.5 bg-slate-800/50 rounded-lg shrink-0">
             <CategoryIcon category={category} className="w-4 h-4 text-slate-400" />
@@ -60,7 +60,7 @@ export function InsightCard({ category, severity, problem, explanation, solution
   }
 
   return (
-    <div className={`bg-[#111115] border rounded-xl p-5 hover:border-slate-700 transition-colors ${severityColor}`}>
+    <div className={`bg-surface border rounded-xl p-5 hover:border-slate-700 transition-colors ${severityColor}`}>
       <div className="flex items-start gap-3 mb-3">
         <div className="p-2 bg-slate-800/50 rounded-lg">
           <CategoryIcon category={category} className="text-slate-400" />

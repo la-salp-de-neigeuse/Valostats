@@ -14,13 +14,13 @@ export default async function AppLayout({
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/login?expired=1");
   }
 
   return (
     <SidebarProvider>
       <SearchProvider>
-        <div className="min-h-screen bg-[#050505] text-slate-200 flex">
+        <div className="min-h-screen bg-background text-text-primary flex">
           <Sidebar />
           <MobileDrawer />
           <div className="flex-1 flex flex-col min-w-0">

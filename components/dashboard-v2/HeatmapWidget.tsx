@@ -13,44 +13,45 @@ export function HeatmapWidget({ data }: HeatmapWidgetProps) {
   if (agentNames.length === 0 || mapNames.length === 0) {
     return (
       <div className="p-5">
-        <h3 className="text-sm font-semibold text-white mb-4">Heatmap Agents / Maps</h3>
-        <p className="text-sm text-slate-500">Pas assez de données</p>
+        <h3 className="text-sm font-semibold text-text-primary mb-4">Heatmap Agents / Maps</h3>
+        <p className="text-sm text-text-muted">Pas assez de données</p>
       </div>
     );
   }
 
   return (
     <div className="p-5">
-      <h3 className="text-sm font-semibold text-white mb-4">Heatmap Agents / Maps</h3>
-      <div className="overflow-x-auto">
+      <h3 className="text-sm font-semibold text-text-primary mb-4">Heatmap Agents / Maps</h3>
+      <div className="overflow-x-auto scrollbar-none">
         <table className="w-full text-xs">
           <thead>
             <tr>
-              <th className="text-left text-slate-400 font-medium pb-2 pr-2">Agent</th>
+              <th className="text-left text-text-muted font-medium pb-2 pr-2">Agent</th>
               {mapNames.map((m) => (
-                <th key={m} className="text-slate-400 font-medium pb-2 px-1 text-center">{m}</th>
+                <th key={m} className="text-text-muted font-medium pb-2 px-1 text-center">{m}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {agentNames.map((agent) => (
               <tr key={agent}>
-                <td className="text-white pr-2 py-1">{agent}</td>
+                <td className="text-text-primary font-medium pr-2 py-1 text-xs">{agent}</td>
                 {mapNames.map((mapName) => {
                   const cell = data.find((d) => d.agentName === agent && d.mapName === mapName);
                   const intensity = cell ? Math.min(cell.winRate / 100, 1) : 0;
                   return (
                     <td
                       key={`${agent}-${mapName}`}
-                      className="px-1 py-1 text-center rounded"
+                      className="px-1 py-1 text-center rounded-sm transition-colors"
                       style={{
                         backgroundColor: cell
-                          ? `rgba(244, 63, 94, ${intensity * 0.6 + 0.1})`
+                          ? `rgba(255, 70, 85, ${intensity * 0.5 + 0.08})`
                           : "transparent",
-                        color: cell ? (intensity > 0.5 ? "#fff" : "#94a3b8") : "#334155",
+                        color: cell ? (intensity > 0.5 ? "var(--foreground)" : "var(--text-secondary)") : "var(--border)",
                       }}
+                      title={cell ? `${agent} sur ${mapName}: ${cell.winRate}% WR (${cell.matchCount}m)` : undefined}
                     >
-                      {cell ? `${cell.winRate}%` : "—"}
+                      <span className="font-medium">{cell ? `${cell.winRate}%` : "—"}</span>
                     </td>
                   );
                 })}

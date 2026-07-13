@@ -104,7 +104,7 @@ export function NotificationsPageClient({
               onClick={() => handleFilterChange(f.value)}
               className={`text-sm px-3 py-1.5 rounded-lg font-medium transition-colors whitespace-nowrap ${
                 typeFilter === f.value
-                  ? "bg-rose-500 text-white"
+                  ? "bg-accent text-white"
                   : "bg-slate-800 text-slate-400 hover:text-white"
               }`}
             >
@@ -115,7 +115,7 @@ export function NotificationsPageClient({
         {data.unreadCount > 0 && (
           <button
             onClick={handleMarkAllRead}
-            className="text-sm text-rose-400 hover:text-rose-300 transition-colors shrink-0"
+            className="text-sm text-accent hover:text-accent-hover transition-colors shrink-0"
           >
             Tout marquer comme lu
           </button>
@@ -123,13 +123,13 @@ export function NotificationsPageClient({
       </div>
 
       {loading && (
-        <div className="bg-[#111115] border border-slate-800 rounded-2xl p-8 text-center">
+        <div className="bg-surface border border-slate-800 rounded-2xl p-8 text-center">
           <p className="text-sm text-slate-500">Chargement...</p>
         </div>
       )}
 
       {!loading && data.notifications.length === 0 && (
-        <div className="bg-[#111115] border border-slate-800 rounded-2xl p-12 text-center">
+        <div className="bg-surface border border-slate-800 rounded-2xl p-12 text-center">
           <div className="text-4xl mb-3" role="img" aria-label="Cloche de notification">🔔</div>
           <h3 className="text-lg font-semibold text-white mb-2">Aucune notification</h3>
           <p className="text-sm text-slate-400">
@@ -139,7 +139,7 @@ export function NotificationsPageClient({
       )}
 
       {!loading && data.notifications.length > 0 && (
-        <div className="bg-[#111115] border border-slate-800 rounded-2xl p-4 space-y-1">
+        <div className="bg-surface border border-slate-800 rounded-2xl p-4 space-y-1">
           {data.notifications.map((n) => (
             <NotificationItem
               key={n.id}
@@ -159,7 +159,7 @@ export function NotificationsPageClient({
               onClick={() => fetchPage(page)}
               className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
                 page === data.page
-                  ? "bg-rose-500 text-white"
+                  ? "bg-accent text-white"
                   : "bg-slate-800 text-slate-400 hover:text-white"
               }`}
             >

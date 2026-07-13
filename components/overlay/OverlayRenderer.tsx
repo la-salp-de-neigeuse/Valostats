@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import type { OverlayData, OverlayWidgetType } from "@/services/overlay/types";
 import { OverlayThemeProvider } from "./ThemeProvider";
+import { Watermark } from "./Watermark";
 import {
   PlayerNameWidget,
   RankWidget,
@@ -173,6 +174,7 @@ export function OverlayRenderer({
           })}
         </div>
       </div>
+      <Watermark />
     </div>
   );
 }

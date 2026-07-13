@@ -87,7 +87,7 @@ export function LinkRiotForm({
       <div>
         <label className="text-sm font-medium text-slate-400 mb-1.5 block">Région</label>
         <select 
-          className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0c]"
+          className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0c]"
           value={platform}
           onChange={(e) => setPlatform(e.target.value as RiotPlatform)}
         >
@@ -104,7 +104,7 @@ export function LinkRiotForm({
         </select>
       </div>
 
-      {error && <p className="text-sm text-rose-500">{error}</p>}
+      {error && <p className="text-sm text-accent">{error}</p>}
 
       <div className="flex gap-3 pt-2">
         {onCancel && (
@@ -116,7 +116,7 @@ export function LinkRiotForm({
             Annuler
           </button>
         )}
-        <Button type="submit" isLoading={isLoading} className="flex-1 bg-rose-500 hover:bg-rose-600">
+        <Button type="submit" isLoading={isLoading} className="flex-1 bg-accent hover:bg-accent-hover">
           Enregistrer
         </Button>
       </div>

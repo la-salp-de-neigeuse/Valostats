@@ -6,7 +6,7 @@ const THEME_VARS: Record<OverlayTheme, Record<string, string>> = {
   dark: {
     "--ol-bg": "#09090b",
     "--ol-text": "#fafafa",
-    "--ol-text-secondary": "#a1a1aa",
+    "--ol-text-secondary": "#94A3B8",
     "--ol-card": "#1c1c1f",
     "--ol-border": "#27272a",
     "--ol-win": "#22c55e",
@@ -15,7 +15,7 @@ const THEME_VARS: Record<OverlayTheme, Record<string, string>> = {
   transparent: {
     "--ol-bg": "transparent",
     "--ol-text": "#ffffff",
-    "--ol-text-secondary": "#a1a1aa",
+    "--ol-text-secondary": "#94A3B8",
     "--ol-card": "rgba(0,0,0,0.5)",
     "--ol-border": "rgba(255,255,255,0.1)",
     "--ol-win": "#22c55e",
@@ -32,17 +32,17 @@ const THEME_VARS: Record<OverlayTheme, Record<string, string>> = {
   },
   minimal: {
     "--ol-bg": "transparent",
-    "--ol-text": "#fafafa",
-    "--ol-text-secondary": "#a1a1aa",
-    "--ol-card": "rgba(0,0,0,0.3)",
-    "--ol-border": "rgba(255,255,255,0.15)",
-    "--ol-win": "#22c55e",
-    "--ol-loss": "#ef4444",
+    "--ol-text": "#0F172A",
+    "--ol-text-secondary": "#475569",
+    "--ol-card": "rgba(255,255,255,0.85)",
+    "--ol-border": "rgba(0,0,0,0.08)",
+    "--ol-win": "#16A34A",
+    "--ol-loss": "#DC2626",
   },
   streamer: {
     "--ol-bg": "linear-gradient(135deg, #0f0f1a 0%, #1a0a2e 50%, #0f0f1a 100%)",
     "--ol-text": "#fafafa",
-    "--ol-text-secondary": "#a1a1aa",
+    "--ol-text-secondary": "#94A3B8",
     "--ol-card": "rgba(30, 15, 50, 0.7)",
     "--ol-border": "rgba(168, 85, 247, 0.25)",
     "--ol-win": "#22c55e",
@@ -162,6 +162,41 @@ export function OverlayThemeProvider({ settings }: { settings: OverlaySettings }
       .overlay-root .ol-badge-loss {
         background: color-mix(in srgb, var(--ol-loss) 20%, transparent);
         color: var(--ol-loss);
+      }
+      .overlay-root .ol-watermark {
+        position: fixed;
+        bottom: 12px;
+        right: 12px;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 1px;
+        padding: 6px 10px;
+        border-radius: 6px;
+        background: color-mix(in srgb, var(--ol-card) 40%, transparent);
+        backdrop-filter: blur(4px);
+        text-decoration: none;
+        opacity: 0.35;
+        transition: opacity 0.2s ease;
+        z-index: 9999;
+        pointer-events: auto;
+      }
+      .overlay-root .ol-watermark:hover {
+        opacity: 0.6;
+      }
+      .overlay-root .ol-watermark-label {
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: var(--ol-text);
+        line-height: 1.2;
+        text-transform: uppercase;
+      }
+      .overlay-root .ol-watermark-domain {
+        font-size: 8px;
+        font-weight: 400;
+        color: var(--ol-text-secondary);
+        line-height: 1.2;
       }
       ${settings.animations ? `
         .overlay-root .ol-card {

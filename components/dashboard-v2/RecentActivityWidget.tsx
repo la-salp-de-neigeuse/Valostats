@@ -6,46 +6,13 @@ interface RecentActivityWidgetProps {
   data: ActivityEntry[];
 }
 
-const activityIcons: Record<ActivityEntry["type"], string> = {
-  sync: "↻",
-  analysis: "✨",
-  goal: "🎯",
-  badge: "🏅",
-  rank: "⬆",
+const ACTIVITY_META: Record<ActivityEntry["type"], { icon: string; ring: string }> = {
+  sync: { icon: "↻", ring: "bg-blue-500/10 text-blue-400" },
+  analysis: { icon: "✨", ring: "bg-accent-light text-accent" },
+  goal: { icon: "🎯", ring: "bg-emerald-500/10 text-emerald-400" },
+  badge: { icon: "🏅", ring: "bg-amber-500/10 text-amber-400" },
+  rank: { icon: "⬆", ring: "bg-violet-500/10 text-violet-400" },
 };
-
-export function RecentActivityWidget({ data }: RecentActivityWidgetProps) {
-  if (data.length === 0) {
-    return (
-      <div className="p-5">
-        <h3 className="text-sm font-semibold text-white mb-4">Activité récente</h3>
-        <p className="text-sm text-slate-500">Aucune activité</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="p-5">
-      <h3 className="text-sm font-semibold text-white mb-4">Activité récente</h3>
-      <div className="space-y-2 max-h-72 overflow-y-auto">
-        {data.map((entry) => (
-          <div key={entry.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-800/30 transition-colors">
-            <span className="text-lg shrink-0">{activityIcons[entry.type]}</span>
-            <div className="min-w-0">
-              <p className="text-sm text-white truncate">{entry.title}</p>
-              {entry.description && (
-                <p className="text-xs text-slate-500 truncate">{entry.description}</p>
-              )}
-            </div>
-            <span className="text-xs text-slate-600 ml-auto shrink-0">
-              {formatRelativeTime(entry.timestamp)}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 function formatRelativeTime(date: Date): string {
   const diff = Date.now() - date.getTime();
@@ -56,4 +23,38 @@ function formatRelativeTime(date: Date): string {
   if (hours < 24) return `il y a ${hours}h`;
   const days = Math.floor(hours / 24);
   return `il y a ${days}j`;
+}
+
+export function RecentActivityWidget({ data }: RecentActivityWidgetProps) {
+  if (data.length === 0) {
+    return (
+      <div className="p-5">
+        <h3 className="text-sm font-semibold text-text-primary mb-4">Activité récente</h3>
+        <p className="text-sm text-text-muted">Aucune activité</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-5">
+      <h3 className="text-sm font-semibold text-text-primary mb-4">Activité récente</h3>
+      <div className="space-y-1 max-h-72 overflow-y-auto scrollbar-none">
+        {data.map((entry) => {
+          const meta = ACTIVITY_META[entry.type];
+          return (
+            <div key={entry.id} className="group flex items-start gap-3 p-2.5 rounded-lg hover:bg-surface-hover/30 transition-all">
+              <div className={`shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-xs ${meta.ring}`}>
+                {meta.icon}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-text-primary truncate group-hover:text-accent transition-colors">{entry.title}</p>
+                {entry.description && <p className="text-xs text-text-muted truncate mt-0.5">{entry.description}</p>}
+              </div>
+              <span className="text-[10px] text-text-muted shrink-0">{formatRelativeTime(entry.timestamp)}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }

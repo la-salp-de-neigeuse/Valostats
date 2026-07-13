@@ -10,7 +10,7 @@ interface EvolutionChartsProps {
 export function EvolutionCharts({ recentMatches }: EvolutionChartsProps) {
   if (recentMatches.length === 0) {
     return (
-      <div className="bg-[#111115] border border-slate-800 rounded-2xl p-6">
+      <div className="bg-surface border border-slate-800 rounded-2xl p-6">
         <h2 className="text-xl font-semibold text-white mb-4">Évolution</h2>
         <p className="text-slate-400">Pas assez de données pour afficher les graphiques.</p>
       </div>
@@ -26,7 +26,7 @@ export function EvolutionCharts({ recentMatches }: EvolutionChartsProps) {
   }));
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl p-6">
+    <div className="bg-surface border border-slate-800 rounded-2xl p-6">
       <h2 className="text-xl font-semibold text-white mb-6">Évolution</h2>
 
       <div className="space-y-6">
@@ -50,7 +50,7 @@ export function EvolutionCharts({ recentMatches }: EvolutionChartsProps) {
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#111115",
+                    backgroundColor: "#0F1626",
                     border: "1px solid #334155",
                     borderRadius: "8px",
                   }}
@@ -60,9 +60,9 @@ export function EvolutionCharts({ recentMatches }: EvolutionChartsProps) {
                 <Line
                   type="monotone"
                   dataKey="kdRatio"
-                  stroke="#f43f5e"
+                  stroke="#FF4655"
                   strokeWidth={2}
-                  dot={{ fill: "#f43f5e", r: 4 }}
+                  dot={{ fill: "#FF4655", r: 4 }}
                   name="K/D"
                 />
               </LineChart>
@@ -90,7 +90,7 @@ export function EvolutionCharts({ recentMatches }: EvolutionChartsProps) {
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#111115",
+                    backgroundColor: "#0F1626",
                     border: "1px solid #334155",
                     borderRadius: "8px",
                   }}
@@ -108,9 +108,9 @@ export function EvolutionCharts({ recentMatches }: EvolutionChartsProps) {
                 <Line
                   type="monotone"
                   dataKey="deaths"
-                  stroke="#f43f5e"
+                  stroke="#FF4655"
                   strokeWidth={2}
-                  dot={{ fill: "#f43f5e", r: 4 }}
+                  dot={{ fill: "#FF4655", r: 4 }}
                   name="Deaths"
                 />
               </LineChart>

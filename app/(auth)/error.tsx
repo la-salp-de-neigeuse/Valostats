@@ -21,10 +21,10 @@ export default function AuthErrorPage({
   reset: () => void;
 }) {
   return (
-    <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
-        <div className="bg-gradient-to-br from-[#111115] to-[#0a0a0c] border border-slate-800 rounded-3xl p-8 text-center">
-          <div className="p-4 bg-rose-500/10 rounded-2xl inline-flex mb-6 text-rose-400">
+        <div className="bg-gradient-to-br bg-surface border border-border rounded-3xl p-8 text-center">
+          <div className="p-4 bg-accent-light rounded-2xl inline-flex mb-6 text-accent">
             <ErrorIcon />
           </div>
 
@@ -36,7 +36,7 @@ export default function AuthErrorPage({
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               onClick={reset}
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg shadow-rose-500/20"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg shadow-accent-glow"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
                 <polyline points="1 4 1 10 7 10" />

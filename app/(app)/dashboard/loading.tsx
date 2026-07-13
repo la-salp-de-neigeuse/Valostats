@@ -1,70 +1,69 @@
-import { Skeleton, SkeletonCard, SkeletonLine } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardLoading() {
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-48 mt-2" />
-        </div>
-        <div className="flex gap-1">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-9 w-16 rounded-xl" />
-          ))}
+    <div className="max-w-7xl mx-auto space-y-7">
+      <div className="rounded-2xl bg-surface border border-border/80 p-8">
+        <div className="flex items-center justify-between gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-56" />
+            <Skeleton className="h-4 w-40" />
+          </div>
+          <Skeleton className="h-9 w-32 rounded-lg" />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => (
-          <SkeletonCard key={i} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="bg-surface border border-border/80 border-l-[3px] border-l-accent/30 rounded-xl p-5 space-y-3">
+            <div className="flex justify-between">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-8 w-8 rounded-lg" />
+            </div>
+            <Skeleton className="h-7 w-20" />
+            <Skeleton className="h-3 w-24" />
+          </div>
         ))}
       </div>
 
-      <div className="bg-gradient-to-br from-[#111115] to-[#0a0a0c] border border-slate-800 rounded-2xl p-6">
-        <div className="flex items-center gap-4">
-          <Skeleton className="h-12 w-12 rounded-xl" />
-          <div className="flex-1">
-            <Skeleton className="h-5 w-32" />
-            <Skeleton className="h-4 w-48 mt-1" />
-          </div>
-        </div>
-        <div className="flex items-center gap-6 mt-4">
-          <Skeleton className="h-16 w-16" />
-          <Skeleton className="flex-1 h-3 rounded-full" />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {[1, 2].map((i) => (
-          <div key={i} className="bg-[#111115] border border-slate-800 rounded-2xl p-6">
-            <Skeleton className="h-5 w-32 mb-4" />
-            {[1, 2, 3].map((j) => (
-              <SkeletonLine key={j} />
-            ))}
+          <div key={i} className="bg-surface border border-border/80 rounded-xl overflow-hidden">
+            <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-border/50">
+              <Skeleton className="h-8 w-8 rounded-lg" />
+              <div className="space-y-1">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+            </div>
+            <div className="p-4 space-y-2">
+              {[1, 2, 3, 4].map((j) => (
+                <div key={j} className="flex items-center gap-3 p-2.5">
+                  <div className="flex-1 space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-3.5 w-20" />
+                      <Skeleton className="h-3 w-6 rounded" />
+                    </div>
+                    <Skeleton className="h-1.5 w-full rounded-full" />
+                  </div>
+                  <Skeleton className="h-5 w-10 rounded-md" />
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-gradient-to-br from-[#111115] to-[#0a0a0c] border border-slate-800 rounded-2xl p-6">
-        <Skeleton className="h-6 w-24 mb-6" />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="bg-surface border border-border/80 rounded-xl p-6">
+        <Skeleton className="h-5 w-40 mb-6" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-slate-800/30 rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Skeleton className="h-2 w-2 rounded-full" />
-                <Skeleton className="h-4 w-24" />
-              </div>
+            <div key={i} className="bg-surface-hover/30 rounded-xl p-4 border border-border/50 space-y-3">
+              <Skeleton className="h-3 w-16" />
               <Skeleton className="h-32 w-full rounded-lg" />
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
-          <SkeletonCard key={i} />
-        ))}
       </div>
     </div>
   );

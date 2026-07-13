@@ -61,7 +61,7 @@ export function PeriodComparison({ data }: PeriodComparisonProps) {
           />
           <Tooltip content={<CustomTooltip />} />
           <Bar dataKey="Winrate" fill="#22c55e" radius={[4, 4, 0, 0]} maxBarSize={24} />
-          <Bar dataKey="K/D" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={24} />
+          <Bar dataKey="K/D" fill="#FF4655" radius={[4, 4, 0, 0]} maxBarSize={24} />
           <Bar dataKey="Matchs" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={24} />
         </BarChart>
       </ResponsiveContainer>

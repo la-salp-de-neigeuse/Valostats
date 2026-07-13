@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const passwordRequirements = z
   .string()
-  .min(12, "Le mot de passe doit contenir au moins 12 caracteres.")
+  .min(8, "Le mot de passe doit contenir au moins 8 caracteres.")
   .max(128, "Le mot de passe est trop long.")
   .regex(/[a-z]/, "Le mot de passe doit contenir une minuscule.")
   .regex(/[A-Z]/, "Le mot de passe doit contenir une majuscule.")

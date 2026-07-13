@@ -51,14 +51,14 @@ export function NotificationDropdown({
   }
 
   return (
-    <div className="absolute right-0 top-full mt-2 w-96 max-w-[90vw] bg-[#111115] border border-slate-800 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-50">
+    <div className="absolute right-0 top-full mt-2 w-96 max-w-[90vw] bg-surface border border-slate-800 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-50 animate-scale-in">
       <div className="flex items-center justify-between p-4 border-b border-slate-800">
         <h3 className="text-sm font-semibold text-white">Notifications</h3>
         <div className="flex items-center gap-2">
           {notifications.some((n) => !n.isRead) && (
             <button
               onClick={handleMarkAllRead}
-              className="text-xs text-rose-400 hover:text-rose-300 transition-colors"
+              className="text-xs text-accent hover:text-accent-hover transition-colors"
             >
               Tout lu
             </button>

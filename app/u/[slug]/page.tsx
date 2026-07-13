@@ -1,5 +1,8 @@
 import { notFound } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth/options";
 import { getPublicProfile } from "@/services/public-profile/public-profile-service";
+import { getSocialLinksForProfile } from "@/services/social/social-service";
 import { PublicProfileView } from "@/components/public-profile/PublicProfileView";
 import type { Metadata } from "next";
 
@@ -49,7 +52,7 @@ export default async function PublicProfilePage({ params, searchParams }: Public
     if (profile.code === "NOT_FOUND") {
       notFound();
     }
-    
+
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="text-center">
@@ -60,5 +63,8 @@ export default async function PublicProfilePage({ params, searchParams }: Public
     );
   }
 
-  return <PublicProfileView profile={profile} />;
+  const session = await getServerSession(authOptions);
+  const socialLinks = await getSocialLinksForProfile(profile.user.id, session?.user?.id);
+
+  return <PublicProfileView profile={profile} socialLinks={socialLinks} />;
 }

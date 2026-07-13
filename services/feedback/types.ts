@@ -42,7 +42,7 @@ export const FEEDBACK_PRIORITY_LABELS: Record<FeedbackPriority, string> = {
 export const FEEDBACK_PRIORITY_COLORS: Record<FeedbackPriority, string> = {
   LOW: "text-slate-400 border-slate-600/40 bg-slate-800",
   MEDIUM: "text-blue-400 border-blue-500/40 bg-blue-500/10",
-  HIGH: "text-orange-400 border-orange-500/40 bg-orange-500/10",
+  HIGH: "text-ai-purple border-ai-purple/40 bg-ai-purple/10",
   CRITICAL: "text-red-400 border-red-500/40 bg-red-500/10",
 };
 

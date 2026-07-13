@@ -13,21 +13,21 @@ function NotFoundIcon() {
 
 export default function AuthNotFoundPage() {
   return (
-    <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
-        <div className="bg-gradient-to-br from-[#111115] to-[#0a0a0c] border border-slate-800 rounded-3xl p-8 text-center">
-          <div className="p-4 bg-rose-500/10 rounded-2xl inline-flex mb-6 text-rose-400">
+        <div className="bg-gradient-to-br bg-surface border border-border rounded-3xl p-8 text-center">
+          <div className="p-4 bg-accent-light rounded-2xl inline-flex mb-6 text-accent">
             <NotFoundIcon />
           </div>
 
           <h1 className="text-2xl font-bold text-white mb-2">Page introuvable</h1>
           <p className="text-slate-400 max-w-sm mx-auto leading-relaxed mb-8">
-            La page que vous recherchez n&apos;existe pas ou a été déplacée.
+            {"La page que vous recherchez n'existe pas ou a été déplacée."}
           </p>
 
           <Link
             href="/login"
-            className="w-full sm:w-auto inline-flex items-center justify-center bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg shadow-rose-500/20"
+            className="w-full sm:w-auto inline-flex items-center justify-center bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg shadow-accent-glow"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
               <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
@@ -41,3 +41,4 @@ export default function AuthNotFoundPage() {
     </div>
   );
 }
+

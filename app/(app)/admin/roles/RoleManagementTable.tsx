@@ -49,7 +49,7 @@ export function RoleManagementTable({ users, currentUserRole }: RoleManagementTa
   );
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl overflow-hidden">
+    <div className="bg-surface border border-slate-800 rounded-2xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -69,8 +69,10 @@ export function RoleManagementTable({ users, currentUserRole }: RoleManagementTa
                 <tr key={user.id} className="hover:bg-slate-800/30 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-rose-500 to-orange-400 flex items-center justify-center text-white font-bold text-xs">
-                        {(user.name || "U").charAt(0).toUpperCase()}
+                      <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polygon points="12 2 22 22 2 22 12 2" />
+                        </svg>
                       </div>
                       <span className="text-sm font-medium text-white">{user.name || "Utilisateur"}</span>
                     </div>
@@ -96,7 +98,7 @@ export function RoleManagementTable({ users, currentUserRole }: RoleManagementTa
                             }
                           }
                         }}
-                        className="bg-slate-800 text-sm text-slate-200 border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-rose-500/50"
+                        className="bg-slate-800 text-sm text-slate-200 border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-accent/50"
                       >
                         {(canAssignOwnerDev
                           ? ["OWNER" as UserRole, "DEVELOPER" as UserRole, ...ASSIGNABLE_ROLES]

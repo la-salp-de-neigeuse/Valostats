@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function MatchHistoryEmpty() {
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-3xl p-12 text-center">
+    <div className="bg-surface border border-slate-800 rounded-3xl p-12 text-center">
       <div className="w-16 h-16 bg-slate-800 rounded-2xl mx-auto mb-6 flex items-center justify-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -28,7 +28,7 @@ export function MatchHistoryEmpty() {
       </p>
       <Link
         href="/profile"
-        className="inline-flex items-center justify-center bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg shadow-rose-500/20"
+        className="inline-flex items-center justify-center bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg shadow-accent-glow"
       >
         Aller au profil
       </Link>

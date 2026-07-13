@@ -9,6 +9,8 @@ import type {
   OverlayWidgetType,
 } from "@/services/overlay/types";
 import { WIDGET_LABELS } from "@/services/overlay/types";
+import { CreatePresetDialog } from "@/components/overlay/presets/CreatePresetDialog";
+import { LimitDialog } from "@/components/overlay/presets/LimitDialog";
 
 const THEME_LABELS: Record<OverlayTheme, string> = {
   dark: "Dark",
@@ -40,6 +42,8 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
   const [settings, setSettings] = useState<OverlaySettings>(initialSettings);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [limitReached, setLimitReached] = useState(0);
   const [dragType, setDragType] = useState<OverlayWidgetType | null>(null);
 
   const update = useCallback(
@@ -117,6 +121,22 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
     }
   }, [settings, router]);
 
+  const handleCreatePreset = async (name: string) => {
+    const res = await fetch("/api/overlay/presets/manage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, settings }),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      if (text.startsWith("LIMIT_REACHED:")) {
+        setLimitReached(Number(text.split(":")[1]));
+        return;
+      }
+      throw new Error(text || "Erreur lors de la création du preset.");
+    }
+  };
+
   const handleDragStart = (e: React.DragEvent, type: OverlayWidgetType) => {
     setDragType(type);
     e.dataTransfer.setData("text/plain", type);
@@ -145,7 +165,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
               onClick={() => update("theme", t)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 settings.theme === t
-                  ? "bg-rose-500 text-white"
+                  ? "bg-accent text-white"
                   : "bg-slate-800/50 text-slate-300 hover:bg-slate-700/50"
               }`}
             >
@@ -163,7 +183,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
               onClick={() => update("displayMode", m)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 settings.displayMode === m
-                  ? "bg-rose-500 text-white"
+                  ? "bg-accent text-white"
                   : "bg-slate-800/50 text-slate-300 hover:bg-slate-700/50"
               }`}
             >
@@ -186,7 +206,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
                   type="checkbox"
                   checked={widget?.visible ?? false}
                   onChange={() => toggleWidget(type)}
-                  className="accent-rose-500"
+                  className="accent-accent"
                 />
                 {WIDGET_LABELS[type]}
               </label>
@@ -228,7 +248,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
                   onDragEnd={() => setDragType(null)}
                   className={`relative flex items-center justify-center text-xs font-medium rounded-lg cursor-grab active:cursor-grabbing transition-all group ${
                     dragType === widget.type
-                      ? "opacity-50 ring-2 ring-rose-500"
+                      ? "opacity-50 ring-2 ring-accent"
                       : "hover:ring-1 hover:ring-slate-500"
                   }`}
                   style={{
@@ -283,7 +303,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
               onClick={() => update("size", s)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 settings.size === s
-                  ? "bg-rose-500 text-white"
+                  ? "bg-accent text-white"
                   : "bg-slate-800/50 text-slate-300 hover:bg-slate-700/50"
               }`}
             >
@@ -315,7 +335,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
             step={10}
             value={settings.fontScale}
             onChange={(e) => update("fontScale", Number(e.target.value))}
-            className="flex-1 accent-rose-500"
+            className="flex-1 accent-accent"
           />
           <span className="text-xs text-slate-400 w-10 text-right">{settings.fontScale}%</span>
         </div>
@@ -330,7 +350,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
             step={5}
             value={settings.transparency}
             onChange={(e) => update("transparency", Number(e.target.value))}
-            className="flex-1 accent-rose-500"
+            className="flex-1 accent-accent"
           />
           <span className="text-xs text-slate-400 w-10 text-right">{settings.transparency}%</span>
         </div>
@@ -343,7 +363,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
               type="checkbox"
               checked={settings.showBorder}
               onChange={(e) => update("showBorder", e.target.checked)}
-              className="accent-rose-500"
+              className="accent-accent"
             />
             Afficher les bordures
           </label>
@@ -356,7 +376,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
               step={2}
               value={settings.borderRadius}
               onChange={(e) => update("borderRadius", Number(e.target.value))}
-              className="w-24 accent-rose-500"
+              className="w-24 accent-accent"
             />
             <span className="text-xs text-slate-400">{settings.borderRadius}px</span>
           </div>
@@ -370,7 +390,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
               type="checkbox"
               checked={settings.shadow}
               onChange={(e) => update("shadow", e.target.checked)}
-              className="accent-rose-500"
+              className="accent-accent"
             />
             Afficher les ombres
           </label>
@@ -384,7 +404,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
                 step={2}
                 value={settings.shadowBlur}
                 onChange={(e) => update("shadowBlur", Number(e.target.value))}
-                className="w-24 accent-rose-500"
+                className="w-24 accent-accent"
               />
               <span className="text-xs text-slate-400">{settings.shadowBlur}px</span>
             </div>
@@ -398,7 +418,7 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
             type="checkbox"
             checked={settings.animations}
             onChange={(e) => update("animations", e.target.checked)}
-            className="accent-rose-500"
+            className="accent-accent"
           />
           Activer les animations de transition
         </label>
@@ -418,13 +438,39 @@ export function SettingsForm({ initialSettings }: { initialSettings: OverlaySett
         </select>
       </Section>
 
-      <button
-        onClick={handleSave}
-        disabled={saving}
-        className="w-full bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white font-medium py-3 rounded-xl transition-colors"
-      >
-        {saving ? "Enregistrement..." : saved ? "✓ Enregistré" : "Enregistrer"}
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="flex-1 bg-accent hover:bg-accent-hover disabled:opacity-50 text-white font-medium py-3 rounded-xl transition-colors"
+        >
+          {saving ? "Enregistrement..." : saved ? "✓ Enregistré" : "Enregistrer"}
+        </button>
+        <button
+          onClick={() => setShowCreateDialog(true)}
+          className="px-4 py-3 bg-surface-hover/50 border border-border text-text-secondary hover:text-text-primary text-sm font-medium rounded-xl transition-colors whitespace-nowrap"
+          title="Enregistrer la configuration actuelle comme preset"
+        >
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="12" y1="18" x2="12" y2="12" />
+            <line x1="9" y1="15" x2="15" y2="15" />
+          </svg>
+        </button>
+      </div>
+
+      <CreatePresetDialog
+        open={showCreateDialog}
+        onClose={() => setShowCreateDialog(false)}
+        onCreate={handleCreatePreset}
+      />
+
+      <LimitDialog
+        open={limitReached > 0}
+        limit={limitReached}
+        onClose={() => setLimitReached(0)}
+      />
     </div>
   );
 }

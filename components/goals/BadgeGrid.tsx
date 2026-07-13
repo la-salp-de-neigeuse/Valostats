@@ -5,7 +5,7 @@ import type { Badge } from "@/services/goals/types";
 export function BadgeGrid({ badges }: { badges: Badge[] }) {
   if (badges.length === 0) {
     return (
-      <div className="bg-[#111115] border border-slate-800 rounded-2xl p-8 text-center">
+      <div className="bg-surface border border-slate-800 rounded-2xl p-8 text-center">
         <div className="text-4xl mb-3">🏅</div>
         <p className="text-slate-400 text-sm">
           Complétez des objectifs pour débloquer des badges.
@@ -19,7 +19,7 @@ export function BadgeGrid({ badges }: { badges: Badge[] }) {
       {badges.map((badge) => (
         <div
           key={badge.id}
-          className="bg-[#111115] border border-slate-800 rounded-2xl p-4 text-center hover:border-amber-500/30 transition-colors group"
+          className="bg-surface border border-slate-800 rounded-2xl p-4 text-center hover:border-amber-500/30 transition-colors group"
         >
           <div className="text-3xl mb-2 group-hover:scale-110 transition-transform">
             {badge.icon}

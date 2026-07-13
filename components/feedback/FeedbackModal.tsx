@@ -64,7 +64,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-[#111115] border border-slate-800 rounded-2xl w-full max-w-lg p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-surface border border-slate-800 rounded-2xl w-full max-w-lg p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
         {success ? (
           <div className="text-center py-12">
             <div className="text-5xl mb-4">🎉</div>
@@ -93,7 +93,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                       onClick={() => setType(t)}
                       className={`px-3 py-2.5 rounded-lg text-sm font-medium border transition-all ${
                         type === t
-                          ? "border-rose-500/50 bg-rose-500/10 text-rose-400"
+                          ? "border-accent/50 bg-accent-light text-accent"
                           : "border-slate-700/50 bg-slate-800/50 text-slate-400 hover:border-slate-600"
                       }`}
                     >
@@ -111,7 +111,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Résumez votre feedback en quelques mots"
-                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500/50"
+                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-accent/50"
                   required
                   minLength={3}
                   maxLength={200}
@@ -126,7 +126,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Décrivez en détail votre retour..."
                   rows={4}
-                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500/50 resize-none"
+                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none"
                   required
                   minLength={10}
                   maxLength={5000}
@@ -151,7 +151,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                 <button
                   type="submit"
                   disabled={sending || title.trim().length < 3 || description.trim().length < 10}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-rose-500 to-orange-500 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-gradient-brand rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {sending ? "Envoi en cours..." : "Envoyer"}
                 </button>

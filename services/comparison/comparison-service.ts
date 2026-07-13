@@ -7,6 +7,8 @@ import {
 import { getEvolutionData, getRecentMatchesForChart } from "@/services/stats/evolution-stats-service";
 import { getLatestAnalysis } from "@/services/ai/ai-analysis-service";
 import { prisma } from "@/lib/prisma/client";
+import { getOrSet } from "@/lib/cache/cache-service";
+import { comparisonKey, TTL } from "@/lib/cache/keys";
 import type { ComparedPlayer, ComparisonData, AiComparisonSummary } from "./types";
 
 function computeAdvantages(a: ComparedPlayer, b: ComparedPlayer): { player1: string[]; player2: string[] } {
@@ -167,15 +169,21 @@ async function buildComparedPlayer(
 }
 
 export async function getComparison(a: string, b: string): Promise<ComparisonData | null> {
-  const [player1, player2] = await Promise.all([
-    buildComparedPlayer(a),
-    buildComparedPlayer(b),
-  ]);
+  return getOrSet(
+    comparisonKey(a, b),
+    async () => {
+      const [player1, player2] = await Promise.all([
+        buildComparedPlayer(a),
+        buildComparedPlayer(b),
+      ]);
 
-  if (!player1 || !player2) return null;
+      if (!player1 || !player2) return null;
 
-  const advantages = computeAdvantages(player1, player2);
-  const aiSummary = generateAiSummary(player1, player2, advantages);
+      const advantages = computeAdvantages(player1, player2);
+      const aiSummary = generateAiSummary(player1, player2, advantages);
 
-  return { player1, player2, advantages, aiSummary };
+      return { player1, player2, advantages, aiSummary };
+    },
+    TTL.COMPARISON,
+  );
 }

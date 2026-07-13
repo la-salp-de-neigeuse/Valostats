@@ -20,22 +20,22 @@ export function AiSection({ analysis }: AiSectionProps) {
     if (!score) return "text-slate-400";
     if (score >= 80) return "text-emerald-400";
     if (score >= 60) return "text-yellow-400";
-    return "text-rose-400";
+    return "text-accent";
   };
 
   const getSeverityColor = (severity: number) => {
-    if (severity >= 4) return "bg-rose-500/20 text-rose-400 border-rose-500/30";
+    if (severity >= 4) return "bg-accent/20 text-accent border-accent/25";
     if (severity >= 2) return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
     return "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
   };
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl p-6">
+    <div className="bg-surface border border-slate-800 rounded-2xl p-6">
       <h2 className="text-xl font-semibold text-white mb-6">Analyse IA</h2>
 
       {/* Score */}
       {analysis.score !== null && (
-        <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-rose-500/10 to-orange-400/10 border border-rose-500/20">
+        <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-accent-light to-ai-purple/10 border border-accent/20">
           <div className="text-sm text-slate-400 mb-1">Score IA</div>
           <div className={`text-4xl font-bold ${getScoreColor(analysis.score)}`}>
             {analysis.score.toFixed(1)}/100

@@ -21,7 +21,7 @@ export function KdChart({ data }: KdChartProps) {
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-48 text-slate-500 text-sm">
-        Pas assez de matchs pour afficher l&apos;évolution
+        {"Pas assez de matchs pour afficher l'évolution"}
       </div>
     );
   }
@@ -32,8 +32,8 @@ export function KdChart({ data }: KdChartProps) {
         <AreaChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="kdGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.15} />
-              <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
+              <stop offset="5%" stopColor="#FF4655" stopOpacity={0.15} />
+              <stop offset="95%" stopColor="#FF4655" stopOpacity={0} />
             </linearGradient>
           </defs>
           <XAxis
@@ -53,10 +53,10 @@ export function KdChart({ data }: KdChartProps) {
           <Area
             type="monotone"
             dataKey="kdRatio"
-            stroke="#f43f5e"
+            stroke="#FF4655"
             strokeWidth={2}
             fill="url(#kdGradient)"
-            dot={{ fill: "#f43f5e", r: 3, strokeWidth: 0 }}
+            dot={{ fill: "#FF4655", r: 3, strokeWidth: 0 }}
             activeDot={{ r: 5, strokeWidth: 0 }}
           />
         </AreaChart>
@@ -64,3 +64,4 @@ export function KdChart({ data }: KdChartProps) {
     </div>
   );
 }
+

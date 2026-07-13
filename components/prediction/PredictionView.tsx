@@ -42,12 +42,12 @@ function PredictionCard({
   accent?: boolean;
 }) {
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden group hover:border-slate-700 transition-colors">
+    <div className="bg-surface border border-slate-800 rounded-2xl p-5 shadow-lg relative overflow-hidden group hover:border-slate-700 transition-colors">
       <div className="flex justify-between items-start mb-2">
         <div className="text-xs text-slate-500 uppercase tracking-wider font-semibold">{label}</div>
         {icon && <div className="text-slate-600 group-hover:text-slate-400 transition-colors">{icon}</div>}
       </div>
-      <div className={`text-3xl font-black tracking-tight ${accent ? "text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-orange-400" : "text-white"}`}>
+      <div className={`text-3xl font-black tracking-tight ${accent ? "text-transparent bg-clip-text bg-gradient-brand" : "text-white"}`}>
         {value}
       </div>
       {subtitle && <div className="text-sm text-slate-400 mt-2 font-medium">{subtitle}</div>}
@@ -56,9 +56,9 @@ function PredictionCard({
 }
 
 function CircularScore({ score, label, subtitle }: { score: number; label: string; subtitle?: string }) {
-  const color = score >= 75 ? "text-emerald-500" : score >= 50 ? "text-amber-500" : "text-rose-500";
+  const color = score >= 75 ? "text-emerald-500" : score >= 50 ? "text-amber-500" : "text-accent";
   return (
-    <div className="flex flex-col items-center justify-center bg-[#111115] border border-slate-800 rounded-2xl p-6 shadow-xl">
+    <div className="flex flex-col items-center justify-center bg-surface border border-slate-800 rounded-2xl p-6 shadow-xl">
       <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">{label}</h3>
       <div className="relative flex items-center justify-center">
         <svg className="w-32 h-32 transform -rotate-90">
@@ -91,13 +91,13 @@ function FactorBadge({ factor }: { factor: InfluencingFactor }) {
   const isNeg = factor.impact === "negative";
   
   return (
-    <div className={`flex items-start gap-3 p-4 rounded-xl border ${isPos ? "bg-emerald-500/10 border-emerald-500/20" : isNeg ? "bg-rose-500/10 border-rose-500/20" : "bg-slate-800/50 border-slate-700"}`}>
-      <div className={`mt-0.5 w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${isPos ? "bg-emerald-500/20 text-emerald-400" : isNeg ? "bg-rose-500/20 text-rose-400" : "bg-slate-700 text-slate-400"}`}>
+    <div className={`flex items-start gap-3 p-4 rounded-xl border ${isPos ? "bg-emerald-500/10 border-emerald-500/20" : isNeg ? "bg-accent-light border-accent/20" : "bg-slate-800/50 border-slate-700"}`}>
+      <div className={`mt-0.5 w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${isPos ? "bg-emerald-500/20 text-emerald-400" : isNeg ? "bg-accent/20 text-accent" : "bg-slate-700 text-slate-400"}`}>
         {isPos ? "↑" : isNeg ? "↓" : "−"}
       </div>
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <span className={`text-sm font-bold ${isPos ? "text-emerald-400" : isNeg ? "text-rose-400" : "text-slate-300"}`}>
+          <span className={`text-sm font-bold ${isPos ? "text-emerald-400" : isNeg ? "text-accent" : "text-slate-300"}`}>
             {factor.name}
           </span>
           <span className="text-xs text-slate-500 font-medium px-1.5 py-0.5 bg-black/20 rounded">
@@ -122,7 +122,7 @@ function RankChart({ data }: { data: PredictionResult }) {
   const currentLine = data.currentRankTier;
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl p-6 shadow-xl">
+    <div className="bg-surface border border-slate-800 rounded-2xl p-6 shadow-xl">
       <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-6 flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-400"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
         Courbe de progression estimée
@@ -130,10 +130,10 @@ function RankChart({ data }: { data: PredictionResult }) {
       <ResponsiveContainer width="100%" height={360}>
         <LineChart data={chartData} margin={{ top: 20, right: 30, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-          <XAxis dataKey="match" tick={{ fill: "#a1a1aa", fontSize: 11 }} axisLine={false} tickLine={false} dy={10} />
+          <XAxis dataKey="match" tick={{ fill: "#94A3B8", fontSize: 11 }} axisLine={false} tickLine={false} dy={10} />
           <YAxis
             domain={[Math.max(0, currentLine - 3), Math.max(currentLine + 5, data.nextRankTier + 1)]}
-            tick={{ fill: "#a1a1aa", fontSize: 11 }}
+            tick={{ fill: "#94A3B8", fontSize: 11 }}
             tickFormatter={formatTier}
             axisLine={false}
             tickLine={false}
@@ -143,14 +143,14 @@ function RankChart({ data }: { data: PredictionResult }) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             formatter={(value: any, name: any) => [value !== null && value !== undefined ? formatTier(Number(value)) : "—", name]}
           />
-          <ReferenceLine y={currentLine} stroke="#f43f5e" strokeDasharray="4 4" label={{ value: "Rang Actuel", position: "insideTopLeft", fill: "#f43f5e", fontSize: 12, fontWeight: 'bold' }} />
+          <ReferenceLine y={currentLine} stroke="#FF4655" strokeDasharray="4 4" label={{ value: "Rang Actuel", position: "insideTopLeft", fill: "#FF4655", fontSize: 12, fontWeight: 'bold' }} />
           <ReferenceLine y={data.nextRankTier} stroke="#22d3ee" strokeDasharray="4 4" label={{ value: "Prochain Rang", position: "insideTopLeft", fill: "#22d3ee", fontSize: 12, fontWeight: 'bold' }} />
           <Line
             type="monotone"
             dataKey="Réel"
-            stroke="#f43f5e"
+            stroke="#FF4655"
             strokeWidth={3}
-            dot={{ r: 3, fill: "#f43f5e", strokeWidth: 0 }}
+            dot={{ r: 3, fill: "#FF4655", strokeWidth: 0 }}
             activeDot={{ r: 6 }}
             connectNulls
           />
@@ -186,14 +186,14 @@ function AiCoachAdvice({ data }: { data: PredictionResult }) {
       </div>
       
       <div className="relative z-10 space-y-6">
-        <div className="bg-[#111115]/60 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-5">
+        <div className="bg-surface/60 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-5">
           <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-2">Verdict Global</h4>
           <p className="text-white text-lg leading-relaxed">
             {data.summary}
           </p>
         </div>
         
-        <div className="bg-[#111115]/40 border border-indigo-500/20 rounded-2xl p-5">
+        <div className="bg-surface/40 border border-indigo-500/20 rounded-2xl p-5">
           <h5 className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-4">Conseils personnalisés pour le Rank Up</h5>
           <ul className="space-y-3">
             {data.advice.map((a, i) => (
@@ -262,20 +262,20 @@ export function PredictionView({ data }: { data: PredictionResult }) {
       {/* LIGNE 3 : FACTEURS D'INFLUENCE & AI COACH */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 space-y-4">
-          <h3 className="text-lg font-bold text-white mb-4">Facteurs d&apos;Influence</h3>
+          <h3 className="text-lg font-bold text-white mb-4">{"Facteurs d'Influence"}</h3>
           <div className="space-y-3">
             {data.influencingFactors.length > 0 ? (
               data.influencingFactors.map((f, i) => (
                 <FactorBadge key={i} factor={f} />
               ))
             ) : (
-              <div className="p-6 text-center border border-slate-800 rounded-2xl bg-[#111115]">
+              <div className="p-6 text-center border border-slate-800 rounded-2xl bg-surface">
                 <p className="text-slate-500 text-sm">Pas assez de données marquantes.</p>
               </div>
             )}
             
             {/* STREAKS MINI-CARD */}
-            <div className="p-4 border border-slate-800 rounded-2xl bg-[#111115] mt-6">
+            <div className="p-4 border border-slate-800 rounded-2xl bg-surface mt-6">
               <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Séries Actuelles</h4>
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
@@ -283,8 +283,8 @@ export function PredictionView({ data }: { data: PredictionResult }) {
                   <span className="text-sm font-medium text-emerald-400">{data.streaks.winStreak} Victoires</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-rose-500" />
-                  <span className="text-sm font-medium text-rose-400">{data.streaks.lossStreak} Défaites</span>
+                  <span className="w-2 h-2 rounded-full bg-accent" />
+                  <span className="text-sm font-medium text-accent">{data.streaks.lossStreak} Défaites</span>
                 </div>
               </div>
             </div>
@@ -302,3 +302,4 @@ export function PredictionView({ data }: { data: PredictionResult }) {
     </div>
   );
 }
+

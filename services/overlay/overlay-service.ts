@@ -26,8 +26,8 @@ function formatSyncTime(date: Date | null | undefined): string | null {
   return `${Math.floor(hours / 24)}j`;
 }
 
-export async function getOverlayData(slug: string): Promise<OverlayData | null> {
-  return getOrSet(overlayKey(slug), async () => {
+export async function getOverlayData(slug: string, skipVisibilityCheck = false): Promise<OverlayData | null> {
+  return getOrSet(overlayKey(slug, skipVisibilityCheck), async () => {
     const user = await prisma.user.findUnique({
     where: { publicSlug: slug },
     select: {
@@ -44,7 +44,7 @@ export async function getOverlayData(slug: string): Promise<OverlayData | null> 
   });
 
   if (!user) return null;
-  if (user.visibility !== "PUBLIC") return null;
+  if (!skipVisibilityCheck && user.visibility !== "PUBLIC") return null;
 
   const serviceUserId = user.id;
   const canShowRank = user.settings?.showRankPublicly ?? false;

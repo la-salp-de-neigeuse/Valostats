@@ -148,7 +148,7 @@ function SearchModalInner({ onClose }: { onClose: () => void }) {
                       onMouseEnter={() => setSelectedIndex(absoluteIndex)}
                       className={`w-full flex items-center gap-3 px-5 py-2.5 text-left transition-colors ${
                         selectedIndex === absoluteIndex
-                          ? "bg-rose-500/10 text-white"
+                          ? "bg-accent-light text-white"
                           : "text-slate-300 hover:bg-slate-800/30"
                       }`}
                     >

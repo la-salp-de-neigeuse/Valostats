@@ -2,6 +2,7 @@ import type { PublicProfile } from "@/services/public-profile/types";
 import type { AggregateStats } from "@/services/stats/aggregate-stats-service";
 import { RoleBadge } from "@/components/roles/RoleBadge";
 import { hasAnyAdminPermission } from "@/services/roles/types";
+import { UserAvatar } from "@/components/ui/placeholder-avatar";
 
 interface ProfileHeaderProps {
   user: PublicProfile["user"];
@@ -15,12 +16,10 @@ export function ProfileHeader({ user, stats }: ProfileHeaderProps) {
   const rank = user.riotAccount?.currentRank || "Non classé";
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl p-6 md:p-8">
+    <div className="bg-surface border border-slate-800 rounded-2xl p-6 md:p-8">
       <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
         {/* Avatar */}
-        <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-rose-500 to-orange-400 flex items-center justify-center text-white font-bold text-3xl shadow-lg shadow-rose-500/20 shrink-0">
-          {displayName.charAt(0).toUpperCase()}
-        </div>
+          <UserAvatar name={displayName} size="5xl" />
 
         {/* Info */}
         <div className="flex-1 space-y-2">
@@ -37,7 +36,7 @@ export function ProfileHeader({ user, stats }: ProfileHeaderProps) {
                 {region}
               </span>
             )}
-            <span className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/30">
+            <span className="px-3 py-1 rounded-full bg-accent-light text-accent border border-accent/25">
               {rank}
             </span>
             <span className="px-3 py-1 rounded-full bg-slate-800 text-slate-300">

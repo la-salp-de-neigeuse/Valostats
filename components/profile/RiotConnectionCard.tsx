@@ -34,7 +34,7 @@ export function RiotConnectionCard({ account }: { account: SafeRiotAccount | nul
   }
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-3xl p-8 flex flex-col h-full">
+    <div className="bg-surface border border-slate-800 rounded-3xl p-8 flex flex-col h-full">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-white">Connexion Riot Games</h2>
         {account && !showForm && (
@@ -71,9 +71,11 @@ export function RiotConnectionCard({ account }: { account: SafeRiotAccount | nul
         ) : account ? (
           <div className="space-y-6">
             <div className="flex items-center gap-4 p-4 bg-slate-900/50 rounded-2xl border border-slate-800">
-              <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center">
-                <span className="text-xl font-bold text-white">{account.gameName.charAt(0)}</span>
-              </div>
+            <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-accent">
+                <polygon points="12 2 22 22 2 22 12 2" />
+              </svg>
+            </div>
               <div>
                 <p className="text-lg font-bold text-white">
                   {account.gameName} <span className="text-slate-500">#{account.tagLine}</span>
@@ -90,7 +92,7 @@ export function RiotConnectionCard({ account }: { account: SafeRiotAccount | nul
             {!account.isVerified && (
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl">
                 <p className="text-xs text-amber-400 mb-2">
-                  Ce compte n&apos;a pas encore été vérifié auprès de Riot Games.
+                  {"Ce compte n'a pas encore été vérifié auprès de Riot Games."}
                 </p>
                 <VerifyRiotButton />
               </div>
@@ -99,7 +101,7 @@ export function RiotConnectionCard({ account }: { account: SafeRiotAccount | nul
             {account.isVerified && (
               <div className="p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
                 <p className="text-xs text-emerald-400 mb-2">
-                  Importez vos matchs Valorant depuis l&apos;API Riot.
+                  {"Importez vos matchs Valorant depuis l'API Riot."}
                 </p>
                 <SyncMatchesButton lastSyncAt={account.lastSyncAt} />
               </div>
@@ -115,7 +117,7 @@ export function RiotConnectionCard({ account }: { account: SafeRiotAccount | nul
               <button
                 onClick={handleUnlink}
                 disabled={unlinking}
-                className="text-sm text-rose-500 hover:text-rose-400 font-medium transition-colors disabled:opacity-50"
+                className="text-sm text-accent hover:text-accent-hover font-medium transition-colors disabled:opacity-50"
               >
                 {unlinking ? "Déliaison..." : "Délier le compte"}
               </button>
@@ -133,7 +135,7 @@ export function RiotConnectionCard({ account }: { account: SafeRiotAccount | nul
             </p>
             <button 
               onClick={() => setShowForm(true)}
-              className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg shadow-rose-500/20 w-full sm:w-auto"
+              className="bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg shadow-accent-glow w-full sm:w-auto"
             >
               Lier mon compte Riot
             </button>
@@ -143,4 +145,5 @@ export function RiotConnectionCard({ account }: { account: SafeRiotAccount | nul
     </div>
   );
 }
+
 

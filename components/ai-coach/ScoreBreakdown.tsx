@@ -22,7 +22,7 @@ export function ScoreBreakdown({ breakdown }: ScoreBreakdownProps) {
   ] as const;
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl p-5">
+    <div className="bg-surface border border-slate-800 rounded-2xl p-5">
       <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
         Détail du score
       </h3>

@@ -18,5 +18,5 @@ export default async function SettingsPageRoute() {
 
   const settings = await getSettings(user.id);
 
-  return <SettingsPage initialData={settings} />;
+  return <SettingsPage initialData={settings} user={user} />;
 }

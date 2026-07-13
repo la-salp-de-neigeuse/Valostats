@@ -11,6 +11,8 @@ export const TTL = {
   PUBLIC_PROFILE: 5 * 60 * 1000,
   GOALS_SUMMARY: 5 * 60 * 1000,
   ACTIVITY: 5 * 60 * 1000,
+  MATCH_HISTORY: 2 * 60 * 1000,
+  COMPARISON: 5 * 60 * 1000,
 } as const;
 
 function prefix(domain: string, ...parts: string[]): string {
@@ -41,8 +43,8 @@ export function recentMatchesKey(userId: string, limit: number): string {
   return prefix("recent-matches", userId, String(limit));
 }
 
-export function overlayKey(slug: string): string {
-  return prefix("overlay", slug);
+export function overlayKey(slug: string, skipVisibilityCheck = false): string {
+  return skipVisibilityCheck ? prefix("overlay-bypass", slug) : prefix("overlay", slug);
 }
 
 export function leaderboardKey(filters: Record<string, unknown>): string {
@@ -90,4 +92,13 @@ export function dashboardRankEvolutionKey(userId: string): string {
 
 export function dashboardVsAverageKey(userId: string): string {
   return prefix("dashboard", userId, "vs-average");
+}
+
+export function matchHistoryKey(userId: string, limit: number, offset: number): string {
+  return prefix("match-history", userId, String(limit), String(offset));
+}
+
+export function comparisonKey(slugA: string, slugB: string): string {
+  const sorted = [slugA, slugB].sort();
+  return prefix("comparison", sorted[0], sorted[1]);
 }

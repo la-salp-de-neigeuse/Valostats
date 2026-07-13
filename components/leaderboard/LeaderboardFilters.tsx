@@ -34,7 +34,7 @@ export function LeaderboardFilters() {
       <select
         value={currentPeriod}
         onChange={(e) => updateParam("period", e.target.value)}
-        className="bg-[#111115] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-rose-500/50"
+        className="bg-surface border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-accent/50"
         aria-label="Période"
       >
         {LEADERBOARD_PERIODS.map((p) => (
@@ -45,7 +45,7 @@ export function LeaderboardFilters() {
       <select
         value={currentSort}
         onChange={(e) => updateParam("sort", e.target.value)}
-        className="bg-[#111115] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-rose-500/50"
+        className="bg-surface border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-accent/50"
         aria-label="Tri"
       >
         {LEADERBOARD_SORT_OPTIONS.map((s) => (
@@ -56,7 +56,7 @@ export function LeaderboardFilters() {
       <select
         value={currentRegion}
         onChange={(e) => updateParam("region", e.target.value)}
-        className="bg-[#111115] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-rose-500/50"
+        className="bg-surface border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-accent/50"
         aria-label="Région"
       >
         {LEADERBOARD_REGIONS.map((r) => (
@@ -67,7 +67,7 @@ export function LeaderboardFilters() {
       <select
         value={currentRank}
         onChange={(e) => updateParam("rank", e.target.value)}
-        className="bg-[#111115] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-rose-500/50"
+        className="bg-surface border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-accent/50"
         aria-label="Rang"
       >
         {LEADERBOARD_RANKS.map((r) => (

@@ -15,6 +15,8 @@ model User {
   normalizedEmail    String                    @unique
   emailVerified      DateTime?
   image              String?
+  bannerUrl          String?
+  bio                String?
   role               UserRole                  @default(USER)
   plan               UserPlan                  @default(FREE)
   visibility         ProfileVisibility         @default(PRIVATE)
@@ -47,10 +49,12 @@ model User {
   goals              Goal[]
   badges             Badge[]
   overlayConfig      OverlayConfig?
+  overlayPresets     OverlayPreset[]
   aiPromptLogs       AiPromptLog[]
   stripeCustomer     StripeCustomer?
   subscription       Subscription?
   feedbacks          Feedback[]
+  socialLinks        SocialLink[]
 
   @@index([visibility])
   @@index([plan])
@@ -129,6 +133,8 @@ model UserSettings {
   showRankPublicly Boolean  @default(false)
   showMatchHistory Boolean  @default(false)
   showAiScore      Boolean  @default(false)
+  showGoals        Boolean  @default(false)
+  showRecentMatches Boolean @default(false)
   allowLeaderboard Boolean  @default(false)
   marketingEmails  Boolean  @default(false)
   productEmails      Boolean  @default(true)
@@ -502,6 +508,22 @@ enum ProfileVisibility {
   PRIVATE
 }
 
+enum SocialPlatform {
+  TWITCH
+  TIKTOK
+  YOUTUBE
+  X
+  DISCORD
+  INSTAGRAM
+  KICK
+}
+
+enum SocialLinkVisibility {
+  PUBLIC
+  CONNECTED_ONLY
+  HIDDEN
+}
+
 enum RiotPlatform {
   BR1
   EUN1
@@ -699,6 +721,19 @@ model OverlayConfig {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model OverlayPreset {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  name      String
+  settings  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
 model AiPromptLog {
   id              BigInt   @id @default(autoincrement())
   userId          String   @db.Uuid
@@ -774,4 +809,19 @@ model Feedback {
   @@index([priority])
   @@index([status, priority])
   @@index([createdAt])
+}
+
+model SocialLink {
+  id        String              @id @default(uuid()) @db.Uuid
+  userId    String              @db.Uuid
+  platform  SocialPlatform
+  url       String
+  visibility SocialLinkVisibility @default(PUBLIC)
+  displayOrder Int              @default(0)
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform])
+  @@index([userId, displayOrder])
 }

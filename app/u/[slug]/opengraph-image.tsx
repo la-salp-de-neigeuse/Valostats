@@ -37,7 +37,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(135deg, #050505 0%, #1a0a0e 50%, #050505 100%)",
+        background: "linear-gradient(135deg, #070A12 0%, #1A0A0E 50%, #070A12 100%)",
         color: "white",
         fontFamily: "system-ui, sans-serif",
         position: "relative",
@@ -52,7 +52,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           width: "600px",
           height: "600px",
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(244,63,94,0.15) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(255,70,85,0.15) 0%, transparent 70%)",
         }}
       />
       <div
@@ -63,7 +63,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           width: "400px",
           height: "400px",
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(244,63,94,0.1) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(255,70,85,0.1) 0%, transparent 70%)",
         }}
       />
       <div
@@ -80,23 +80,23 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             width: "80px",
             height: "80px",
             borderRadius: "50%",
-            background: "linear-gradient(135deg, #f43f5e, #fb923c)",
+            background: "linear-gradient(135deg, #FF4655, #A855F7)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "40px",
-            fontWeight: 700,
+            fontSize: "36px",
+            fontWeight: 900,
             color: "white",
-            boxShadow: "0 0 40px rgba(244,63,94,0.3)",
+            boxShadow: "0 0 40px rgba(255,70,85,0.3)",
           }}
         >
-          {displayName.charAt(0).toUpperCase()}
+          V
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: "48px", fontWeight: 700, color: "white", lineHeight: 1.1 }}>
             {displayName}
           </div>
-          <div style={{ fontSize: "24px", color: "#f43f5e", marginTop: "4px" }}>
+          <div style={{ fontSize: "24px", color: "#FF4655", marginTop: "4px" }}>
             {rank}
           </div>
         </div>
@@ -109,7 +109,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <div style={{ fontSize: "36px", fontWeight: 700, color: "#f43f5e" }}>{winrate}</div>
+          <div style={{ fontSize: "36px", fontWeight: 700, color: "#FF4655" }}>{winrate}</div>
           <div style={{ fontSize: "16px", color: "#94a3b8", marginTop: "4px" }}>Winrate</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>

@@ -3,13 +3,13 @@ import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "@/lib/auth/session";
 import { getLatestAnalysis } from "@/services/ai/ai-analysis-service";
+import { getRiotAccountByUserId } from "@/services/riot-account/riot-account-service";
 import { EmptyState } from "@/components/ui/empty-state";
 
 export const metadata: Metadata = {
   title: "Dashboard",
   description: "Aperçu complet de vos performances Valorant en un coup d'œil.",
 };
-import { getRiotAccountByUserId } from "@/services/riot-account/riot-account-service";
 import { isPremiumUser } from "@/services/subscription/subscription-service";
 import {
   getAgentAggregatesByPeriod,

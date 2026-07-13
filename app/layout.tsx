@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthSessionProvider } from "@/components/auth/session-provider";
 import { ToastProvider } from "@/components/ui/toast";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { AuroraBackground } from "@/components/ui/aurora-background";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,7 +47,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050505",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#070A12" },
+    { media: "(prefers-color-scheme: light)", color: "#F8FAFC" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
@@ -56,15 +61,33 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="fr" data-theme="dark" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var t = localStorage.getItem("theme");
+                if (!t || !["dark","light","midnight"].includes(t)) t = "dark";
+                document.documentElement.setAttribute("data-theme", t);
+              } catch(e) {}
+            `,
+          }}
+        />
+      </head>
       <body className="flex min-h-full flex-col">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-rose-500 focus:text-white focus:rounded-xl focus:text-sm focus:font-semibold"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded-xl focus:text-sm focus:font-semibold"
         >
           Aller au contenu principal
         </a>
-        <AuthSessionProvider><ToastProvider>{children}</ToastProvider></AuthSessionProvider>
+        <ThemeProvider>
+          <AuroraBackground />
+          <div className="relative z-10 flex-1 flex flex-col">
+            <AuthSessionProvider><ToastProvider>{children}</ToastProvider></AuthSessionProvider>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

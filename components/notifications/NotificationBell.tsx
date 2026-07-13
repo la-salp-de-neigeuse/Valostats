@@ -7,6 +7,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
   const [unreadCount, setUnreadCount] = useState(initialUnread);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchUnread = useCallback(async () => {
     try {
@@ -21,8 +22,33 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(fetchUnread, 30_000);
-    return () => clearInterval(interval);
+    function startPolling() {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = setInterval(fetchUnread, 30_000);
+    }
+
+    function stopPolling() {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+
+    function onVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        fetchUnread();
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    }
+
+    startPolling();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      stopPolling();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, [fetchUnread]);
 
   useEffect(() => {
@@ -39,7 +65,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
     <div ref={dropdownRef} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-slate-400 hover:text-white transition-colors"
+        className="relative p-2 text-text-muted hover:text-text-secondary transition-colors"
         aria-label="Notifications"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -47,7 +73,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
           <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
         </svg>
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center shadow-lg shadow-rose-500/30">
+          <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-accent text-white text-[10px] font-bold flex items-center justify-center shadow-glow">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}

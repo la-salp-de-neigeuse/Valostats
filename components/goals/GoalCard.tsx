@@ -5,14 +5,14 @@ import type { GoalWithProgress } from "@/services/goals/types";
 const difficultyColors: Record<string, string> = {
   EASY: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
   MEDIUM: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  HARD: "bg-rose-500/10 text-rose-400 border-rose-500/20",
+  HARD: "bg-accent-light text-accent border-accent/20",
 };
 
 const priorityColors: Record<string, string> = {
   LOW: "text-slate-500",
   MEDIUM: "text-slate-400",
   HIGH: "text-amber-400",
-  CRITICAL: "text-rose-400",
+  CRITICAL: "text-accent",
 };
 
 const statusColors: Record<string, string> = {
@@ -64,10 +64,10 @@ export function GoalCard({
     ? "bg-emerald-500"
     : goal.percentage >= 40
       ? "bg-amber-500"
-      : "bg-rose-500";
+      : "bg-accent";
 
   return (
-    <div className="bg-[#111115] border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-colors">
+    <div className="bg-surface border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-colors">
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
@@ -105,7 +105,7 @@ export function GoalCard({
 
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/50">
         {goal.deadline && (
-          <span className={`text-xs ${getDeadlineLabel(goal.deadline) === "Expiré" ? "text-rose-400" : "text-slate-500"}`}>
+          <span className={`text-xs ${getDeadlineLabel(goal.deadline) === "Expiré" ? "text-accent" : "text-slate-500"}`}>
             {getDeadlineLabel(goal.deadline)}
           </span>
         )}

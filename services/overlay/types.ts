@@ -80,7 +80,7 @@ export const DEFAULT_OVERLAY_SETTINGS: OverlaySettings = {
   displayMode: "normal",
   widgets: DEFAULT_WIDGETS,
   colors: {
-    primary: "#f43f5e",
+    primary: "#FF4655",
     secondary: "#94a3b8",
     accent: "#22d3ee",
     background: "",

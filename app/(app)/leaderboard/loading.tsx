@@ -21,7 +21,7 @@ export default function LeaderboardLoading() {
         ))}
       </div>
 
-      <div className="bg-[#111115] border border-slate-800 rounded-2xl overflow-hidden">
+      <div className="bg-surface border border-slate-800 rounded-2xl overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-800">
           <div className="flex items-center gap-4">
             {[1, 2, 3, 4, 5].map((i) => (
