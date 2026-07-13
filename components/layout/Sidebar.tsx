@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { NAV_ITEMS, ABOUT_ITEMS } from "./nav-items";
+import { Logo } from "@/components/ui/logo";
 import { UpgradeButton } from "@/components/subscription/UpgradeButton";
 import { canViewAdminPanel } from "@/services/roles/types";
 
@@ -57,14 +58,7 @@ export function Sidebar() {
   return (
     <aside aria-label="Navigation latérale" className="w-64 bg-background border-r border-border hidden md:flex flex-col shrink-0">
       <div className="h-16 flex items-center px-6 border-b border-border">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-brand-br flex items-center justify-center text-white font-bold text-sm shadow-glow">
-            V
-          </div>
-          <span className="text-lg font-bold text-text-primary tracking-wider">
-            VALO<span className="text-accent">STATS</span>
-          </span>
-        </Link>
+        <Logo href="/dashboard" size={32} textClassName="text-lg" />
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Pages">

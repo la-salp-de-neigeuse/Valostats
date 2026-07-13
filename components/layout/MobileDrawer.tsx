@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useCallback, useEffect, useRef } f
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { NAV_ITEMS, ABOUT_ITEMS } from './nav-items'
+import { Logo } from '@/components/ui/logo'
 
 interface SidebarContextType {
   isOpen: boolean
@@ -121,12 +122,7 @@ export function MobileDrawer() {
         }`}
       >
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-brand-br flex items-center justify-center text-white font-bold text-xs">
-              V
-            </div>
-            <span className="text-lg font-bold text-text-primary">ValoStats</span>
-          </div>
+          <Logo size={28} textClassName="text-lg" />
           <button
             onClick={close}
             className="text-text-muted hover:text-text-primary p-1 transition-colors"

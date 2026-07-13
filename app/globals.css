@@ -292,3 +292,9 @@ body {
   scrollbar-width: none;
 }
 .scrollbar-none::-webkit-scrollbar { display: none; }
+
+/* Logo — strips black background from PNG on dark themes */
+[data-theme="dark"] .logo-image,
+[data-theme="midnight"] .logo-image {
+  mix-blend-mode: screen;
+}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/ui/logo";
 
 export function Footer() {
   return (
@@ -6,14 +7,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-gradient-brand-br flex items-center justify-center text-white font-bold text-xs shadow-glow">
-                V
-              </div>
-              <span className="text-base font-bold tracking-wider text-text-primary">
-                VALO<span className="text-accent">STATS</span>
-              </span>
-            </div>
+            <Logo size={24} textClassName="text-base" />
             <p className="text-sm text-text-muted leading-relaxed">
               {"Plateforme SaaS d'analyse et d'amélioration pour joueurs de Valorant."}
             </p>

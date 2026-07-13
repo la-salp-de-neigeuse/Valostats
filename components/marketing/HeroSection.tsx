@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 function DashboardMockup() {
@@ -66,18 +67,40 @@ export function HeroSection() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="space-y-8">
+            <div className="flex items-center gap-4">
+              <div className="relative w-12 h-12 sm:w-14 sm:h-14">
+                <Image
+                  src="/logo.png"
+                  alt="ValoStats"
+                  fill
+                  sizes="(max-width: 640px) 48px, 56px"
+                  className="object-contain logo-image"
+                  priority
+                  unoptimized
+                />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary tracking-tight">
+                  VALO<span className="text-accent">STATS</span>
+                </h1>
+                <p className="text-sm sm:text-base text-text-muted">
+                  Your Valorant performance, redefined.
+                </p>
+              </div>
+            </div>
+
             <div className="inline-flex items-center gap-2 text-xs text-accent bg-accent-light px-3 py-1.5 rounded-full border border-accent/20">
               <span className="w-1.5 h-1.5 bg-accent rounded-full" />
               {"Plateforme d'analyse Valorant"}
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary leading-tight tracking-tight">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary leading-tight tracking-tight">
               Analysez vos performances{" "}
               <span className="text-transparent bg-clip-text bg-gradient-brand">
                 Valorant
               </span>{" "}
               et progressez
-            </h1>
+            </h2>
 
             <p className="text-lg text-text-secondary leading-relaxed max-w-lg">
               ValoStats synchronise vos matchs, analyse vos statistiques et vous aide

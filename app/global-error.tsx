@@ -12,7 +12,7 @@ export default function GlobalError({
     <html>
       <head>
         <meta charSet="utf-8" />
-        <title>Erreur | ValoStats</title>
+        <title>ValoStats</title>
       </head>
       <body>
         <div className="min-h-screen bg-background flex items-center justify-center p-4">

@@ -24,25 +24,25 @@ export const metadata: Metadata = {
     default: "ValoStats",
     template: "%s | ValoStats",
   },
-  description: "Analysez et améliorez vos performances sur Valorant. Suivi KDA, winrate, coach IA, overlay stream, classement et plus encore.",
+  description: "Your Valorant performance, redefined.",
   openGraph: {
     type: "website",
     locale: "fr_FR",
     siteName: "ValoStats",
     title: "ValoStats",
-    description: "Analysez et améliorez vos performances sur Valorant. Suivi KDA, winrate, coach IA, overlay stream, classement et plus encore.",
+    description: "Your Valorant performance, redefined.",
   },
   twitter: {
     card: "summary_large_image",
     title: "ValoStats",
-    description: "Analysez et améliorez vos performances sur Valorant. Suivi KDA, winrate, coach IA, overlay stream, classement et plus encore.",
+    description: "Your Valorant performance, redefined.",
   },
   robots: {
     index: true,
     follow: true,
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: [{ url: "/logo.png", type: "image/png" }, { url: "/favicon.ico", sizes: "any" }],
   },
 };
 
