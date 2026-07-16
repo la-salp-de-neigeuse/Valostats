@@ -1,0 +1,6 @@
+{
+  "version": "1.0.0",
+  "filename": "ValoStats-Setup-1.0.0.exe",
+  "releaseNotes": "## ValoStats Companion 1.0.0\n\nPremière version publique de ValoStats Companion.\n\n### Nouveautés\n- Overlay Pre Game Coach avec analyse IA\n- Détection automatique des parties Valorant\n- Mode silencieux dans la barre des tâches\n- Raccourci clavier Ctrl+Shift+O pour afficher/masquer l'overlay\n- Mise à jour automatique\n\n### Installation\nTéléchargez et lancez le fichier Setup. L'application s'installe en quelques secondes.",
+  "publishedAt": "2026-07-15T00:00:00.000Z"
+}

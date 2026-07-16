@@ -1,0 +1,50 @@
+import { Badge } from "@/components/ui/badge";
+
+export function OverlayCaptureSection() {
+  return (
+    <section className="py-20 lg:py-28 bg-surface/20 relative overflow-hidden">
+      <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-accent/[0.04] rounded-full blur-[150px] pointer-events-none" />
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-16">
+          <Badge variant="premium" size="sm" className="mb-4">
+            Overlay en action
+          </Badge>
+          <h2 className="text-3xl sm:text-4xl font-bold text-text-primary tracking-tight">
+            L&apos;overlay Pre Game Coach
+          </h2>
+          <p className="mt-4 text-text-secondary max-w-2xl mx-auto">
+            Un overlay transparent, animé et riche en informations qui s&apos;intègre
+            parfaitement à votre écran de jeu.
+          </p>
+        </div>
+        <div className="relative max-w-5xl mx-auto">
+          <div className="aspect-video rounded-2xl bg-gradient-to-br from-surface-hover to-surface border border-border overflow-hidden flex items-center justify-center">
+            <div className="text-center p-12">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent/20 to-ai-purple/20 flex items-center justify-center mx-auto mb-5">
+                <svg className="w-10 h-10 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                </svg>
+              </div>
+              <p className="text-text-muted text-base mb-2">Aperçu de l&apos;overlay en jeu</p>
+              <p className="text-text-muted text-sm">
+                (Capture d&apos;écran à venir — l&apos;overlay est actif et fonctionnel)
+              </p>
+            </div>
+          </div>
+          <div className="mt-8 grid sm:grid-cols-3 gap-4">
+            {[
+              { label: "Profils joueurs", desc: "KDA, rank, agents joués, historique des matchs" },
+              { label: "Analyse IA", desc: "Forces, faiblesses, conseils personnalisés par joueur" },
+              { label: "Animations fluides", desc: "Transitions glassmorphism, couleurs par agent, danger level" },
+            ].map((item, i) => (
+              <div key={i} className="bg-surface border border-border rounded-xl p-4 text-center">
+                <div className="text-xs font-semibold text-accent mb-1">{item.label}</div>
+                <p className="text-xs text-text-secondary">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

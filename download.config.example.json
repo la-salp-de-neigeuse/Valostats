@@ -1,0 +1,6 @@
+{
+  "_comment": "Copier ce fichier en download.config.json pour configurer la source de téléchargement.",
+  "_docs": "Types disponibles: local, github, s3",
+  "type": "local",
+  "downloadsDir": "public/downloads"
+}

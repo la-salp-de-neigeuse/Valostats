@@ -21,5 +21,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/mentions-legales`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.2 },
     { url: `${baseUrl}/cgu`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.2 },
     { url: `${baseUrl}/confidentialite`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.2 },
+    { url: `${baseUrl}/notre-application`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
   ];
 }
