@@ -92,8 +92,8 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
 ];
 
 export function DownloadsPageClient() {
-  const [downloadUrl, setDownloadUrl] = useState("/downloads/ValoStats-Setup-1.0.0.exe");
-  const [filename, setFilename] = useState("ValoStats-Setup-1.0.0.exe");
+  const [downloadUrl, setDownloadUrl] = useState("/downloads/ValoStats-Setup-1.0.1.exe");
+  const [filename, setFilename] = useState("ValoStats-Setup-1.0.1.exe");
 
   useEffect(() => {
     fetch("/api/download")
@@ -179,7 +179,7 @@ export function DownloadsPageClient() {
             <div className="md:col-span-2 space-y-3">
               <Card className="text-center space-y-1.5">
                 <p className="text-xs text-text-muted uppercase tracking-wider font-semibold">Version</p>
-                <p className="text-lg font-bold text-text-primary">v1.0.0</p>
+                <p className="text-lg font-bold text-text-primary">v1.0.1</p>
               </Card>
 
               <Card className="space-y-2">

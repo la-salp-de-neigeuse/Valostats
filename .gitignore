@@ -42,3 +42,7 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# Large download binaries (Vercel blocks >50MB — served via GitHub Releases instead)
+public/downloads/*.exe
+public/downloads/*.exe.blockmap

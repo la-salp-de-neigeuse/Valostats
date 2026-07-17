@@ -1,0 +1,10 @@
+version: 1.0.1
+files:
+  - url: ValoStats-Setup-1.0.1.exe
+    sha512: +zngF9Fz3YZagAbVBo1AcJyiB3LlADManuKTw7wWvzXJr7Z0FBsLLq2suWBiCCAwAvnDbPVB6qalIvxqXpKihQ==
+    size: 93271591
+path: ValoStats-Setup-1.0.1.exe
+sha512: +zngF9Fz3YZagAbVBo1AcJyiB3LlADManuKTw7wWvzXJr7Z0FBsLLq2suWBiCCAwAvnDbPVB6qalIvxqXpKihQ==
+releaseName: ValoStats Companion v1.0.1
+releaseNotes: Consultez https://valostats.app/a-propos/changelog pour les notes de version.
+releaseDate: '2026-07-17T04:28:47.762Z'

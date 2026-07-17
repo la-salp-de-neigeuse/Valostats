@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge";
 export function HeroSection() {
   const ref = useRef<HTMLDivElement>(null);
   const [version, setVersion] = useState("...");
-  const [downloadUrl, setDownloadUrl] = useState("/downloads/ValoStats-Setup-1.0.0.exe");
-  const [filename, setFilename] = useState("ValoStats-Setup-1.0.0.exe");
+  const [downloadUrl, setDownloadUrl] = useState("/downloads/ValoStats-Setup-1.0.1.exe");
+  const [filename, setFilename] = useState("ValoStats-Setup-1.0.1.exe");
 
   useEffect(() => {
     fetch("/api/download")
