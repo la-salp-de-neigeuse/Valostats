@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
@@ -91,6 +92,19 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
 ];
 
 export function DownloadsPageClient() {
+  const [downloadUrl, setDownloadUrl] = useState("/downloads/ValoStats-Setup-1.0.0.exe");
+  const [filename, setFilename] = useState("ValoStats-Setup-1.0.0.exe");
+
+  useEffect(() => {
+    fetch("/api/download")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.url) setDownloadUrl(data.url);
+        if (data.filename) setFilename(data.filename);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="max-w-5xl mx-auto space-y-12">
       <PageHeader
@@ -139,7 +153,8 @@ export function DownloadsPageClient() {
 
               <div className="flex flex-wrap items-center gap-6 pt-2">
                 <a
-                  href="#"
+                  href={downloadUrl}
+                  download={filename}
                   className="inline-flex items-center gap-3 bg-accent hover:bg-accent-hover text-white font-bold text-lg px-8 py-4 rounded-xl transition-all duration-200 hover-scale shadow-glow hover:shadow-glow"
                 >
                   <ArrowDownIcon />

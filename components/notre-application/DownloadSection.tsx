@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 
 interface DownloadData {
   version: string;
+  url: string;
   size: number;
   releaseNotes: string;
   publishedAt: string;
@@ -63,15 +63,16 @@ export function DownloadSection() {
 
         <div className="flex flex-col items-center gap-6">
           {data && data.size > 0 ? (
-            <Link
-              href="/api/download?redirect=1"
-              className={`group relative inline-flex items-center gap-3 h-16 px-10 text-lg font-bold rounded-xl bg-gradient-to-r from-accent to-accent-hover text-white shadow-glow hover:shadow-glow transition-all duration-300 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background`}
+            <a
+              href={data.url}
+              download={data.filename}
+              className="group relative inline-flex items-center gap-3 h-16 px-10 text-lg font-bold rounded-xl bg-gradient-to-r from-accent to-accent-hover text-white shadow-glow hover:shadow-glow transition-all duration-300 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
               </svg>
               Télécharger ValoStats Companion
-            </Link>
+            </a>
           ) : (
             <span className="group relative inline-flex items-center gap-3 h-16 px-10 text-lg font-bold rounded-xl bg-surface/50 text-text-muted cursor-not-allowed select-none">
               <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">

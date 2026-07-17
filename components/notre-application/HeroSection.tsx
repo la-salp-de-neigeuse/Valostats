@@ -1,17 +1,22 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 
 export function HeroSection() {
   const ref = useRef<HTMLDivElement>(null);
   const [version, setVersion] = useState("...");
+  const [downloadUrl, setDownloadUrl] = useState("/downloads/ValoStats-Setup-1.0.0.exe");
+  const [filename, setFilename] = useState("ValoStats-Setup-1.0.0.exe");
 
   useEffect(() => {
     fetch("/api/download")
       .then((r) => r.json())
-      .then((data) => setVersion(data.version || "..."))
+      .then((data) => {
+        setVersion(data.version || "...");
+        if (data.url) setDownloadUrl(data.url);
+        if (data.filename) setFilename(data.filename);
+      })
       .catch(() => setVersion("..."));
   }, []);
 
@@ -54,16 +59,17 @@ export function HeroSection() {
           des parties — le tout sans effort.
         </p>
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style={{ animationDelay: "0.2s" }}>
-          <Link
-            href="/api/download?redirect=1"
+          <a
+            href={downloadUrl}
+            download={filename}
             className="group relative inline-flex items-center gap-3 h-14 px-8 text-base font-bold rounded-xl bg-accent text-white shadow-glow hover:shadow-glow hover:bg-accent-hover transition-all duration-300 hover-scale"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
             </svg>
             Télécharger ValoStats Companion
-          </Link>
-          <Link
+          </a>
+          <a
             href="#features"
             className="inline-flex items-center gap-2 h-14 px-8 text-base font-semibold rounded-xl bg-surface border border-border text-text-secondary hover:text-text-primary hover:border-accent/50 transition-all duration-300 hover-scale"
           >
@@ -71,7 +77,7 @@ export function HeroSection() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
             </svg>
             En savoir plus
-          </Link>
+          </a>
         </div>
         <div className="mt-16 flex items-center justify-center gap-8 text-sm text-text-muted animate-fade-in" style={{ animationDelay: "0.4s" }}>
           <span className="flex items-center gap-2">

@@ -77,6 +77,11 @@ export class DownloadService {
   private async selectSource(): Promise<DownloadSource> {
     const envSource = process.env.DOWNLOAD_SOURCE;
 
+    // 0. DOWNLOAD_URL prime sur tout — permet de définir une URL directe
+    if (process.env.DOWNLOAD_URL) {
+      return this.createUrlSource();
+    }
+
     // 1. Source GitHub
     if (envSource === "github" || process.env.GITHUB_OWNER) {
       const source = new GitHubSource();
@@ -120,6 +125,36 @@ export class DownloadService {
       downloadsDir: process.env.LOCAL_DOWNLOADS_DIR || "public/downloads",
     });
     return source;
+  }
+
+  private createUrlSource(): DownloadSource {
+    const url = process.env.DOWNLOAD_URL!;
+    const filename = process.env.DOWNLOAD_FILENAME || url.split("/").pop() || "ValoStats-Setup-1.0.0.exe";
+    const version = process.env.DOWNLOAD_VERSION || "1.0.0";
+    const size = parseInt(process.env.DOWNLOAD_SIZE || "86000000", 10);
+
+    return {
+      name: "url",
+      async init() {},
+      async getLatestDownload() {
+        return {
+          version,
+          url,
+          size,
+          releaseNotes: process.env.DOWNLOAD_RELEASE_NOTES || "",
+          publishedAt: new Date().toISOString(),
+          filename,
+          platform: "win32",
+          arch: "x64",
+        };
+      },
+      async getDownloadForVersion() {
+        return this.getLatestDownload();
+      },
+      async healthCheck() {
+        return true;
+      },
+    };
   }
 
   private async sourceFromConfig(config: Record<string, unknown>): Promise<DownloadSource> {

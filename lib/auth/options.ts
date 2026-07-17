@@ -1,6 +1,7 @@
 import type { NextAuthOptions, User as NextAuthUser } from "next-auth";
 import type { UserRole, UserPlan, ProfileVisibility } from "@prisma/client";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { encode as encodeJwt, decode as decodeJwt } from "next-auth/jwt";
 
 import { authenticateUser } from "@/services/users/user-service";
 import { loginSchema } from "@/lib/validation/auth";
@@ -12,6 +13,7 @@ type ValoStatsAuthUser = NextAuthUser & {
   publicSlug: string;
   privacyVersion: number;
   sessionVersion: number;
+  rememberMe?: boolean;
 };
 
 export const authOptions: NextAuthOptions = {
@@ -30,9 +32,15 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Mot de passe", type: "password" },
+        rememberMe: { label: "Rester connecté", type: "checkbox" },
       },
       async authorize(credentials) {
-        const parsedCredentials = loginSchema.safeParse(credentials);
+        if (!credentials) return null;
+
+        const parsedCredentials = loginSchema.safeParse({
+          email: credentials.email,
+          password: credentials.password,
+        });
 
         if (!parsedCredentials.success) {
           return null;
@@ -54,6 +62,7 @@ export const authOptions: NextAuthOptions = {
           publicSlug: user.publicSlug,
           privacyVersion: user.privacyVersion,
           sessionVersion: user.sessionVersion,
+          rememberMe: credentials.rememberMe === "true",
         } satisfies ValoStatsAuthUser;
       },
     }),
@@ -68,6 +77,7 @@ export const authOptions: NextAuthOptions = {
         token.publicSlug = authUser.publicSlug;
         token.privacyVersion = authUser.privacyVersion;
         token.sessionVersion = authUser.sessionVersion;
+        token.rememberMe = authUser.rememberMe;
       }
 
       return token;
@@ -84,6 +94,32 @@ export const authOptions: NextAuthOptions = {
       }
 
       return session;
+    },
+  },
+  jwt: {
+    async encode({ token, secret }) {
+      if (!token) return "";
+
+      const now = Math.floor(Date.now() / 1000);
+      const rememberMe = (token as { rememberMe?: boolean }).rememberMe !== false;
+      const maxAgeSecs = rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60;
+
+      return await encodeJwt({
+        token: {
+          ...token,
+          iat: now,
+          exp: now + maxAgeSecs,
+        },
+        secret,
+      });
+    },
+    async decode({ token, secret }) {
+      if (!token) return null;
+      try {
+        return await decodeJwt({ token, secret });
+      } catch {
+        return null;
+      }
     },
   },
 };
