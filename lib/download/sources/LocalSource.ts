@@ -47,19 +47,26 @@ export class LocalSource implements DownloadSource {
     const manifest = this.readManifest();
 
     if (manifest) {
-      return {
-        version: manifest.version,
-        url: `${this.baseUrl}/${manifest.filename}`,
-        size: this.getFileSize(manifest.filename),
-        releaseNotes: manifest.releaseNotes || "",
-        publishedAt: manifest.publishedAt || new Date().toISOString(),
-        filename: manifest.filename,
-        platform: "win32",
-        arch: "x64",
-      };
+      const size = this.getFileSize(manifest.filename);
+      if (size > 0) {
+        return {
+          version: manifest.version,
+          url: `${this.baseUrl}/${manifest.filename}`,
+          size,
+          releaseNotes: manifest.releaseNotes || "",
+          publishedAt: manifest.publishedAt || new Date().toISOString(),
+          filename: manifest.filename,
+          platform: "win32",
+          arch: "x64",
+        };
+      }
+      // manifest exists but file is missing → fall through to placeholder
     }
 
-    return this.fallbackToDirectoryScan();
+    const scanned = this.fallbackToDirectoryScan();
+    if (scanned.size > 0) return scanned;
+
+    return this.createPlaceholder();
   }
 
   async getDownloadForVersion(version: string): Promise<DownloadInfo> {

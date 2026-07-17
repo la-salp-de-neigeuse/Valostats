@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       headers.set("X-Download-Size", String(info.size));
       headers.set("X-Source", process.env.DOWNLOAD_SOURCE || "local");
 
-      return NextResponse.redirect(info.url, {
+      return NextResponse.redirect(new URL(info.url, request.url), {
         status: 302,
         headers,
       });
