@@ -55,6 +55,7 @@ model User {
   subscription       Subscription?
   feedbacks          Feedback[]
   socialLinks        SocialLink[]
+  companionSessions  CompanionSession[]
 
   @@index([visibility])
   @@index([plan])
@@ -486,6 +487,31 @@ model AuditLog {
   @@index([userId])
   @@index([action])
   @@index([createdAt])
+}
+
+model CompanionSession {
+  id           String               @id @default(uuid()) @db.Uuid
+  userId       String?              @db.Uuid
+  code         String               @unique
+  pollKey      String               @unique
+  partnerToken String?              @unique
+  status       CompanionLinkStatus  @default(PENDING)
+  expiresAt    DateTime
+  linkedAt     DateTime?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  user         User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([code])
+  @@index([pollKey])
+  @@index([status, expiresAt])
+}
+
+enum CompanionLinkStatus {
+  PENDING
+  LINKED
+  EXPIRED
 }
 
 enum UserRole {

@@ -6,9 +6,9 @@ const cspHeader = [
   `default-src 'self'`,
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   `style-src 'self' 'unsafe-inline'`,
-  `img-src 'self' blob: data: https://cmsassets.rgpub.io https://media.valorant-api.com`,
+  `img-src 'self' blob: data: https://cmsassets.rgpub.io https://media.valorant-api.com https://cmsassets.content.gg https://playvalorant.com`,
   `font-src 'self'`,
-  `  connect-src 'self' https://api.riotgames.com https://zqiwvdtqoqiuronihxzy.supabase.co`,
+  `connect-src 'self' https://api.riotgames.com https://zqiwvdtqoqiuronihxzy.supabase.co`,
   `frame-ancestors 'none'`,
   `frame-src 'none'`,
   `object-src 'none'`,
@@ -20,6 +20,15 @@ const cspHeader = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "media.valorant-api.com" },
+      { protocol: "https", hostname: "cmsassets.rgpub.io" },
+      { protocol: "https", hostname: "cmsassets.content.gg" },
+      { protocol: "https", hostname: "playvalorant.com" },
+    ],
+  },
 
   async headers() {
     return [

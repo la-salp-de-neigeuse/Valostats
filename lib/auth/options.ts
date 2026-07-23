@@ -14,6 +14,7 @@ type ValoStatsAuthUser = NextAuthUser & {
   privacyVersion: number;
   sessionVersion: number;
   rememberMe?: boolean;
+  image?: string | null;
 };
 
 if (!process.env.NEXTAUTH_SECRET) {
@@ -26,6 +27,17 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
     maxAge: 60 * 60 * 24 * 30,
     updateAge: 60 * 60 * 24,
+  },
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
   },
   pages: {
     signIn: "/login",
@@ -60,6 +72,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           name: user.name,
           email: user.email,
+          image: user.image,
           role: user.role,
           plan: user.plan,
           visibility: user.visibility,
@@ -72,7 +85,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+      async jwt({ token, user }) {
       if (user) {
         const authUser = user as ValoStatsAuthUser;
         token.role = authUser.role;
@@ -82,6 +95,8 @@ export const authOptions: NextAuthOptions = {
         token.privacyVersion = authUser.privacyVersion;
         token.sessionVersion = authUser.sessionVersion;
         token.rememberMe = authUser.rememberMe;
+
+        if (authUser.image) token.picture = authUser.image;
       }
 
       return token;
@@ -95,6 +110,7 @@ export const authOptions: NextAuthOptions = {
         session.user.publicSlug = token.publicSlug;
         session.user.privacyVersion = token.privacyVersion;
         session.user.sessionVersion = token.sessionVersion;
+        session.user.image = token.picture ?? null;
       }
 
       return session;
@@ -105,7 +121,7 @@ export const authOptions: NextAuthOptions = {
       if (!token) return "";
 
       const now = Math.floor(Date.now() / 1000);
-      const rememberMe = (token as { rememberMe?: boolean }).rememberMe !== false;
+      const rememberMe = token.rememberMe !== false;
       const maxAgeSecs = rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60;
 
       return await encodeJwt({

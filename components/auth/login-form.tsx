@@ -38,6 +38,9 @@ export function LoginForm({ registered }: { registered?: boolean }) {
       setError(errorMessages[result.error] ?? result.error);
       setIsLoading(false);
     } else {
+      if (rememberMe) {
+        await fetch("/api/auth/persist-session", { method: "POST" });
+      }
       router.push("/dashboard");
     }
   }

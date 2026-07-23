@@ -42,6 +42,7 @@ export async function POST(request: Request) {
       publicSlug: user.publicSlug,
       privacyVersion: user.privacyVersion,
       sessionVersion: user.sessionVersion,
+      rememberMe: true,
     };
 
     const secret = process.env.NEXTAUTH_SECRET;
