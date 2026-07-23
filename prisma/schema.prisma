@@ -15,8 +15,6 @@ model User {
   normalizedEmail    String                    @unique
   emailVerified      DateTime?
   image              String?
-  bannerUrl          String?
-  bio                String?
   role               UserRole                  @default(USER)
   plan               UserPlan                  @default(FREE)
   visibility         ProfileVisibility         @default(PRIVATE)
@@ -29,10 +27,20 @@ model User {
   deletedAt          DateTime?
   createdAt          DateTime                  @default(now())
   updatedAt          DateTime                  @updatedAt
+  bannerUrl          String?
+  bio                String?
   accounts           Account[]
   aiAnalyses         AiAnalysis[]
+  aiPromptLogs       AiPromptLog[]
+  badges             Badge[]
+  companionSessions  CompanionSession[]
   dashboardWidgets   DashboardWidget[]
+  feedbacks          Feedback[]
+  goals              Goal[]
   leaderboardRows    LeaderboardEntry[]
+  notifications      Notification[]
+  overlayConfig      OverlayConfig?
+  overlayPresets     OverlayPreset[]
   password           PasswordCredential?
   passwordResets     PasswordResetToken[]
   agentAggregates    PlayerAgentAggregate[]
@@ -42,20 +50,12 @@ model User {
   publicProfileCache PublicPlayerProfileCache?
   riotAccount        RiotAccount?
   sessions           Session[]
+  socialLinks        SocialLink[]
+  stripeCustomer     StripeCustomer?
+  subscription       Subscription?
   syncJobs           SyncJob[]
   usageCounters      UsageCounter[]
   settings           UserSettings?
-  notifications      Notification[]
-  goals              Goal[]
-  badges             Badge[]
-  overlayConfig      OverlayConfig?
-  overlayPresets     OverlayPreset[]
-  aiPromptLogs       AiPromptLog[]
-  stripeCustomer     StripeCustomer?
-  subscription       Subscription?
-  feedbacks          Feedback[]
-  socialLinks        SocialLink[]
-  companionSessions  CompanionSession[]
 
   @@index([visibility])
   @@index([plan])
@@ -129,25 +129,25 @@ model VerificationToken {
 }
 
 model UserSettings {
-  id               String   @id @default(uuid()) @db.Uuid
-  userId           String   @unique @db.Uuid
-  showRankPublicly Boolean  @default(false)
-  showMatchHistory Boolean  @default(false)
-  showAiScore      Boolean  @default(false)
-  showGoals        Boolean  @default(false)
-  showRecentMatches Boolean @default(false)
-  allowLeaderboard Boolean  @default(false)
-  marketingEmails  Boolean  @default(false)
-  productEmails      Boolean  @default(true)
-  preferredProvider  String?
-  preferredModel     String?
-  temperature        Decimal? @db.Decimal(5, 2)
-  maxTokens          Int?
-  llmTimeout         Int?
+  id                   String   @id @default(uuid()) @db.Uuid
+  userId               String   @unique @db.Uuid
+  showRankPublicly     Boolean  @default(false)
+  showMatchHistory     Boolean  @default(false)
+  showAiScore          Boolean  @default(false)
+  allowLeaderboard     Boolean  @default(false)
+  marketingEmails      Boolean  @default(false)
+  productEmails        Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  llmTimeout           Int?
+  maxTokens            Int?
   notificationSettings Json?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preferredModel       String?
+  preferredProvider    String?
+  temperature          Decimal? @db.Decimal(5, 2)
+  showGoals            Boolean  @default(false)
+  showRecentMatches    Boolean  @default(false)
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model RiotAccount {
@@ -160,20 +160,20 @@ model RiotAccount {
   regionGroup           RiotRegionGroup
   currentRank           String?
   currentRankTier       Int?
-  currentPlayerCardId   String?
   encryptedAccessToken  Bytes?
   encryptedRefreshToken Bytes?
   tokenExpiresAt        DateTime?
   scopes                String?
   consentExpiresAt      DateTime?
-  isVerified            Boolean         @default(false)
-  verifiedAt            DateTime?
   connectedAt           DateTime        @default(now())
   lastSyncAt            DateTime?
   nextSyncAt            DateTime?
   syncCursor            String?
   syncLockUntil         DateTime?
   lastSyncError         String?
+  isVerified            Boolean         @default(false)
+  verifiedAt            DateTime?
+  currentPlayerCardId   String?
   user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([gameName, tagLine])
@@ -324,26 +324,26 @@ model PlayerMapAggregate {
 }
 
 model AiAnalysis {
-  id            BigInt           @id @default(autoincrement())
-  userId        String           @db.Uuid
-  aggregateId   BigInt?
-  status        AiAnalysisStatus @default(PENDING)
-  modelName     String
-  modelVersion  String
-  promptVersion String
+  id               BigInt           @id @default(autoincrement())
+  userId           String           @db.Uuid
+  aggregateId      BigInt?
+  status           AiAnalysisStatus @default(PENDING)
+  modelName        String
+  modelVersion     String
+  promptVersion    String
   inputHash        String
   score            Decimal?         @db.Decimal(6, 2)
   summary          String?
-  provider         String
+  inputTokens      Int?
+  outputTokens     Int?
+  estimatedCost    Decimal?         @db.Decimal(10, 4)
+  generatedAt      DateTime?
+  createdAt        DateTime         @default(now())
   generationTimeMs Int              @default(0)
+  provider         String
   rawResult        Json?
-  inputTokens   Int?
-  outputTokens  Int?
-  estimatedCost Decimal?         @db.Decimal(10, 4)
-  generatedAt   DateTime?
-  createdAt     DateTime         @default(now())
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  insights      AiInsight[]
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  insights         AiInsight[]
 
   @@unique([userId, modelName, modelVersion, promptVersion, inputHash])
   @@index([userId, createdAt])
@@ -490,22 +490,197 @@ model AuditLog {
 }
 
 model CompanionSession {
-  id           String               @id @default(uuid()) @db.Uuid
-  userId       String?              @db.Uuid
-  code         String               @unique
-  pollKey      String               @unique
-  partnerToken String?              @unique
-  status       CompanionLinkStatus  @default(PENDING)
+  id           String              @id @default(uuid()) @db.Uuid
+  userId       String?             @db.Uuid
+  code         String              @unique
+  pollKey      String              @unique
+  partnerToken String?             @unique
+  status       CompanionLinkStatus @default(PENDING)
   expiresAt    DateTime
   linkedAt     DateTime?
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-  user         User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  user         User?               @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([code])
   @@index([pollKey])
   @@index([status, expiresAt])
+}
+
+model Notification {
+  id         BigInt    @id @default(autoincrement())
+  userId     String    @db.Uuid
+  type       String
+  channel    String    @default("IN_APP")
+  title      String
+  body       String?
+  link       String?
+  metadata   Json      @default("{}")
+  readAt     DateTime?
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, readAt, archivedAt])
+  @@index([userId, type])
+}
+
+model Goal {
+  id           BigInt    @id @default(autoincrement())
+  userId       String    @db.Uuid
+  title        String
+  description  String
+  type         String
+  difficulty   String
+  priority     String
+  reward       String?
+  currentValue Decimal   @db.Decimal(10, 2)
+  targetValue  Decimal   @db.Decimal(10, 2)
+  unit         String
+  status       String    @default("PENDING")
+  deadline     DateTime?
+  completedAt  DateTime?
+  metadata     Json      @default("{}")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([userId, type])
+  @@index([userId, priority])
+  @@index([userId, deadline])
+  @@index([userId, status, deadline])
+}
+
+model Badge {
+  id          BigInt   @id @default(autoincrement())
+  userId      String   @db.Uuid
+  badgeId     String
+  name        String
+  description String
+  icon        String
+  unlockedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId, unlockedAt])
+}
+
+model OverlayConfig {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @db.Uuid
+  settings  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model OverlayPreset {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  name      String
+  settings  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model AiPromptLog {
+  id              BigInt   @id @default(autoincrement())
+  userId          String   @db.Uuid
+  provider        String
+  model           String
+  promptVersion   String?
+  systemPrompt    String?
+  userPrompt      String?
+  responseContent String?
+  inputTokens     Int?
+  outputTokens    Int?
+  estimatedCost   Decimal? @db.Decimal(10, 6)
+  durationMs      Int?
+  success         Boolean
+  errorMessage    String?
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, success])
+  @@index([provider])
+}
+
+model StripeCustomer {
+  id               String @id @default(uuid()) @db.Uuid
+  userId           String @unique @db.Uuid
+  stripeCustomerId String @unique
+  user             User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id                   String             @id @default(uuid()) @db.Uuid
+  userId               String             @unique @db.Uuid
+  stripeSubscriptionId String             @unique
+  stripeCustomerId     String
+  status               SubscriptionStatus
+  plan                 UserPlan           @default(FREE)
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+  canceledAt           DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([plan])
+}
+
+model Feedback {
+  id              BigInt           @id @default(autoincrement())
+  userId          String           @db.Uuid
+  type            FeedbackType
+  title           String
+  description     String
+  status          FeedbackStatus   @default(NEW)
+  priority        FeedbackPriority @default(MEDIUM)
+  pageUrl         String?
+  browser         String?
+  operatingSystem String?
+  userAgent       String?
+  screenshotUrl   String?
+  adminNote       String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([priority])
+  @@index([status, priority])
+  @@index([createdAt])
+}
+
+model SocialLink {
+  id           String               @id @default(uuid()) @db.Uuid
+  userId       String               @db.Uuid
+  platform     SocialPlatform
+  url          String
+  visibility   SocialLinkVisibility @default(PUBLIC)
+  displayOrder Int                  @default(0)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform])
+  @@index([userId, displayOrder])
 }
 
 enum CompanionLinkStatus {
@@ -676,179 +851,4 @@ enum FeedbackPriority {
   MEDIUM
   HIGH
   CRITICAL
-}
-
-model Notification {
-  id          BigInt    @id @default(autoincrement())
-  userId      String    @db.Uuid
-  type        String
-  channel     String    @default("IN_APP")
-  title       String
-  body        String?
-  link        String?
-  metadata    Json      @default("{}")
-  readAt      DateTime?
-  archivedAt  DateTime?
-  createdAt   DateTime  @default(now())
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, createdAt])
-  @@index([userId, readAt, archivedAt])
-  @@index([userId, type])
-}
-
-model Goal {
-  id            BigInt   @id @default(autoincrement())
-  userId        String   @db.Uuid
-  title         String
-  description   String
-  type          String
-  difficulty    String
-  priority      String
-  reward        String?
-  currentValue  Decimal  @db.Decimal(10, 2)
-  targetValue   Decimal  @db.Decimal(10, 2)
-  unit          String
-  status        String    @default("PENDING")
-  deadline      DateTime?
-  completedAt   DateTime?
-  metadata      Json     @default("{}")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, status])
-  @@index([userId, type])
-  @@index([userId, priority])
-  @@index([userId, deadline])
-  @@index([userId, status, deadline])
-}
-
-model Badge {
-  id          BigInt   @id @default(autoincrement())
-  userId      String   @db.Uuid
-  badgeId     String
-  name        String
-  description String
-  icon        String
-  unlockedAt  DateTime @default(now())
-  createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, badgeId])
-  @@index([userId, unlockedAt])
-}
-
-model OverlayConfig {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @unique @db.Uuid
-  settings  Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model OverlayPreset {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @db.Uuid
-  name      String
-  settings  Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, name])
-  @@index([userId])
-}
-
-model AiPromptLog {
-  id              BigInt   @id @default(autoincrement())
-  userId          String   @db.Uuid
-  provider        String
-  model           String
-  promptVersion   String?
-  systemPrompt    String?
-  userPrompt      String?
-  responseContent String?
-  inputTokens     Int?
-  outputTokens    Int?
-  estimatedCost   Decimal? @db.Decimal(10, 6)
-  durationMs      Int?
-  success         Boolean
-  errorMessage    String?
-  createdAt       DateTime @default(now())
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, createdAt])
-  @@index([userId, success])
-  @@index([provider])
-}
-
-model StripeCustomer {
-  id               String @id @default(uuid()) @db.Uuid
-  userId           String @unique @db.Uuid
-  stripeCustomerId String @unique
-  user             User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Subscription {
-  id                   String             @id @default(uuid()) @db.Uuid
-  userId               String             @unique @db.Uuid
-  stripeSubscriptionId String             @unique
-  stripeCustomerId     String
-  status               SubscriptionStatus
-  plan                 UserPlan           @default(FREE)
-  currentPeriodStart   DateTime
-  currentPeriodEnd     DateTime
-  cancelAtPeriodEnd    Boolean            @default(false)
-  canceledAt           DateTime?
-  trialStart           DateTime?
-  trialEnd             DateTime?
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
-  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([status])
-  @@index([plan])
-}
-
-model Feedback {
-  id              BigInt          @id @default(autoincrement())
-  userId          String          @db.Uuid
-  type            FeedbackType
-  title           String
-  description     String
-  status          FeedbackStatus  @default(NEW)
-  priority        FeedbackPriority @default(MEDIUM)
-  pageUrl         String?
-  browser         String?
-  operatingSystem String?
-  userAgent       String?
-  screenshotUrl   String?
-  adminNote       String?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([type])
-  @@index([status])
-  @@index([priority])
-  @@index([status, priority])
-  @@index([createdAt])
-}
-
-model SocialLink {
-  id        String              @id @default(uuid()) @db.Uuid
-  userId    String              @db.Uuid
-  platform  SocialPlatform
-  url       String
-  visibility SocialLinkVisibility @default(PUBLIC)
-  displayOrder Int              @default(0)
-  createdAt DateTime            @default(now())
-  updatedAt DateTime            @updatedAt
-  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, platform])
-  @@index([userId, displayOrder])
 }

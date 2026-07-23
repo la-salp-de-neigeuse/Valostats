@@ -25,7 +25,7 @@ export default function CompanionLinkPage() {
     }
     if (sessionStatus === "loading") return;
     if (sessionStatus === "unauthenticated") return;
-    setLinkState("pending");
+    handleLink();
   }, [code, sessionStatus]);
 
   async function handleLink() {
@@ -191,6 +191,9 @@ export default function CompanionLinkPage() {
             <h1 className="text-xl font-bold text-text-primary">Code expiré</h1>
             <p className="text-sm text-text-muted">{errorMessage}</p>
             <p className="text-sm text-text-muted">Veuillez relancer le Companion pour générer un nouveau code.</p>
+            <button onClick={() => handleLink()} className="mt-4 bg-accent hover:bg-accent-hover text-white font-bold py-2 px-6 rounded-lg transition-colors">
+              Réessayer
+            </button>
           </>
         )}
 
@@ -198,7 +201,7 @@ export default function CompanionLinkPage() {
           <>
             <h1 className="text-xl font-bold text-text-primary">Code déjà utilisé</h1>
             <p className="text-sm text-text-muted">{errorMessage}</p>
-            <p className="text-sm text-text-muted">Veuillez relancer le Companion pour générer un nouveau code.</p>
+            <p className="text-sm text-text-muted">Votre Companion est déjà lié à un compte.</p>
           </>
         )}
 
