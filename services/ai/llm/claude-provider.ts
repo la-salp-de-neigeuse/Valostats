@@ -214,6 +214,7 @@ export class ClaudeProvider implements LLMProvider {
           "x-api-key": apiKey,
           "anthropic-version": "2023-06-01",
         },
+        signal: AbortSignal.timeout(30000),
         body: JSON.stringify({
           model,
           max_tokens: maxTokens,

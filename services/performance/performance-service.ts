@@ -87,15 +87,58 @@ function buildRadar(metrics: PerformanceMetrics, aiScore: number | null): RadarM
   ];
 }
 
-function buildVsAverage(aggregate: AggregateStats | null): PerformanceData["vsAverage"] {
+async function buildVsAverage(aggregate: AggregateStats | null): Promise<PerformanceData["vsAverage"]> {
   if (!aggregate || aggregate.matchCount < 5) return [];
-  const avg = aggregate; // PlayerStatAggregate holds averages directly
+
+  const globalAgg = await prisma.playerStatAggregate.aggregate({
+    where: { period: "ALL_TIME" },
+    _avg: {
+      winRate: true,
+      averageKda: true,
+      headshotRate: true,
+      damagePerRound: true,
+      combatScore: true,
+    },
+  });
+
+  const avg = globalAgg._avg;
+
   return [
-    { label: "K/D", playerValue: Number(avg.kdRatio), averageValue: Number(avg.kdRatio) * 0.85, unit: "", higherIsBetter: true },
-    { label: "Winrate", playerValue: Number(avg.winRate), averageValue: 50, unit: "%", higherIsBetter: true },
-    { label: "Headshot", playerValue: Number(avg.headshotRate), averageValue: Number(avg.headshotRate) * 0.9, unit: "%", higherIsBetter: true },
-    { label: "ADR", playerValue: Number(avg.damagePerRound), averageValue: Number(avg.damagePerRound) * 0.85, unit: "", higherIsBetter: true },
-    { label: "ACS", playerValue: Number(avg.combatScore), averageValue: Number(avg.combatScore) * 0.85, unit: "", higherIsBetter: true },
+    {
+      label: "K/D",
+      playerValue: Number(aggregate.kdRatio),
+      averageValue: Number(avg.averageKda ?? 0),
+      unit: "",
+      higherIsBetter: true,
+    },
+    {
+      label: "Winrate",
+      playerValue: Number(aggregate.winRate),
+      averageValue: Number(avg.winRate ?? 50),
+      unit: "%",
+      higherIsBetter: true,
+    },
+    {
+      label: "Headshot",
+      playerValue: Number(aggregate.headshotRate),
+      averageValue: Number(avg.headshotRate ?? 0),
+      unit: "%",
+      higherIsBetter: true,
+    },
+    {
+      label: "ADR",
+      playerValue: Number(aggregate.damagePerRound),
+      averageValue: Number(avg.damagePerRound ?? 0),
+      unit: "",
+      higherIsBetter: true,
+    },
+    {
+      label: "ACS",
+      playerValue: Number(aggregate.combatScore),
+      averageValue: Number(avg.combatScore ?? 0),
+      unit: "",
+      higherIsBetter: true,
+    },
   ];
 }
 
@@ -134,7 +177,7 @@ export async function getPerformanceData(
   }));
 
   const radar = hasData ? buildRadar(metrics, analysis?.score ?? null) : [];
-  const vsAverage = buildVsAverage(aggregate);
+  const vsAverage = await buildVsAverage(aggregate);
 
   const aiScore = analysis?.score ?? null;
   const strengths = (coachingReport?.strengths ?? []).map((s) => s.problem);

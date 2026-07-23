@@ -3,8 +3,10 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { assertSameOrigin, HttpError, jsonError } from "@/lib/security/request";
 import { verifyRiotAccount } from "@/services/riot-account/riot-account-service";
+import { syncMatchesForUser } from "@/services/riot-api/match-sync-service";
 import { RiotApiError } from "@/services/riot-api/api-client";
 import { checkRateLimit } from "@/lib/security/rate-limit";
+import { prisma } from "@/lib/prisma/client";
 
 export async function POST(request: Request) {
   try {
@@ -30,6 +32,15 @@ export async function POST(request: Request) {
     }
 
     const account = await verifyRiotAccount(user.id);
+
+    const matchCount = await prisma.playerMatchStats.count({
+      where: { userId: user.id },
+    });
+    if (matchCount === 0) {
+      syncMatchesForUser(user.id).catch((err) =>
+        console.warn("[AutoSync] Échec de la sync post-vérification:", err)
+      );
+    }
 
     return NextResponse.json(account);
   } catch (error) {

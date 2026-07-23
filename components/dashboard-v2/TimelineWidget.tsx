@@ -27,7 +27,8 @@ export function TimelineWidget({ data }: TimelineWidgetProps) {
     return (
       <div className="p-5">
         <h3 className="text-sm font-semibold text-text-primary mb-4">Timeline</h3>
-        <p className="text-sm text-text-muted">Aucun match récent</p>
+        <p className="text-sm text-text-muted">Aucune partie disponible.</p>
+          <p className="text-xs text-text-muted/60 mt-1">Jouez un match pour commencer l&apos;analyse.</p>
       </div>
     );
   }

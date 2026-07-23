@@ -29,3 +29,11 @@ export function formatAgentName(agentId: string): string {
   const normalized = agentId.toLowerCase();
   return AGENT_ID_TO_NAME[normalized] ?? agentId;
 }
+
+const AGENT_NAME_TO_UUID: Record<string, string> = Object.fromEntries(
+  Object.entries(AGENT_ID_TO_NAME).map(([uuid, name]) => [name, uuid])
+);
+
+export function getAgentUuid(name: string): string | null {
+  return AGENT_NAME_TO_UUID[name] ?? null;
+}

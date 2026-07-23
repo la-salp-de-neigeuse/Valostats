@@ -25,6 +25,7 @@ import {
 import { getV2DashboardData } from "@/services/dashboard/v2-dashboard-service";
 import { getWidgetLayout } from "@/services/dashboard/widget-layout-service";
 import { getPrediction } from "@/services/prediction/prediction-service";
+import { getPlayerInfo } from "@/services/dashboard/player-info-service";
 import { DashboardV2Client } from "@/components/dashboard-v2/DashboardV2Client";
 
 export default async function DashboardPage({
@@ -55,6 +56,7 @@ export default async function DashboardPage({
     v2Data,
     initialLayout,
     prediction,
+    playerInfo,
   ] = await Promise.all([
     getAggregateStatsByPeriod(user.id, period),
     getAgentAggregatesByPeriod(user.id, period),
@@ -63,10 +65,11 @@ export default async function DashboardPage({
     getLatestAnalysis(user.id),
     getEvolutionData(user.id, premium),
     getPerformanceByPeriod(user.id, premium),
-    getRecentMatchesForChart(user.id, 15, premium),
+    getRecentMatchesForChart(user.id, 15),
     getV2DashboardData(user.id),
     getWidgetLayout(user.id),
     getPrediction(user.id),
+    getPlayerInfo(user.id),
   ]);
 
   const hasMatches = stats.matchCount > 0;
@@ -125,6 +128,7 @@ export default async function DashboardPage({
       worstMap={stats.worstMap}
       premium={premium}
       hasMatches={hasMatches}
+      playerInfo={playerInfo}
       predictionSummary={prediction ? {
         currentRankLabel: prediction.currentRankLabel,
         nextRankLabel: prediction.nextRankLabel,

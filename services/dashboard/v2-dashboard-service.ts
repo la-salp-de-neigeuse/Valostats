@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma/client";
 import { getLatestAnalysis } from "@/services/ai/ai-analysis-service";
-import { getOrSet } from "@/lib/cache/cache-service";
+import { getOrSet, getOrSetWithSource } from "@/lib/cache/cache-service";
 import {
+  dashboardV2Key,
   dashboardHeatmapKey,
   dashboardTimelineKey,
   dashboardActivityKey,
@@ -21,28 +22,35 @@ import type {
 } from "./types";
 
 export async function getV2DashboardData(userId: string): Promise<V2DashboardData> {
-  const [heatmap, timeline, activity, goals, rankEvolution, insights] = await Promise.all([
-    getHeatmapData(userId),
-    getTimelineData(userId),
-    getActivityData(userId),
-    getGoalsSummary(userId),
-    getRankEvolution(userId),
-    getLatestAnalysis(userId),
-  ]);
+  const { data, source } = await getOrSetWithSource(
+    dashboardV2Key(userId),
+    async () => {
+      const [heatmap, timeline, activity, goals, rankEvolution, insights] = await Promise.all([
+        getHeatmapData(userId),
+        getTimelineData(userId),
+        getActivityData(userId),
+        getGoalsSummary(userId),
+        getRankEvolution(userId),
+        getLatestAnalysis(userId),
+      ]);
 
-  const vsAverage = await getVsAverage(userId);
+      const vsAverage = await getVsAverage(userId);
 
-  return {
-    heatmap,
-    timeline,
-    activity,
-    goals,
-    rankEvolution,
-    insights: insights
-      ? { score: insights.score, summary: insights.summary, count: insights.insights.length }
-      : null,
-    vsAverage,
-  };
+      return {
+        heatmap,
+        timeline,
+        activity,
+        goals,
+        rankEvolution,
+        insights: insights
+          ? { score: insights.score, summary: insights.summary, count: insights.insights.length }
+          : null,
+        vsAverage,
+      };
+    },
+    TTL.DASHBOARD,
+  );
+  return { ...data, source };
 }
 
 async function getHeatmapData(userId: string): Promise<HeatmapCell[]> {

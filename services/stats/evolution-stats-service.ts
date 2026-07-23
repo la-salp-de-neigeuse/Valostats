@@ -145,11 +145,7 @@ export async function getPerformanceByPeriod(userId: string, premium?: boolean):
 export async function getRecentMatchesForChart(
   userId: string,
   limit: number = 15,
-  premium?: boolean
 ): Promise<RecentMatchPoint[]> {
-  const hasPremium = premium ?? await isPremiumUser(userId);
-  if (!hasPremium) return [];
-
   return getOrSet(recentMatchesKey(userId, limit), async () => {
     const matches = await prisma.playerMatchStats.findMany({
     where: { userId },

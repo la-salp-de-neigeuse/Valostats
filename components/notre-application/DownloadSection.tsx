@@ -40,7 +40,7 @@ export function DownloadSection() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         {!loading && data && (
           <Badge variant="premium" size="sm" className="mb-6">
-            Version {data.version}
+                v{data.version}
           </Badge>
         )}
         <h2 className="text-3xl sm:text-4xl font-bold text-text-primary tracking-tight mb-4">
@@ -71,14 +71,14 @@ export function DownloadSection() {
               <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
               </svg>
-              Télécharger ValoStats Companion
+              Télécharger{data.version ? ` v${data.version}` : ""} ValoStats Companion
             </a>
           ) : (
             <span className="group relative inline-flex items-center gap-3 h-16 px-10 text-lg font-bold rounded-xl bg-surface/50 text-text-muted cursor-not-allowed select-none">
               <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
               </svg>
-              Bientôt disponible
+              Bientôt disponible{data?.version ? ` (v${data.version})` : ""}
             </span>
           )}
 
@@ -88,7 +88,7 @@ export function DownloadSection() {
                 <svg className="w-3.5 h-3.5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
-                Version {data.version}
+            v{data.version}
               </span>
               <span className="flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">

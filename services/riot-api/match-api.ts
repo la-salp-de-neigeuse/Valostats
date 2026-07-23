@@ -23,6 +23,7 @@ export interface RiotMatchPlayerDto {
   teamId: string;
   characterId: string;
   competitiveTier: number;
+  playerCard?: string;
   stats: {
     score: number;
     roundsPlayed: number;
@@ -30,6 +31,7 @@ export interface RiotMatchPlayerDto {
     deaths: number;
     assists: number;
     playtimeMillis: number;
+    headshots?: number;
     abilityCasts: {
       grenadeCasts: number;
       ability1Casts: number;

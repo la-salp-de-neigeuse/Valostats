@@ -19,7 +19,11 @@ function createClient(): Redis | null {
       enableOfflineQueue: false,
     });
 
-    client.on("error", () => {});
+    client.on("error", (_err) => {
+      if (process.env.DEBUG === "true") {
+        console.warn("[Redis]", _err instanceof Error ? _err.message : String(_err));
+      }
+    });
 
     return client;
   } catch {

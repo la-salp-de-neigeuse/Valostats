@@ -14,11 +14,11 @@ interface PredictionWidgetData {
 
 export function PredictionWidget({ data }: { data: PredictionWidgetData }) {
   const scoreColor = data.globalProgressionScore >= 75 ? "text-emerald-400"
-    : data.globalProgressionScore >= 50 ? "text-amber-400" : "text-error";
+    : data.globalProgressionScore >= 50 ? "text-amber-400" : "text-red-400";
   const strokeColor = data.globalProgressionScore >= 75 ? "#22c55e"
-    : data.globalProgressionScore >= 50 ? "#f59e0b" : "var(--error)";
+    : data.globalProgressionScore >= 50 ? "#f59e0b" : "#ef4444";
   const trendLabel = data.slope > 0.02 ? "En progression" : data.slope < -0.02 ? "En déclin" : "Stable";
-  const trendColor = data.slope > 0.02 ? "text-emerald-400" : data.slope < -0.02 ? "text-error" : "text-amber-400";
+  const trendColor = data.slope > 0.02 ? "text-emerald-400" : data.slope < -0.02 ? "text-red-400" : "text-amber-400";
 
   return (
     <div className="p-5 h-full flex flex-col gap-4">

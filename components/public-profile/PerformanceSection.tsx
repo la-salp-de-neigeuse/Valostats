@@ -9,7 +9,8 @@ export function PerformanceSection({ recentMatches }: PerformanceSectionProps) {
     return (
       <div className="bg-surface border border-slate-800 rounded-2xl p-6">
         <h2 className="text-xl font-semibold text-white mb-4">Derniers matchs</h2>
-        <p className="text-slate-400">Aucun match récent.</p>
+        <p className="text-slate-400">Aucune partie disponible.</p>
+          <p className="text-slate-500 text-sm mt-1">Jouez un match pour commencer l&apos;analyse.</p>
       </div>
     );
   }

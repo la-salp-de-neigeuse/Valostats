@@ -20,7 +20,7 @@ export default async function PerformancePage() {
     getPerformanceData(user.id),
     getEvolutionData(user.id, premium),
     getPerformanceByPeriod(user.id, premium),
-    getRecentMatchesForChart(user.id, 15, premium),
+    getRecentMatchesForChart(user.id, 15),
   ]);
 
   return (

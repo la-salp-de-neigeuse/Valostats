@@ -13,6 +13,7 @@ export const TTL = {
   ACTIVITY: 5 * 60 * 1000,
   MATCH_HISTORY: 2 * 60 * 1000,
   COMPARISON: 5 * 60 * 1000,
+  NEWS: 30 * 60 * 1000,
 } as const;
 
 function prefix(domain: string, ...parts: string[]): string {
@@ -68,6 +69,10 @@ export function performanceKey(userId: string, period: string): string {
 
 export function publicProfileKey(slug: string, period: string): string {
   return prefix("public-profile", slug, period);
+}
+
+export function dashboardV2Key(userId: string): string {
+  return prefix("dashboard", userId, "v2");
 }
 
 export function dashboardHeatmapKey(userId: string): string {

@@ -59,7 +59,7 @@ function mapCategory(category: string): InsightCategory {
   return CATEGORY_MAP[category] ?? InsightCategory.GAME_SENSE;
 }
 
-export function llmToAnalysisResult(llm: LLMAnalysisResult): AnalysisResult {
+export function llmToAnalysisResult(llm: LLMAnalysisResult, input: AnalysisInput): AnalysisResult {
   const insights = [
     ...llm.strengths.map(
       (s): import("@/services/ai/types").Insight => ({
@@ -93,7 +93,10 @@ export function llmToAnalysisResult(llm: LLMAnalysisResult): AnalysisResult {
     ),
   ];
 
-  return { score: llm.score, summary: llm.summary, insights };
+  const breakdown = calculateScoreBreakdown(input);
+  const score = llm.score || breakdown.overall;
+
+  return { score, summary: llm.summary, insights, engine: "llm" };
 }
 
 export function llmToCoachingReport(
@@ -138,6 +141,7 @@ export function llmToCoachingReport(
     score: llm.score,
     summary: llm.summary,
     insights,
+    engine: "llm",
     scoreBreakdown,
     profile,
     strengths,

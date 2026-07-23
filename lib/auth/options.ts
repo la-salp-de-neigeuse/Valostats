@@ -16,6 +16,10 @@ type ValoStatsAuthUser = NextAuthUser & {
   rememberMe?: boolean;
 };
 
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error("NEXTAUTH_SECRET is not set — authentication will fail");
+}
+
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {

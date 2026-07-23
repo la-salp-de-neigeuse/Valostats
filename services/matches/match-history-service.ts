@@ -16,6 +16,7 @@ export type MatchHistoryItem = {
   deaths: number;
   assists: number;
   score: number;
+  combatScore: number;
   durationSeconds: number;
   playedAt: Date;
   queue: ValorantQueue;
@@ -38,6 +39,7 @@ function toMatchHistoryItem(
     deaths: number;
     assists: number;
     score: number;
+    combatScore: unknown;
     matchStartedAt: Date;
     match: {
       durationSeconds: number;
@@ -55,6 +57,7 @@ function toMatchHistoryItem(
     deaths: stat.deaths,
     assists: stat.assists,
     score: stat.score,
+    combatScore: Number(stat.combatScore),
     durationSeconds: stat.match.durationSeconds,
     playedAt: stat.matchStartedAt,
     queue: stat.match.queue,

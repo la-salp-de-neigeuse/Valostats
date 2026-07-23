@@ -37,10 +37,12 @@ export class LocalSource implements DownloadSource {
   readonly name = "local";
   private downloadsDir = "public/downloads";
   private baseUrl = "/downloads";
+  private fallbackVersion = "";
 
   async init(config: DownloadSourceConfig): Promise<void> {
     this.downloadsDir = String(config.downloadsDir || "public/downloads");
     this.baseUrl = String(config.baseUrl || "/downloads");
+    this.fallbackVersion = String(config.fallbackVersion || "");
   }
 
   async getLatestDownload(): Promise<DownloadInfo> {
@@ -66,7 +68,21 @@ export class LocalSource implements DownloadSource {
     const scanned = this.fallbackToDirectoryScan();
     if (scanned.size > 0) return scanned;
 
-    return this.createPlaceholder();
+    // Ultime fallback : utiliser la version du package.json companion
+    if (this.fallbackVersion) {
+      return {
+        version: this.fallbackVersion,
+        url: "",
+        size: 0,
+        releaseNotes: "",
+        publishedAt: new Date().toISOString(),
+        filename: `ValoStats-Setup-${this.fallbackVersion}.exe`,
+        platform: "win32",
+        arch: "x64",
+      };
+    }
+
+    throw new Error("Aucun fichier de téléchargement trouvé. Déployez un fichier .exe ou un manifeste latest.json dans public/downloads/.");
   }
 
   async getDownloadForVersion(version: string): Promise<DownloadInfo> {
@@ -128,7 +144,7 @@ export class LocalSource implements DownloadSource {
 
     try {
       if (!existsSync(dir)) {
-        return this.createPlaceholder();
+        throw new Error(`Le répertoire ${dir} n'existe pas.`);
       }
       const files = readdirSync(dir);
       for (const file of files) {
@@ -143,7 +159,7 @@ export class LocalSource implements DownloadSource {
     }
 
     if (!latestExe) {
-      return this.createPlaceholder();
+      throw new Error("Aucun fichier .exe trouvé dans le répertoire de téléchargement.");
     }
 
     const versionMatch = latestExe.name.match(/[\d]+\.[\d]+\.[\d]+/);
@@ -159,17 +175,4 @@ export class LocalSource implements DownloadSource {
     };
   }
 
-  private createPlaceholder(): DownloadInfo {
-    return {
-      version: "1.0.0",
-      url: "#",
-      size: 0,
-      releaseNotes:
-        "Application disponible prochainement. Revenez bientôt pour télécharger ValoStats Companion.",
-      publishedAt: new Date().toISOString(),
-      filename: "ValoStats-Setup-1.0.0.exe",
-      platform: "win32",
-      arch: "x64",
-    };
-  }
 }

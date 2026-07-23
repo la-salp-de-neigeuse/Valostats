@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { ReactNode } from "react";
 
 const SIZES = {
@@ -49,13 +52,15 @@ interface UserAvatarProps {
 }
 
 export function UserAvatar({ src, name, size = "md", className = "", icon }: UserAvatarProps) {
-  if (src) {
+  const [imgError, setImgError] = useState(false);
+
+  if (src && !imgError) {
     return (
       <div
         className={`rounded-full bg-surface-hover shrink-0 flex items-center justify-center overflow-hidden ${SIZES[size]} ${className}`}
         title={name || undefined}
       >
-        <img src={src} alt={name || ""} className="w-full h-full object-cover" />
+        <img src={src} alt={name || ""} className="w-full h-full object-cover" onError={() => setImgError(true)} />
       </div>
     );
   }

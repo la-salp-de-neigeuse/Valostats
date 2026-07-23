@@ -30,6 +30,7 @@ function resizeImage(dataUrl: string, maxWidth: number, maxHeight: number, quali
 export function ProfileBanner({ bannerUrl, onBannerChange, onToast }: ProfileBannerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -82,12 +83,16 @@ export function ProfileBanner({ bannerUrl, onBannerChange, onToast }: ProfileBan
 
   return (
     <div className="relative w-full h-64 md:h-72 rounded-3xl overflow-hidden bg-gradient-to-br from-accent/30 via-surface to-surface">
-      {bannerUrl && (
+      {bannerUrl && !imgError ? (
         <img
+          key={bannerUrl}
           src={bannerUrl}
           alt="Bannière du profil"
           className="absolute inset-0 w-full h-full object-cover"
+          onError={() => setImgError(true)}
         />
+      ) : (imgError || !bannerUrl) && (
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/30 via-surface to-surface" />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
 

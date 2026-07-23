@@ -1,6 +1,6 @@
 {
-  "version": "1.0.1",
-  "filename": "ValoStats-Setup-1.0.1.exe",
-  "releaseNotes": "## ValoStats Companion 1.0.1\n\n### Nouveautés\n- Icône officielle ValoStats dans toute l'application\n- Connexion automatique au site de production (Vercel)\n- Migration automatique depuis les versions précédentes\n- Message d'erreur adapté au contexte (dev/prod)\n- Correctifs et optimisation du téléchargement",
-  "publishedAt": "2026-07-17T06:18:00.000Z"
+  "version": "1.0.2",
+  "filename": "ValoStats-Setup-1.0.2.exe",
+  "releaseNotes": "## ValoStats Companion 1.0.2\n\n### Corrections de bugs\n- Détection Valorant : le premier scan est maintenant attendu avant l'envoi de l'état initial au renderer (plus de race condition)\n- Bouton Ouvrir Pre Game Coach : réactivation des handlers IPC overlay\n- Pre Game Coach : ouverture automatique sur Agent Select, fermeture automatique au début de la partie",
+  "publishedAt": "2026-07-18T00:00:00.000Z"
 }

@@ -6,7 +6,7 @@ const cspHeader = [
   `default-src 'self'`,
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   `style-src 'self' 'unsafe-inline'`,
-  `img-src 'self' blob: data:`,
+  `img-src 'self' blob: data: https://cmsassets.rgpub.io https://media.valorant-api.com`,
   `font-src 'self'`,
   `  connect-src 'self' https://api.riotgames.com https://zqiwvdtqoqiuronihxzy.supabase.co`,
   `frame-ancestors 'none'`,

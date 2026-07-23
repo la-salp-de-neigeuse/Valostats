@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export function MatchHistoryEmpty() {
   return (
     <div className="bg-surface border border-slate-800 rounded-3xl p-12 text-center">
@@ -22,16 +20,10 @@ export function MatchHistoryEmpty() {
           <line x1="16" x2="8" y1="17" y2="17" />
         </svg>
       </div>
-      <h2 className="text-xl font-bold text-white mb-2">Aucun match enregistré</h2>
-      <p className="text-slate-400 mb-8 max-w-md mx-auto leading-relaxed">
-        Synchronisez votre compte Riot depuis votre profil pour importer votre historique de matchs.
+      <p className="text-lg text-white mb-2">Aucune partie disponible.</p>
+      <p className="text-slate-400 max-w-md mx-auto leading-relaxed">
+        Jouez un match pour commencer l&apos;analyse.
       </p>
-      <Link
-        href="/profile"
-        className="inline-flex items-center justify-center bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg shadow-accent-glow"
-      >
-        Aller au profil
-      </Link>
     </div>
   );
 }

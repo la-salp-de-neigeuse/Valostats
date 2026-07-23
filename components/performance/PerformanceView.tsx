@@ -42,7 +42,7 @@ export function PerformanceView({
         { label: "Winrate", value: `${metrics.winRate.toFixed(1)}%`, sub: `${metrics.wins}V / ${metrics.losses}D`, color: "text-emerald-500" as const, tooltip: "Pourcentage de parties gagnées" },
         { label: "K/D", value: metrics.kda.toFixed(2), sub: `${metrics.matchCount} matchs`, color: "text-accent" as const, tooltip: "Ratio kills / morts" },
         { label: "ADR", value: metrics.damagePerRound.toFixed(1), sub: "par round", color: "text-sky-500" as const, tooltip: "Dégâts moyens par round" },
-        { label: "HS %", value: `${metrics.headshotRate.toFixed(1)}%`, sub: "précision", color: "text-amber-500" as const, tooltip: "Taux de têtes" },
+        { label: "HS %", value: metrics.headshotRate > 0 ? `${metrics.headshotRate.toFixed(1)}%` : "N/D", sub: metrics.headshotRate > 0 ? "précision" : "Non disponible", color: "text-amber-500" as const, tooltip: "Taux de têtes" },
         { label: "ACS", value: metrics.combatScore.toFixed(0), sub: "score combat", color: "text-purple-500" as const, tooltip: "Score de combat moyen" },
         { label: "Survie", value: `${(metrics.survivalRate * 100).toFixed(1)}%`, sub: "par round", color: "text-cyan-500" as const, tooltip: "Taux de survie par round" },
         { label: "Attaque", value: `${metrics.attackWinRate.toFixed(1)}%`, sub: "winrate", color: "text-indigo-500" as const, tooltip: "Winrate en attaque" },

@@ -1,3 +1,6 @@
+import { debug } from "@/lib/debug";
+import { RIOT_FETCH_TIMEOUT_MS, RIOT_RETRY_COUNT } from "@/constants/limits";
+
 export class RiotApiError extends Error {
   constructor(
     public status: number,
@@ -11,8 +14,6 @@ export class RiotApiError extends Error {
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
-
-import { RIOT_FETCH_TIMEOUT_MS, RIOT_RETRY_COUNT } from "@/constants/limits";
 
 export async function riotFetch(
   url: string,
@@ -88,6 +89,6 @@ export async function riotFetch(
     throw new RiotApiError(response.status, `Erreur API Riot: ${response.statusText}`);
   }
 
-  console.info(`[Riot API] 200 — ${region} ${url.split("?")[0]} (${elapsedMs}ms)`);
+  debug(`[Riot API] 200 — ${region} ${url.split("?")[0]} (${elapsedMs}ms)`);
   return response.json();
 }

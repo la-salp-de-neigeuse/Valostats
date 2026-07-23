@@ -159,6 +159,7 @@ model RiotAccount {
   regionGroup           RiotRegionGroup
   currentRank           String?
   currentRankTier       Int?
+  currentPlayerCardId   String?
   encryptedAccessToken  Bytes?
   encryptedRefreshToken Bytes?
   tokenExpiresAt        DateTime?

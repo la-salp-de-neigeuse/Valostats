@@ -1,10 +1,12 @@
 import { RiotRegionGroup, SyncJobType } from "@prisma/client";
 import { prisma } from "@/lib/prisma/client";
+import { competitiveTierToRank } from "@/lib/valorant/competitive-tiers";
 import { RiotApiError, sleep } from "@/services/riot-api/api-client";
 import { getMatchDetails, getMatchIdsByPuuid } from "@/services/riot-api/match-api";
 import { transformMatch } from "@/services/riot-api/match-transformer";
 import { recalculateGoals } from "@/services/goals/goals-service";
 import { createNotification } from "@/services/notifications/notifications-service";
+import { cacheDelete } from "@/lib/cache/cache-service";
 
 export interface MatchSyncResult {
   matchIdsFound: number;
@@ -88,6 +90,8 @@ export async function syncMatchesForUser(userId: string): Promise<MatchSyncResul
 
   let nextCursor: string | null = riotAccount.syncCursor;
 
+  let firstPlayerCardId: string | null = null;
+
   try {
     const { ids: matchIds, nextCursor: computedCursor } = await collectMatchIds(
       riotAccount.riotPuuid,
@@ -131,6 +135,9 @@ export async function syncMatchesForUser(userId: string): Promise<MatchSyncResul
         const playerStats = playerStatsByPuuid.get(riotAccount.riotPuuid);
 
         if (playerStats) {
+          if (!firstPlayerCardId && playerStats.playerCardId) {
+            firstPlayerCardId = playerStats.playerCardId;
+          }
           try {
             await prisma.playerMatchStats.upsert({
               where: {
@@ -166,6 +173,22 @@ export async function syncMatchesForUser(userId: string): Promise<MatchSyncResul
     const now = new Date();
     const nextSyncAt = new Date(now.getTime() + SYNC_COOLDOWN_MINUTES * 60 * 1000);
 
+    const latestStats = await prisma.playerMatchStats.findFirst({
+      where: { userId, rankTierAtMatch: { not: null } },
+      orderBy: { matchStartedAt: "desc" },
+      select: { rankTierAtMatch: true },
+    });
+    const latestRankTier = latestStats?.rankTierAtMatch;
+    let currentRank: string | undefined;
+    let currentRankTier: number | undefined;
+    if (latestRankTier != null) {
+      currentRank = competitiveTierToRank(latestRankTier);
+      currentRankTier = latestRankTier;
+    } else if (!riotAccount.currentRankTier) {
+      currentRank = "Non classé";
+      currentRankTier = 0;
+    }
+
     await prisma.riotAccount.update({
       where: { userId },
       data: {
@@ -174,6 +197,9 @@ export async function syncMatchesForUser(userId: string): Promise<MatchSyncResul
         syncCursor: nextCursor,
         syncLockUntil: null,
         lastSyncError: result.errors.length > 0 ? result.errors[0] : null,
+        ...(firstPlayerCardId ? { currentPlayerCardId: firstPlayerCardId } : {}),
+        ...(currentRank !== undefined ? { currentRank } : {}),
+        ...(currentRankTier !== undefined ? { currentRankTier } : {}),
       },
     });
 
@@ -209,6 +235,40 @@ export async function syncMatchesForUser(userId: string): Promise<MatchSyncResul
           },
         });
       } catch {
+      }
+    }
+
+    const cacheKeys = [
+      `cache:dashboard:${userId}:v2`,
+      `cache:dashboard:${userId}:heatmap`,
+      `cache:dashboard:${userId}:timeline`,
+      `cache:dashboard:${userId}:activity`,
+      `cache:dashboard:${userId}:goals`,
+      `cache:dashboard:${userId}:rank-evolution`,
+      `cache:dashboard:${userId}:vs-average`,
+      `cache:stats:${userId}:*`,
+      `cache:evolution:${userId}`,
+      `cache:period-compare:${userId}`,
+      `cache:recent-matches:${userId}:*`,
+      `cache:performance:${userId}:*`,
+      `cache:match-history:${userId}:*`,
+    ];
+    for (const key of cacheKeys) {
+      if (key.endsWith(":*")) {
+        try {
+          const { getRedis } = await import("@/lib/redis/client");
+          const client = getRedis();
+          if (client) {
+            const stream = client.scanStream({ match: key, count: 100 });
+            for await (const keys of stream) {
+              if (keys.length > 0) {
+                await client.del(...keys);
+              }
+            }
+          }
+        } catch {}
+      } else {
+        await cacheDelete(key).catch(() => {});
       }
     }
 

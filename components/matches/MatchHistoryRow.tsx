@@ -64,8 +64,16 @@ export function MatchHistoryRow({ match }: { match: MatchHistoryItem }) {
             </p>
           </div>
           <div>
+            <p className="text-xs text-slate-500 mb-1">ACS</p>
+            <p className="font-semibold text-white">{match.combatScore.toFixed(0)}</p>
+          </div>
+          <div>
             <p className="text-xs text-slate-500 mb-1">Score</p>
             <p className="font-semibold text-white">{match.score.toLocaleString("fr-FR")}</p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-500 mb-1">MVP</p>
+            <p className="font-semibold text-white">—</p>
           </div>
           <div>
             <p className="text-xs text-slate-500 mb-1">Durée</p>

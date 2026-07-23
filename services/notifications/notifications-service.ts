@@ -115,8 +115,8 @@ export async function markAsRead(userId: string, notificationId: bigint): Promis
 
   if (updated.count === 0) return null;
 
-  const notification = await prisma.notification.findUnique({
-    where: { id: notificationId },
+  const notification = await prisma.notification.findFirst({
+    where: { id: notificationId, userId },
   });
 
   return notification ? toNotification(notification) : null;

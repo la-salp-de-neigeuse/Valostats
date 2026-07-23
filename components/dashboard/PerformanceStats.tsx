@@ -61,8 +61,8 @@ export function PerformanceStats({ stats }: PerformanceStatsProps) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Headshot"
-            value={`${stats.headshotRate}%`}
-            subtitle="Précision"
+            value={stats.headshotRateAvailable ? `${stats.headshotRate}%` : "N/D"}
+            subtitle={stats.headshotRateAvailable ? "Précision" : "Non disponible"}
             icon={
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="8" r="5" /><path d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2" />

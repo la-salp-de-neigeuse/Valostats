@@ -1,4 +1,5 @@
 import { MatchResult, RiotPlatform, RiotRegionGroup, ValorantQueue } from "@prisma/client";
+import { competitiveTierToRank } from "@/lib/valorant/competitive-tiers";
 import type { RiotMatchDto, RiotMatchPlayerDto, RiotMatchTeamDto } from "@/services/riot-api/match-api";
 
 const QUEUE_ID_TO_ENUM: Record<string, ValorantQueue> = {
@@ -52,7 +53,10 @@ function calcDamagePerRound(player: RiotMatchPlayerDto): number {
   return Math.round((totalDamage / rounds) * 100) / 100;
 }
 
-function calcHeadshotRate(): number {
+function calcHeadshotRate(player: RiotMatchPlayerDto): number {
+  if (player.stats.headshots != null && player.stats.kills > 0) {
+    return Math.round((player.stats.headshots / player.stats.kills) * 10_000) / 100;
+  }
   return 0;
 }
 
@@ -107,6 +111,7 @@ export interface TransformedMatch {
     {
       matchStartedAt: Date;
       agentName: string;
+      playerCardId: string | null;
       mapName: string;
       teamId: string;
       result: MatchResult;
@@ -177,16 +182,17 @@ export function transformMatch(
     playerStatsByPuuid.set(player.subject, {
       matchStartedAt: gameStartedAt,
       agentName: player.characterId,
+      playerCardId: player.playerCard ?? null,
       mapName,
       teamId: player.teamId,
       result: resolveResult(player.teamId, dto.teams),
-      rankAtMatch: null,
+      rankAtMatch: competitiveTierToRank(player.competitiveTier),
       rankTierAtMatch: player.competitiveTier ?? null,
       kills: player.stats.kills,
       deaths: player.stats.deaths,
       assists: player.stats.assists,
       score: player.stats.score,
-      headshotRate: calcHeadshotRate(),
+      headshotRate: calcHeadshotRate(player),
       damagePerRound: calcDamagePerRound(player),
       combatScore: calcCombatScore(player),
       firstBloods: player.firstBloodCount ?? firstBloods,

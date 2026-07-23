@@ -10,6 +10,7 @@ export type SafeRiotAccount = Pick<
   | "regionGroup"
   | "currentRank"
   | "currentRankTier"
+  | "currentPlayerCardId"
   | "connectedAt"
   | "lastSyncAt"
   | "isVerified"
@@ -25,6 +26,7 @@ function toSafeRiotAccount(account: RiotAccount): SafeRiotAccount {
     regionGroup: account.regionGroup,
     currentRank: account.currentRank,
     currentRankTier: account.currentRankTier,
+    currentPlayerCardId: account.currentPlayerCardId,
     connectedAt: account.connectedAt,
     lastSyncAt: account.lastSyncAt,
     isVerified: account.isVerified,
@@ -69,7 +71,7 @@ export async function linkRiotAccount(
 ): Promise<SafeRiotAccount> {
   const regionGroup = PLATFORM_TO_REGION_GROUP[input.platform];
   
-  const fakePuuid = crypto.randomUUID();
+  const placeholderPuuid = `unverified-${crypto.randomUUID()}`;
 
   const account = await prisma.riotAccount.upsert({
     where: { userId },
@@ -81,12 +83,12 @@ export async function linkRiotAccount(
     },
     create: {
       userId,
-      riotPuuid: fakePuuid,
+      riotPuuid: placeholderPuuid,
       gameName: input.gameName,
       tagLine: input.tagLine,
       platform: input.platform,
       regionGroup,
-      currentRank: "Non Classé",
+      currentRank: "Non classé",
       currentRankTier: 0,
       isVerified: false,
     },

@@ -31,6 +31,7 @@ function resizeImage(dataUrl: string, maxSize: number, quality = 0.8): Promise<s
 
 export function ProfileAvatar({ image, name, onAvatarChange, onToast }: ProfileAvatarProps) {
   const [uploading, setUploading] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -84,12 +85,14 @@ export function ProfileAvatar({ image, name, onAvatarChange, onToast }: ProfileA
         className="block rounded-full focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
         aria-label="Modifier l'avatar"
       >
-        {image ? (
+        {image && !imgError ? (
           <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-border">
             <img
+              key={image}
               src={image}
               alt={name || ""}
               className="w-full h-full object-cover"
+              onError={() => setImgError(true)}
             />
           </div>
         ) : (

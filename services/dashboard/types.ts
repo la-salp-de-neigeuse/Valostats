@@ -1,4 +1,5 @@
 import type { DashboardWidgetType } from "@prisma/client";
+import type { DataSource } from "@/lib/cache/cache-service";
 
 export interface WidgetLayout {
   id: string;
@@ -71,4 +72,5 @@ export interface V2DashboardData {
     count: number;
   } | null;
   vsAverage: VsAverage[];
+  source: DataSource;
 }

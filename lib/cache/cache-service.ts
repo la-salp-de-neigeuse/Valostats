@@ -40,3 +40,18 @@ export async function getOrSet<T>(
   await cacheSet(key, value, ttlMs);
   return value;
 }
+
+export type DataSource = "cache" | "riot" | "unavailable";
+
+export async function getOrSetWithSource<T>(
+  key: string,
+  fetch: () => Promise<T>,
+  ttlMs: number,
+): Promise<{ data: T; source: DataSource }> {
+  const cached = await cacheGet<T>(key);
+  if (cached !== null) return { data: cached, source: "cache" };
+
+  const value = await fetch();
+  await cacheSet(key, value, ttlMs);
+  return { data: value, source: "riot" };
+}

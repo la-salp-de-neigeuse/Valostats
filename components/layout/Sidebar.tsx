@@ -62,8 +62,8 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Pages">
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-          const isActive = pathname === href || pathname.startsWith(href + "/");
+        {NAV_ITEMS.map(({ href, label, icon: Icon, matchExact }) => {
+          const isActive = matchExact ? pathname === href : (pathname === href || pathname.startsWith(href + "/"));
           return (
             <Link
               key={href}

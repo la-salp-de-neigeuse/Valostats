@@ -11,7 +11,7 @@ export function generateInsights(input: AnalysisInput): AnalysisResult {
   const score = scoreBreakdown.overall;
   const summary = generateSummary(insights, score, input.stats, profile);
 
-  return { score, summary, insights };
+  return { score, summary, insights, engine: "heuristic" };
 }
 
 export function generateCoachingReport(input: AnalysisInput): CoachingReport {
@@ -29,6 +29,7 @@ export function generateCoachingReport(input: AnalysisInput): CoachingReport {
     score,
     summary,
     insights,
+    engine: "heuristic",
     scoreBreakdown,
     profile,
     strengths,

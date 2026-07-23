@@ -32,9 +32,11 @@ export interface AggregateStats {
   averageAssists: number;
   kdRatio: number;
   headshotRate: number;
+  headshotRateAvailable: boolean;
   damagePerRound: number;
   combatScore: number;
   firstDeathRate: number;
+  firstDeathRateAvailable: boolean;
   attackWinRate: number;
   defenseWinRate: number;
   utilityPerRound: number;
@@ -78,9 +80,11 @@ const EMPTY_AGGREGATE_STATS: AggregateStats = {
   averageAssists: 0,
   kdRatio: 0,
   headshotRate: 0,
+  headshotRateAvailable: false,
   damagePerRound: 0,
   combatScore: 0,
   firstDeathRate: 0,
+  firstDeathRateAvailable: false,
   attackWinRate: 0,
   defenseWinRate: 0,
   utilityPerRound: 0,
@@ -157,9 +161,11 @@ export async function getAggregateStatsByPeriod(
     averageAssists: round(aggregate.assists / totalMatches, 1),
     kdRatio: totalDeaths > 0 ? round(totalKills / totalDeaths, 2) : round(totalKills, 2),
     headshotRate: Number(aggregate.headshotRate),
+    headshotRateAvailable: false,
     damagePerRound: Number(aggregate.damagePerRound),
     combatScore: Number(aggregate.combatScore),
     firstDeathRate: Number(aggregate.firstDeathRate),
+    firstDeathRateAvailable: false,
     attackWinRate: Number(aggregate.attackWinRate),
     defenseWinRate: Number(aggregate.defenseWinRate),
     utilityPerRound: Number(aggregate.utilityPerRound),

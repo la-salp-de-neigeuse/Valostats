@@ -33,8 +33,9 @@ function CustomTooltip({
 export function RecentMatchesChart({ data }: RecentMatchesChartProps) {
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-48 text-slate-500 text-sm">
-        Aucun match récent à afficher
+      <div className="flex flex-col items-center justify-center h-48 text-slate-500 text-sm gap-1 text-center px-4">
+        <span className="font-medium">Aucune partie disponible</span>
+        <span className="text-xs text-slate-600">Jouez un match pour commencer l&apos;analyse.</span>
       </div>
     );
   }

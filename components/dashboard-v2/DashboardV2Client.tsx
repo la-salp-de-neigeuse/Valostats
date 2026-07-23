@@ -5,10 +5,12 @@ import type { WidgetLayout, V2DashboardData } from "@/services/dashboard/types";
 import type { AggregateStats, AgentAggregate, MapAggregate } from "@/services/stats/aggregate-stats-service";
 import type { EvolutionBlock, PeriodComparison as EvolutionPeriodComparison, RecentMatchPoint } from "@/services/stats/evolution-stats-service";
 import type { AnalysisResult } from "@/services/ai/types";
+import type { PlayerInfo } from "@/services/dashboard/player-info-service";
 import { PerformanceStats } from "@/components/dashboard/PerformanceStats";
 import { AgentStats } from "@/components/dashboard/AgentStats";
 import { MapStats } from "@/components/dashboard/MapStats";
 import { DashboardHero } from "@/components/dashboard/DashboardHero";
+import { PlayerInfoCard } from "@/components/dashboard/PlayerInfoCard";
 import { AiScoreCard } from "@/components/ai-coach/AiScoreCard";
 import { WinRateChart } from "@/components/charts/WinRateChart";
 import { KdChart } from "@/components/charts/KdChart";
@@ -38,6 +40,7 @@ interface DashboardV2ClientProps {
   worstMap: string | null;
   premium: boolean;
   hasMatches: boolean;
+  playerInfo: PlayerInfo | null;
   predictionSummary: {
     currentRankLabel: string;
     nextRankLabel: string;
@@ -49,8 +52,19 @@ interface DashboardV2ClientProps {
   } | null;
 }
 
+function AnimatedSection({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  return (
+    <div
+      className={`animate-stagger-fade ${className}`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function WidgetWrapper({
-  widget, children, onDragStart, onDragOver, onDragEnd, onDrop, isDragOver,
+  widget, children, onDragStart, onDragOver, onDragEnd, onDrop, isDragOver, index,
 }: {
   widget: WidgetLayout;
   children: React.ReactNode;
@@ -59,6 +73,7 @@ function WidgetWrapper({
   onDragEnd?: () => void;
   onDrop?: (e: React.DragEvent, w: WidgetLayout) => void;
   isDragOver?: boolean;
+  index: number;
 }) {
   return (
     <div
@@ -67,14 +82,12 @@ function WidgetWrapper({
       onDragOver={onDragOver}
       onDragEnd={onDragEnd}
       onDrop={(e) => onDrop?.(e, widget)}
-      className={`bg-surface border rounded-xl overflow-hidden transition-all duration-200
-        ${isDragOver ? "border-accent/50 shadow-glow ring-1 ring-accent/20" : "border-border/80"}
-        hover:border-border-hover cursor-grab active:cursor-grabbing
-        lg:col-[var(--col)] lg:row-[var(--row)]`}
+      className={`animate-stagger-fade bg-surface border rounded-xl overflow-hidden transition-all duration-300
+        ${isDragOver ? "border-accent/50 shadow-glow ring-1 ring-accent/20 scale-[1.02]" : "border-border/80"}
+        hover:border-border-hover hover:shadow-sm cursor-grab active:cursor-grabbing`}
       style={{
-        "--col": `span ${widget.width}`,
-        "--row": `span ${widget.height}`,
-      } as React.CSSProperties}
+        animationDelay: `${400 + index * 80}ms`,
+      }}
     >
       {children}
     </div>
@@ -84,7 +97,7 @@ function WidgetWrapper({
 export function DashboardV2Client({
   initialLayout, v2Data, stats, agents, maps, evolutionBlocks,
   periodComparison, recentMatches, analysis, bestMap, worstMap,
-  premium, hasMatches, predictionSummary,
+  premium, hasMatches, playerInfo, predictionSummary,
 }: DashboardV2ClientProps) {
   const [layout, setLayout] = useState<WidgetLayout[]>(initialLayout);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
@@ -203,43 +216,61 @@ export function DashboardV2Client({
   }
 
   if (!hasMatches) {
-    return <LegacyDashboardShell stats={stats} analysis={analysis} agents={agents} maps={maps} bestMap={bestMap} worstMap={worstMap} />;
+    return <LegacyDashboardShell stats={stats} analysis={analysis} agents={agents} maps={maps} bestMap={bestMap} worstMap={worstMap} playerInfo={playerInfo} />;
   }
 
-  return (
-    <div className="max-w-7xl mx-auto space-y-7">
-      <DashboardHero title="Dashboard" description="Aperçu complet de vos performances Valorant.">
-        <Button
-          onClick={handleSave}
-          isLoading={saving}
-          variant="secondary"
-          size="sm"
-          leftIcon={
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-              <polyline points="17 21 17 13 7 13 7 21" />
-              <polyline points="7 3 7 8 15 8" />
-            </svg>
-          }
-        >
-          Sauvegarder
-        </Button>
-      </DashboardHero>
+  const sortedLayout = layout.filter((w) => w.visible);
 
-      <PerformanceStats stats={stats} />
+  return (
+    <div className="max-w-7xl mx-auto space-y-6">
+      <AnimatedSection delay={0}>
+        <DashboardHero title="Dashboard" description="Aperçu complet de vos performances Valorant.">
+          {sortedLayout.length > 0 && (
+            <Button
+              onClick={handleSave}
+              isLoading={saving}
+              variant="secondary"
+              size="sm"
+              leftIcon={
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </svg>
+              }
+            >
+              Sauvegarder
+            </Button>
+          )}
+        </DashboardHero>
+      </AnimatedSection>
+
+      {playerInfo && (
+        <AnimatedSection delay={80}>
+          <PlayerInfoCard data={playerInfo} />
+        </AnimatedSection>
+      )}
+
+      <AnimatedSection delay={100}>
+        <PerformanceStats stats={stats} />
+      </AnimatedSection>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <AgentStats agents={agents} />
-        <MapStats maps={maps} bestMap={bestMap} worstMap={worstMap} />
+        <AnimatedSection delay={200}>
+          <AgentStats agents={agents} />
+        </AnimatedSection>
+        <AnimatedSection delay={250}>
+          <MapStats maps={maps} bestMap={bestMap} worstMap={worstMap} />
+        </AnimatedSection>
       </div>
 
-      <div className="flex flex-col lg:grid lg:grid-cols-4 gap-5 auto-rows-min">
-        {layout
-          .filter((w) => w.visible)
-          .map((w) => (
+      {sortedLayout.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 auto-rows-min">
+          {sortedLayout.map((w, i) => (
             <WidgetWrapper
               key={w.id}
               widget={w}
+              index={i}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDragEnd={() => setDragOverId(null)}
@@ -249,12 +280,15 @@ export function DashboardV2Client({
               <WidgetContent widget={w} />
             </WidgetWrapper>
           ))}
-      </div>
+        </div>
+      )}
 
       {predictionSummary && (
-        <div className="bg-surface border border-border/80 rounded-xl overflow-hidden max-w-md">
-          <PredictionWidget data={predictionSummary} />
-        </div>
+        <AnimatedSection delay={500} className="bg-surface border border-border/80 rounded-xl overflow-hidden">
+          <div className="max-w-md">
+            <PredictionWidget data={predictionSummary} />
+          </div>
+        </AnimatedSection>
       )}
     </div>
   );
@@ -269,7 +303,7 @@ function WidgetHeader({ title }: { title: string }) {
 }
 
 function LegacyDashboardShell({
-  stats, analysis, agents, maps, bestMap, worstMap,
+  stats, analysis, agents, maps, bestMap, worstMap, playerInfo,
 }: {
   stats: AggregateStats;
   analysis: AnalysisResult | null;
@@ -277,21 +311,40 @@ function LegacyDashboardShell({
   maps: MapAggregate[];
   bestMap: string | null;
   worstMap: string | null;
+  playerInfo: PlayerInfo | null;
 }) {
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <DashboardHero title="Dashboard" description="Aperçu de vos performances Valorant." />
-      <PerformanceStats stats={stats} />
-      {analysis && (
-        <div className="bg-surface border border-border/80 rounded-xl overflow-hidden">
-          <AiScoreCard score={analysis.score} summary={analysis.summary} />
-        </div>
+    <div className="max-w-6xl mx-auto space-y-6">
+      <AnimatedSection delay={0}>
+        <DashboardHero title="Dashboard" description="Aperçu de vos performances Valorant." />
+      </AnimatedSection>
+
+      {playerInfo && (
+        <AnimatedSection delay={80}>
+          <PlayerInfoCard data={playerInfo} />
+        </AnimatedSection>
       )}
+
+      <AnimatedSection delay={100}>
+        <PerformanceStats stats={stats} />
+      </AnimatedSection>
+
+      {analysis && (
+        <AnimatedSection delay={150}>
+          <div className="bg-surface border border-border/80 rounded-xl overflow-hidden">
+            <AiScoreCard score={analysis.score} summary={analysis.summary} />
+          </div>
+        </AnimatedSection>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <AgentStats agents={agents} />
-        <MapStats maps={maps} bestMap={bestMap} worstMap={worstMap} />
+        <AnimatedSection delay={200}>
+          <AgentStats agents={agents} />
+        </AnimatedSection>
+        <AnimatedSection delay={250}>
+          <MapStats maps={maps} bestMap={bestMap} worstMap={worstMap} />
+        </AnimatedSection>
       </div>
     </div>
   );
 }
-

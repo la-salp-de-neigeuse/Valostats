@@ -101,8 +101,11 @@ export interface CoachingReport extends AnalysisResult {
   goals: CoachingGoal[];
 }
 
+export type AnalysisEngine = "llm" | "heuristic";
+
 export interface AnalysisResult {
   score: number;
   summary: string;
   insights: Insight[];
+  engine: AnalysisEngine;
 }

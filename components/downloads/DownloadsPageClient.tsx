@@ -92,8 +92,9 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
 ];
 
 export function DownloadsPageClient() {
-  const [downloadUrl, setDownloadUrl] = useState("/downloads/ValoStats-Setup-1.0.1.exe");
-  const [filename, setFilename] = useState("ValoStats-Setup-1.0.1.exe");
+  const [downloadUrl, setDownloadUrl] = useState("");
+  const [filename, setFilename] = useState("");
+  const [version, setVersion] = useState("");
 
   useEffect(() => {
     fetch("/api/download")
@@ -101,6 +102,7 @@ export function DownloadsPageClient() {
       .then((data) => {
         if (data.url) setDownloadUrl(data.url);
         if (data.filename) setFilename(data.filename);
+        if (data.version) setVersion(data.version);
       })
       .catch(() => {});
   }, []);
@@ -158,7 +160,7 @@ export function DownloadsPageClient() {
                   className="inline-flex items-center gap-3 bg-accent hover:bg-accent-hover text-white font-bold text-lg px-8 py-4 rounded-xl transition-all duration-200 hover-scale shadow-glow hover:shadow-glow"
                 >
                   <ArrowDownIcon />
-                  Télécharger ValoStats Companion
+                  Télécharger{version ? ` v${version}` : ""} ValoStats Companion
                 </a>
 
                 <div className="flex items-center gap-3">
@@ -179,7 +181,7 @@ export function DownloadsPageClient() {
             <div className="md:col-span-2 space-y-3">
               <Card className="text-center space-y-1.5">
                 <p className="text-xs text-text-muted uppercase tracking-wider font-semibold">Version</p>
-                <p className="text-lg font-bold text-text-primary">v1.0.1</p>
+                <p className="text-lg font-bold text-text-primary">{version ? `v${version}` : "—"}</p>
               </Card>
 
               <Card className="space-y-2">

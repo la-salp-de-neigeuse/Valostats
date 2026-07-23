@@ -57,7 +57,6 @@ export function PresetsPageClient({ initialPresets, compact }: { initialPresets:
     const link = `${baseUrl}/overlay/preset/${preset.id}`;
     try {
       await navigator.clipboard.writeText(link);
-      setTimeout(() => {}, 2000);
     } catch {
       prompt("Copiez ce lien :", link);
     }

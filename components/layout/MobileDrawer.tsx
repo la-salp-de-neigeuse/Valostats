@@ -135,7 +135,7 @@ export function MobileDrawer() {
         </div>
         <nav className="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-5rem)]" aria-label="Navigation principale">
           {NAV_ITEMS.map((item) => {
-            const isActive = pathname.startsWith(item.href)
+            const isActive = item.matchExact ? pathname === item.href : pathname.startsWith(item.href)
             return (
               <Link
                 key={item.href}

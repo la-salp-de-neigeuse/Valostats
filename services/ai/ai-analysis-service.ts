@@ -7,7 +7,7 @@ import { InsightCategory, InsightSeverity } from "./types";
 import { AI_ANALYSIS_CACHE_TTL_MS } from "@/constants/ai";
 import { PROMPT_VERSION } from "@/services/ai/prompt-builder";
 import { analysisInputToLLMInput, llmToAnalysisResult, llmToCoachingReport } from "@/services/ai/llm/converter";
-import type { AnalysisInput, AnalysisResult, CoachingReport } from "./types";
+import type { AnalysisInput, AnalysisResult, CoachingReport, AnalysisEngine } from "./types";
 import type { LLMAnalysisResult } from "@/services/ai/llm/types";
 import { createNotification } from "@/services/notifications/notifications-service";
 import { getProvider } from "@/services/ai/llm/llm-client";
@@ -59,7 +59,7 @@ async function tryLlm(
       promptVersion: PROMPT_VERSION,
     };
 
-    const result = llmToAnalysisResult(llmResult);
+    const result = llmToAnalysisResult(llmResult, input);
 
     return { result, meta, rawResult: llmResult, generationTimeMs };
   } catch {
@@ -315,7 +315,7 @@ export async function runAiAnalysis(userId: string, aggregateId: bigint): Promis
 
     const cached = await checkCache(userId, inputHash, llmMeta);
     if (cached) {
-      return { score: cached.score, summary: cached.summary, insights: cached.insights };
+      return { score: cached.score, summary: cached.summary, insights: cached.insights, engine: "llm" };
     }
 
     const llmResult = await tryLlm(input, playerName, currentRank);
@@ -368,9 +368,9 @@ export async function runAiAnalysis(userId: string, aggregateId: bigint): Promis
 
   const heuristicResult = await runHeuristic(input);
 
-  const cached = await checkCache(userId, inputHash, heuristicResult.meta);
-  if (cached) {
-    return { score: cached.score, summary: cached.summary, insights: cached.insights };
+  const cachedHeuristic = await checkCache(userId, inputHash, heuristicResult.meta);
+  if (cachedHeuristic) {
+    return { score: cachedHeuristic.score, summary: cachedHeuristic.summary, insights: cachedHeuristic.insights, engine: "heuristic" };
   }
 
   await storeResult(
@@ -439,6 +439,7 @@ export async function getLatestAnalysis(userId: string) {
       solution: insight.solution,
       evidence: insight.evidence as Record<string, unknown>,
     })),
+    engine: (analysis.provider === "RULE_BASED" ? "heuristic" : "llm") as AnalysisEngine,
     createdAt: analysis.createdAt,
     provider: analysis.provider,
     modelName: analysis.modelName,

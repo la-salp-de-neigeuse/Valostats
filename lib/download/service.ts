@@ -1,31 +1,25 @@
-import { DownloadSource, DownloadInfo, DownloadSourceConfig } from "./types";
+import { DownloadSource, DownloadInfo } from "./types";
 import { GitHubSource } from "./sources/GitHubSource";
 import { S3Source } from "./sources/S3Source";
 import { LocalSource } from "./sources/LocalSource";
 
 /**
- * DownloadService
- *
- * Singleton central qui sélectionne automatiquement la source
- * de téléchargement active et fournit une API unifiée.
- *
- * Ordre de sélection de la source:
- *   1. Variables d'environnement (DOWNLOAD_SOURCE, GITHUB_OWNER, etc.)
- *   2. Fichier de configuration download.config.json à la racine
- *   3. Fallback vers la source locale (public/downloads/)
- *
- * Usage côté serveur:
- *   import { downloadService } from "@/lib/download";
- *   const info = await downloadService.getLatestDownload();
- *
- * Changement de source (ex: de local vers GitHub Releases):
- *   Dans le .env:
- *     DOWNLOAD_SOURCE=github
- *     GITHUB_OWNER=valostats
- *     GITHUB_REPO=valostats-companion
- *
- * Aucune modification du frontend nécessaire.
+ * Tente de lire la version depuis valostats-companion/package.json.
+ * Utile comme ultime fallback quand aucune source n'est disponible.
  */
+function readCompanionVersion(): string | null {
+  try {
+    const { readFileSync, existsSync } = require("fs");
+    const { join } = require("path");
+    const pkgPath = join(process.cwd(), "..", "valostats-companion", "package.json");
+    if (!existsSync(pkgPath)) return null;
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
+    return pkg.version || null;
+  } catch {
+    return null;
+  }
+}
+
 export class DownloadService {
   private source: DownloadSource | null = null;
   private initialized = false;
@@ -75,27 +69,30 @@ export class DownloadService {
   }
 
   private async selectSource(): Promise<DownloadSource> {
-    const envSource = process.env.DOWNLOAD_SOURCE;
-
     // 0. DOWNLOAD_URL prime sur tout — permet de définir une URL directe
     if (process.env.DOWNLOAD_URL) {
       return this.createUrlSource();
     }
 
-    // 1. Source GitHub
-    if (envSource === "github" || process.env.GITHUB_OWNER) {
-      const source = new GitHubSource();
-      await source.init({
-        name: "github",
-        owner: process.env.GITHUB_OWNER || "",
-        repo: process.env.GITHUB_REPO || "valostats-companion",
-        token: process.env.GH_PAT || "",
-      });
-      return source;
+    // 1. Essayer GitHub en premier si configuré
+    if (process.env.GITHUB_OWNER && process.env.GITHUB_REPO) {
+      try {
+        const source = new GitHubSource();
+        await source.init({
+          name: "github",
+          owner: process.env.GITHUB_OWNER,
+          repo: process.env.GITHUB_REPO,
+          token: process.env.GH_PAT || "",
+        });
+        const healthy = await source.healthCheck();
+        if (healthy) return source;
+      } catch {
+        // GitHub indisponible → fallback
+      }
     }
 
     // 2. Source S3
-    if (envSource === "s3" || process.env.S3_BASE_URL) {
+    if (process.env.DOWNLOAD_SOURCE === "s3" || process.env.S3_BASE_URL) {
       const source = new S3Source();
       await source.init({
         name: "s3",
@@ -123,14 +120,15 @@ export class DownloadService {
     await source.init({
       name: "local",
       downloadsDir: process.env.LOCAL_DOWNLOADS_DIR || "public/downloads",
+      fallbackVersion: readCompanionVersion() || undefined,
     });
     return source;
   }
 
   private createUrlSource(): DownloadSource {
     const url = process.env.DOWNLOAD_URL!;
-    const filename = process.env.DOWNLOAD_FILENAME || url.split("/").pop() || "ValoStats-Setup-1.0.0.exe";
-    const version = process.env.DOWNLOAD_VERSION || "1.0.0";
+    const filename = process.env.DOWNLOAD_FILENAME || url.split("/").pop() || "";
+    const version = process.env.DOWNLOAD_VERSION || readCompanionVersion() || "";
     const size = parseInt(process.env.DOWNLOAD_SIZE || "86000000", 10);
 
     return {
@@ -185,6 +183,7 @@ export class DownloadService {
         await source.init({
           name: "local",
           downloadsDir: String(config.downloadsDir || "public/downloads"),
+          fallbackVersion: readCompanionVersion() || undefined,
         });
         return source;
       }

@@ -74,6 +74,17 @@ function DownloadsIcon(props: SVGProps<SVGSVGElement>) {
   )
 }
 
+function NewsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg aria-hidden="true" {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0V6" />
+      <path d="M12 7h4" />
+      <path d="M12 11h4" />
+      <path d="M8 15h8" />
+    </svg>
+  )
+}
+
 function PredictionIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg aria-hidden="true" {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -105,6 +116,7 @@ export interface NavItem {
   href: string
   label: string
   icon: FC<SVGProps<SVGSVGElement>>
+  matchExact?: boolean
 }
 
 export interface AboutItem {
@@ -117,11 +129,13 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/matches', label: 'Matchs', icon: MatchesIcon },
   { href: '/leaderboard', label: 'Classement', icon: LeaderboardIcon },
   { href: '/ai-coach', label: 'Coach IA', icon: CoachIcon },
+  { href: '/news', label: 'Actualités', icon: NewsIcon },
   { href: '/prediction', label: 'Prédiction', icon: PredictionIcon },
   { href: '/goals', label: 'Objectifs', icon: GoalsIcon },
   { href: '/overlay', label: 'Overlay', icon: OverlayIcon },
   { href: '/downloads', label: 'Téléchargements', icon: DownloadsIcon },
-  { href: '/profile', label: 'Profil', icon: ProfileIcon },
+  { href: '/profile/stats', label: 'Profil', icon: ProfileIcon },
+  { href: '/profile', label: 'Compte', icon: ProfileIcon, matchExact: true },
   { href: '/settings', label: 'Paramètres', icon: SettingsIcon },
 ]
 
