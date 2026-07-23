@@ -6,7 +6,7 @@ const cspHeader = [
   `default-src 'self'`,
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   `style-src 'self' 'unsafe-inline'`,
-  `img-src 'self' blob: data: https://cmsassets.rgpub.io https://media.valorant-api.com https://cmsassets.content.gg https://playvalorant.com`,
+  `img-src 'self' blob: data: https:`,
   `font-src 'self'`,
   `connect-src 'self' https://api.riotgames.com https://zqiwvdtqoqiuronihxzy.supabase.co`,
   `frame-ancestors 'none'`,
@@ -22,11 +22,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 
   images: {
+    unoptimized: true,
     remotePatterns: [
-      { protocol: "https", hostname: "media.valorant-api.com" },
-      { protocol: "https", hostname: "cmsassets.rgpub.io" },
-      { protocol: "https", hostname: "cmsassets.content.gg" },
-      { protocol: "https", hostname: "playvalorant.com" },
+      { protocol: "https", hostname: "**" },
     ],
   },
 
